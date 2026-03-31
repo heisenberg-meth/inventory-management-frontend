@@ -22,8 +22,8 @@ import { Settings } from "./screens/Settings";
 import { ActivityLog } from "./screens/ActivityLog";
 import { Invoices } from "./screens/Invoices";
 import { NotFound, AccessDenied } from "./screens/ErrorPages";
-import { ComingSoon } from "./screens/ComingSoon";
 import { PaymentsReceived } from "./screens/PaymentsReceived";
+import { Bills } from "./screens/Bills";
 import { CompositeItems } from "./screens/CompositeItems";
 import { AIDashboard } from "./screens/AIDashboard";
 import { Analytics } from "./screens/Analytics";
@@ -69,7 +69,7 @@ export const router = createBrowserRouter([
       // Purchases
       { path: "suppliers", Component: Suppliers },
       { path: "purchase-orders", Component: PurchaseOrders },
-      { path: "bills", element: <ComingSoon title="Bills" /> },
+      { path: "bills", Component: Bills },
 
       // Reports
       { path: "reports", Component: ReportsDashboard },
