@@ -5,7 +5,6 @@ import { HomeDashboard } from "./screens/HomeDashboard";
 import { ProductManagement } from "./screens/ProductManagement";
 import { StockManagement } from "./screens/StockManagement";
 import { PlatformDashboard } from "./screens/PlatformDashboard";
-import { Navigate } from "react-router";
 
 // New screens
 import { Categories } from "./screens/Categories";
@@ -30,11 +29,12 @@ import { Analytics } from "./screens/Analytics";
 import { PriceLists } from "./screens/PriceLists";
 import { StockTransfers } from "./screens/StockTransfers";
 import { Shipments } from "./screens/Shipments";
+import { LandingPage } from "./screens/Landingpage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/login" replace />,
+    element: <LandingPage />,
   },
   {
     path: "/login",
