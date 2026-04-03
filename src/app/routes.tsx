@@ -1,128 +1,47 @@
-import { createBrowserRouter } from "react-router";
-import { Layout } from "./components/Layout";
-import { LoginScreen } from "./screens/LoginScreen";
-import { HomeDashboard } from "./screens/HomeDashboard";
-import { ProductManagement } from "./screens/ProductManagement";
-import { StockManagement } from "./screens/StockManagement";
-import { PlatformDashboard } from "./screens/PlatformDashboard";
+import { lazy } from "react";
 
-// New screens
-import { Categories } from "./screens/Categories";
-import { Brands } from "./screens/Brands";
-import { Warehouses } from "./screens/Warehouses";
-import { LowStockAlerts } from "./screens/LowStockAlerts";
-import { PurchaseOrders } from "./screens/PurchaseOrders";
-import { Suppliers } from "./screens/Suppliers";
-import { Customers } from "./screens/Customers";
-import { SalesOrders } from "./screens/SalesOrders";
-import { ReportsDashboard } from "./screens/ReportsDashboard";
-import { UsersRoles } from "./screens/UsersRoles";
-import { Settings } from "./screens/Settings";
-import { ActivityLog } from "./screens/ActivityLog";
-import { Invoices } from "./screens/Invoices";
-import { NotFound, AccessDenied } from "./screens/ErrorPages";
-import { PaymentsReceived } from "./screens/PaymentsReceived";
-import { Bills } from "./screens/Bills";
-import { CompositeItems } from "./screens/CompositeItems";
-import { AIDashboard } from "./screens/AIDashboard";
-import { Analytics } from "./screens/Analytics";
-import { PriceLists } from "./screens/PriceLists";
-import { StockTransfers } from "./screens/StockTransfers";
-import { Shipments } from "./screens/Shipments";
-import { LandingPage } from "./screens/Landingpage";
-import { PortalSelection } from "./screens/PortalSelection";
+// Lazy-loaded common screens
+export const LandingPage = lazy(() => import("./screens/Landingpage").then(m => ({ default: m.LandingPage })));
+export const LoginScreen = lazy(() => import("./screens/LoginScreen").then(m => ({ default: m.LoginScreen })));
+export const PortalSelection = lazy(() => import("./screens/PortalSelection").then(m => ({ default: m.PortalSelection })));
 
-import { PlatformAdminLayout } from "./platform-admin/PlatformAdminLayout";
-import { Subscriptions } from "./platform-admin/screens/Subscriptions";
-import { GlobalDashboard } from "./platform-admin/screens/GlobalDashboard";
-import { Tenants } from "./platform-admin/screens/Tenants";
-import { TenantUsers } from "./platform-admin/screens/TenantUsers";
-import { PlatformAdmins } from "./platform-admin/screens/PlatformAdmins";
-import { Payments } from "./platform-admin/screens/Payments";
-import { TenantProfile } from "./platform-admin/screens/TenantProfile";
-import { SupportTickets } from './platform-admin/screens/SupportTickets';
-import { AuditLogs } from './platform-admin/screens/AuditLogs';
-import { PlatformReports } from './platform-admin/screens/PlatformReports';
+// Lazy-loaded Tenant screens
+export const HomeDashboard = lazy(() => import("./screens/HomeDashboard").then(m => ({ default: m.HomeDashboard })));
+export const AIDashboard = lazy(() => import("./screens/AIDashboard").then(m => ({ default: m.AIDashboard })));
+export const Analytics = lazy(() => import("./screens/Analytics").then(m => ({ default: m.Analytics })));
+export const ProductManagement = lazy(() => import("./screens/ProductManagement").then(m => ({ default: m.ProductManagement })));
+export const Categories = lazy(() => import("./screens/Categories").then(m => ({ default: m.Categories })));
+export const Brands = lazy(() => import("./screens/Brands").then(m => ({ default: m.Brands })));
+export const CompositeItems = lazy(() => import("./screens/CompositeItems").then(m => ({ default: m.CompositeItems })));
+export const PriceLists = lazy(() => import("./screens/PriceLists").then(m => ({ default: m.PriceLists })));
+export const StockManagement = lazy(() => import("./screens/StockManagement").then(m => ({ default: m.StockManagement })));
+export const Warehouses = lazy(() => import("./screens/Warehouses").then(m => ({ default: m.Warehouses })));
+export const StockTransfers = lazy(() => import("./screens/StockTransfers").then(m => ({ default: m.StockTransfers })));
+export const LowStockAlerts = lazy(() => import("./screens/LowStockAlerts").then(m => ({ default: m.LowStockAlerts })));
+export const Shipments = lazy(() => import("./screens/Shipments").then(m => ({ default: m.Shipments })));
+export const Customers = lazy(() => import("./screens/Customers").then(m => ({ default: m.Customers })));
+export const SalesOrders = lazy(() => import("./screens/SalesOrders").then(m => ({ default: m.SalesOrders })));
+export const Invoices = lazy(() => import("./screens/Invoices").then(m => ({ default: m.Invoices })));
+export const PaymentsReceived = lazy(() => import("./screens/PaymentsReceived").then(m => ({ default: m.PaymentsReceived })));
+export const Suppliers = lazy(() => import("./screens/Suppliers").then(m => ({ default: m.Suppliers })));
+export const PurchaseOrders = lazy(() => import("./screens/PurchaseOrders").then(m => ({ default: m.PurchaseOrders })));
+export const Bills = lazy(() => import("./screens/Bills").then(m => ({ default: m.Bills })));
+export const ReportsDashboard = lazy(() => import("./screens/ReportsDashboard").then(m => ({ default: m.ReportsDashboard })));
+export const ActivityLog = lazy(() => import("./screens/ActivityLog").then(m => ({ default: m.ActivityLog })));
+export const UsersRoles = lazy(() => import("./screens/UsersRoles").then(m => ({ default: m.UsersRoles })));
+export const Settings = lazy(() => import("./screens/Settings").then(m => ({ default: m.Settings })));
+export const PlatformDashboard = lazy(() => import("./screens/PlatformDashboard").then(m => ({ default: m.PlatformDashboard })));
+export const NotFound = lazy(() => import("./screens/ErrorPages").then(m => ({ default: m.NotFound })));
+export const AccessDenied = lazy(() => import("./screens/ErrorPages").then(m => ({ default: m.AccessDenied })));
 
-export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <LandingPage />,
-  },
-  {
-    path: "/login",
-    Component: LoginScreen,
-  },
-  {
-    path: "/portal",
-    Component: PortalSelection,
-  },
-  {
-    path: "/admin",
-    Component: PlatformAdminLayout,
-    children: [
-      { index: true, element: <GlobalDashboard /> },
-      { path: "dashboard", element: <GlobalDashboard /> },
-      { path: "tenants", element: <Tenants /> },
-      { path: "tenants/:id", element: <TenantProfile /> },
-      { path: "tenant-users", element: <TenantUsers /> },
-      { path: "platform-admins", element: <PlatformAdmins /> },
-      { path: "payments", element: <Payments /> },
-      { path: "subscriptions", element: <Subscriptions /> },
-      { path: "audit-logs", element: <AuditLogs /> },
-      { path: "reports", element: <PlatformReports /> },
-      { path: "support", element: <SupportTickets /> },
-    ],
-  },
-  {
-    path: "/app",
-    Component: Layout,
-    children: [
-      { index: true, Component: HomeDashboard },
-
-      // Products
-      { path: "products", Component: ProductManagement },
-      { path: "categories", Component: Categories },
-      { path: "item-groups", element: <Brands /> },
-      { path: "composite", Component: CompositeItems },
-      { path: "price-lists", Component: PriceLists },
-
-      // Inventory / Stock
-      { path: "stock", Component: StockManagement },
-      { path: "warehouses", Component: Warehouses },
-      { path: "transfers", Component: StockTransfers },
-      { path: "alerts", Component: LowStockAlerts },
-
-      // Sales
-      { path: "customers", Component: Customers },
-      { path: "orders", Component: SalesOrders },
-      { path: "shipments", Component: Shipments },
-      { path: "invoices", Component: Invoices },
-      { path: "payments", Component: PaymentsReceived },
-
-      // Purchases
-      { path: "suppliers", Component: Suppliers },
-      { path: "purchase-orders", Component: PurchaseOrders },
-      { path: "bills", Component: Bills },
-
-      // Reports
-      { path: "reports", Component: ReportsDashboard },
-      { path: "activity", Component: ActivityLog },
-
-      // Users & Settings
-      { path: "users", Component: UsersRoles },
-      { path: "settings", Component: Settings },
-
-      // Platform
-      { path: "platform", Component: PlatformDashboard },
-      { path: "ai", Component: AIDashboard },
-      { path: "analytics", Component: Analytics },
-
-      // Error pages
-      { path: "access-denied", Component: AccessDenied },
-
-      // Catch-all
-      { path: "*", Component: NotFound },
-    ],
-  },
-]);
+// Lazy-loaded Platform Admin screens
+export const GlobalDashboard = lazy(() => import("./platform-admin/screens/GlobalDashboard").then(m => ({ default: m.GlobalDashboard })));
+export const Tenants = lazy(() => import("./platform-admin/screens/Tenants").then(m => ({ default: m.Tenants })));
+export const TenantProfile = lazy(() => import("./platform-admin/screens/TenantProfile").then(m => ({ default: m.TenantProfile })));
+export const TenantUsers = lazy(() => import("./platform-admin/screens/TenantUsers").then(m => ({ default: m.TenantUsers })));
+export const PlatformAdmins = lazy(() => import("./platform-admin/screens/PlatformAdmins").then(m => ({ default: m.PlatformAdmins })));
+export const Payments = lazy(() => import("./platform-admin/screens/Payments").then(m => ({ default: m.Payments })));
+export const Subscriptions = lazy(() => import("./platform-admin/screens/Subscriptions").then(m => ({ default: m.Subscriptions })));
+export const AuditLogs = lazy(() => import("./platform-admin/screens/AuditLogs").then(m => ({ default: m.AuditLogs })));
+export const PlatformReports = lazy(() => import("./platform-admin/screens/PlatformReports").then(m => ({ default: m.PlatformReports })));
+export const SupportTickets = lazy(() => import("./platform-admin/screens/SupportTickets").then(m => ({ default: m.SupportTickets })));

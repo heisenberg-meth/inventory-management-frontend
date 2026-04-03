@@ -125,7 +125,7 @@ export const ReportsDashboard: React.FC = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
               <XAxis dataKey="month" tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={v => `₹${(v / 1000).toFixed(0)}K`} />
-              <Tooltip {...CHART_TOOLTIP_STYLE} formatter={(v: number | string) => [`₹${Number(v).toLocaleString()}`, 'Sales']} />
+              <Tooltip {...CHART_TOOLTIP_STYLE} formatter={(v) => [`₹${Number(v).toLocaleString()}`, 'Sales']} />
               <Area type="monotone" dataKey="sales" stroke="var(--color-mint)" fill="rgba(29,185,122,0.12)" strokeWidth={2} />
               <Area type="monotone" dataKey="purchases" stroke="var(--color-info)" fill="rgba(56,189,248,0.12)" strokeWidth={2} />
             </AreaChart>
@@ -140,7 +140,7 @@ export const ReportsDashboard: React.FC = () => {
               <Pie data={categoryData} cx="50%" cy="50%" innerRadius={52} outerRadius={80} paddingAngle={2} dataKey="value">
                 {categoryData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
               </Pie>
-              <Tooltip {...CHART_TOOLTIP_STYLE} formatter={(v: number | string) => [`${v}%`, 'Value']} />
+              <Tooltip {...CHART_TOOLTIP_STYLE} formatter={(v) => [`${v}%`, 'Value']} />
             </PieChart>
           </ResponsiveContainer>
           <div className="space-y-2 mt-2">
@@ -182,7 +182,7 @@ export const ReportsDashboard: React.FC = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
               <XAxis dataKey="month" tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={v => `₹${(v / 1000).toFixed(0)}K`} />
-              <Tooltip {...CHART_TOOLTIP_STYLE} formatter={(v: number | string) => [`₹${Number(v).toLocaleString()}`, 'Profit']} />
+              <Tooltip {...CHART_TOOLTIP_STYLE} formatter={(v) => [`₹${Number(v).toLocaleString()}`, 'Profit']} />
               <Line type="monotone" dataKey="profit" stroke="var(--color-warning)" strokeWidth={2.5} dot={{ fill: 'var(--color-warning)', r: 4 }} activeDot={{ r: 6 }} />
             </LineChart>
           </ResponsiveContainer>

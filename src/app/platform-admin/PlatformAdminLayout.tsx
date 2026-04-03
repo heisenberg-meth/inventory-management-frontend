@@ -5,6 +5,8 @@ import {
   Wallet, FileText, BarChart3, LifeBuoy, LogOut, Search, Bell, 
   Sun, Moon, Menu
 } from 'lucide-react';
+import { Suspense } from 'react';
+import { PageLoader } from '../components/PageLoader';
 import '../../styles/platform-admin.css';
 
 interface NavItem {
@@ -194,7 +196,9 @@ export const PlatformAdminLayout: React.FC = () => {
 
         {/* Page Container */}
         <main className="flex-1 overflow-y-auto bg-[var(--pa-page-bg)] p-8 lg:p-10 transition-colors duration-300">
-           <Outlet />
+           <Suspense fallback={<PageLoader />}>
+             <Outlet />
+           </Suspense>
         </main>
       </div>
     </div>

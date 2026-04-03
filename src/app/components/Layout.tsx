@@ -6,6 +6,8 @@ import {
   Home, Package, Grid3x3, ShoppingBag, ShoppingCart, BarChart3, Settings,
   Building, Bell as BellIcon, CreditCard, Globe
 } from 'lucide-react';
+import { Suspense } from 'react';
+import { PageLoader } from './PageLoader';
 
 interface NavItem {
   icon?: React.ElementType; // Optional icon for sub-items
@@ -140,7 +142,6 @@ export const Layout: React.FC = () => {
       section.items.some(item => isActive(item.path))
     );
     if (currentSection && currentSection.title !== expandedSection) {
-      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       setExpandedSection(currentSection.title);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -524,7 +525,9 @@ export const Layout: React.FC = () => {
 
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto bg-[var(--color-primary-bg)]">
-          <Outlet />
+          <Suspense fallback={<PageLoader />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

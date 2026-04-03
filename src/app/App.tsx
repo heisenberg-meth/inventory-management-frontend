@@ -1,5 +1,5 @@
 import { RouterProvider } from 'react-router';
-import { router } from './routes';
+import { router } from './router';
 
 // Initialize theme before React renders to avoid flash
 const saved = localStorage.getItem('ims-theme');
