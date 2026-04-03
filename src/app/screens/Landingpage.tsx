@@ -370,6 +370,18 @@ export function LandingPage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Handle dark mode by toggling class on html root
+  useEffect(() => {
+    const html = document.documentElement;
+    if (isDark) {
+      html.classList.add('dark');
+      html.classList.remove('light');
+    } else {
+      html.classList.remove('dark');
+      html.classList.add('light');
+    }
+  }, [isDark]);
+
   const scrollTo = (id: string) => {
     setMobileMenuOpen(false);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
