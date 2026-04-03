@@ -27,8 +27,10 @@ export const PlatformAdminLayout: React.FC = () => {
     const html = document.documentElement;
     if (isDark) {
       html.classList.add('dark');
+      html.classList.remove('light');
     } else {
       html.classList.remove('dark');
+      html.classList.add('light');
     }
     localStorage.setItem('ims-theme', isDark ? 'dark' : 'light');
   }, [isDark]);
@@ -59,6 +61,7 @@ export const PlatformAdminLayout: React.FC = () => {
     '/admin/platform-admins': { title: 'Platform Admins', breadcrumb: 'PLATFORM ADMINISTRATION' },
     '/admin/payments': { title: 'Payments', breadcrumb: 'PAYMENT MANAGEMENT' },
     '/admin/subscriptions': { title: 'Plans', breadcrumb: 'PLANS & PRICING' },
+
     '/admin/support': { title: 'Support', breadcrumb: 'CUSTOMER SUPPORT' },
     '/admin/audit-logs': { title: 'Audit Logs', breadcrumb: 'SYSTEM AUDIT' },
     '/admin/reports': { title: 'Reports', breadcrumb: 'PLATFORM ANALYTICS' },
@@ -67,7 +70,7 @@ export const PlatformAdminLayout: React.FC = () => {
   const currentHeader = headerMap[location.pathname] || { title: 'Command Center', breadcrumb: 'GLOBAL WORKSPACE' };
 
   return (
-    <div className={`pa-root flex h-screen w-full overflow-hidden bg-[var(--pa-page-bg)] transition-colors duration-300`}>
+    <div className={`pa-root ${isDark ? 'dark' : 'light'} flex h-screen w-full overflow-hidden bg-[var(--pa-page-bg)] transition-colors duration-300`}>
       {/* Sidebar Overlay (Mobile) */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
@@ -161,7 +164,7 @@ export const PlatformAdminLayout: React.FC = () => {
                 <div className="w-2 h-2 rounded-full bg-[#1db97a] shadow-[0_0_8px_rgba(29,185,122,0.4)] animate-pulse" />
                 <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--pa-text-muted)]">{currentHeader.breadcrumb}</span>
               </div>
-              <h2 className="text-[18px] font-extrabold text-[#0d1b2a] tracking-tight -mt-0.5">{currentHeader.title}</h2>
+              <h2 className="text-[18px] font-extrabold text-[var(--pa-text-near-black)] tracking-tight -mt-0.5">{currentHeader.title}</h2>
             </div>
           </div>
 
@@ -171,20 +174,20 @@ export const PlatformAdminLayout: React.FC = () => {
               <input
                 type="text"
                 placeholder="SEARCH DATA CORE..."
-                className="w-[360px] h-11 bg-white dark:bg-[var(--pa-card-bg)] border border-[#e2e8f0] dark:border-white/10 rounded-lg pl-12 pr-4 text-[13px] font-medium text-[var(--pa-text-near-black)] placeholder-[#9aa5b4] focus:outline-none focus:ring-2 focus:ring-[#0d6e5a]/20 transition-all"
+                className="w-[360px] h-11 bg-[var(--pa-card-bg)] border border-[var(--pa-border)] rounded-lg pl-12 pr-4 text-[13px] font-medium text-[var(--pa-text-near-black)] placeholder-[#9aa5b4] focus:outline-none focus:ring-2 focus:ring-[#0d6e5a]/20 transition-all"
               />
             </div>
 
-            <button className="w-10 h-10 flex items-center justify-center border border-[#e2e8f0] dark:border-white/10 rounded-lg text-[var(--pa-text-muted)] hover:bg-[#f8fbff] dark:hover:bg-white/5 transition-colors">
+            <button className="w-10 h-10 flex items-center justify-center border border-[var(--pa-border)] rounded-lg text-[var(--pa-text-muted)] hover:bg-[var(--pa-row-hover)] transition-colors">
               <Bell className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center gap-4 pl-4 border-l border-[#e2e8f0] dark:border-white/10">
+            <div className="flex items-center gap-4 pl-4 border-l border-[var(--pa-border)]">
               <div className="text-right hidden sm:block">
                 <div className="text-[13px] font-semibold text-[var(--pa-text-near-black)]">Admin Root</div>
                 <div className="text-[10px] font-semibold text-[#1db97a] uppercase tracking-wider">AUTHORIZED</div>
               </div>
-              <div className="w-10 h-10 rounded-full bg-[#0d6e5a] flex items-center justify-center text-white text-[14px] font-bold">
+              <div className="w-10 h-10 rounded-full bg-[var(--pa-teal)] flex items-center justify-center text-white text-[14px] font-bold">
                 AD
               </div>
             </div>

@@ -115,23 +115,25 @@ export const Layout: React.FC = () => {
     },
   ];
 
+  const isActive = (path: string) => {
+    if (path === '/app') return location.pathname === '/app';
+    return location.pathname.startsWith(path);
+  };
+
   // Auto-expand current section on mount or path change
   useEffect(() => {
     const currentSection = navSections.find(section => 
       section.items.some(item => isActive(item.path))
     );
-    if (currentSection) {
+    if (currentSection && currentSection.title !== expandedSection) {
+      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       setExpandedSection(currentSection.title);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   const toggleSection = (title: string) => {
     setExpandedSection(expandedSection === title ? null : title);
-  };
-
-  const isActive = (path: string) => {
-    if (path === '/app') return location.pathname === '/app';
-    return location.pathname.startsWith(path);
   };
 
   const notifications = [

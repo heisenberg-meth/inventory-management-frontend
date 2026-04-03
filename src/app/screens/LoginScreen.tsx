@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import {
   Building2, Mail, Lock, Eye, EyeOff, LayoutGrid,
-  Shield, ShieldCheck, Fingerprint, Info, Star, ChevronLeft, Zap, Sun, Moon
+  Shield, ShieldCheck, Fingerprint, Info, Star, Zap, Sun, Moon
 } from 'lucide-react';
 
 // Import images for Vite
@@ -103,7 +103,7 @@ export const LoginScreen: React.FC = () => {
           {/* BACK LINK */}
           {/*<div className="pl-8 pt-5 text-left">
             <button
-              onClick={() => navigate('/portal')}
+              onClick={() => navigate('/')}   
               className="flex items-center gap-1.5 text-[12px] font-[500] text-text-secondary hover:text-mint transition-all group"
             >
               <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
