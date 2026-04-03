@@ -505,7 +505,6 @@ export function LandingPage() {
               </button>
               <button
                 onClick={() => navigate("/login?role=tenant-admin")}
-                onClick={() => navigate("/login?role=admin")}
                 className="px-4 py-2 rounded-lg text-sm font-medium border transition-colors"
                 style={{ borderColor: t.border, color: t.textPrimary, background: "transparent" }}
               >
