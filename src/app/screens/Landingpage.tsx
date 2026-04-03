@@ -359,7 +359,7 @@ export function LandingPage() {
 
   const t = isDark ? darkTheme : lightTheme;
 
-  const { activeDropdown, open, scheduleClose, cancelClose, close } = useMegaDropdown();
+  const { activeDropdown, open, scheduleClose, cancelClose } = useMegaDropdown();
   const NAV_HEIGHT = 64;
 
   useEffect(() => {
@@ -490,7 +490,6 @@ export function LandingPage() {
                 open={open}
                 scheduleClose={scheduleClose}
                 textColor={t.textSecondary}
-                scrollTo={(id) => { close(); scrollTo(id); }}
               />
             </div>
 
@@ -504,11 +503,7 @@ export function LandingPage() {
                 {isDark ? <Sun size={16} /> : <Moon size={16} />}
               </button>
               <button
-<<<<<<< HEAD
-                onClick={() => navigate("/login?role=admin")}
-=======
                 onClick={() => navigate("/login?role=tenant-admin")}
->>>>>>> 4a70faa166f0f87c35868209e3e3524e1f1c03d8
                 className="px-4 py-2 rounded-lg text-sm font-medium border transition-colors"
                 style={{ borderColor: t.border, color: t.textPrimary, background: "transparent" }}
               >

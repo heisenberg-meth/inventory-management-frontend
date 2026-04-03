@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, Building, Bell, CreditCard, Save, Check, Globe, Mail, Smartphone } from 'lucide-react';
+import { Settings as SettingsIcon, Building, Bell, CreditCard, Save, Check, Globe, Mail, Smartphone, User, Phone, MapPin, Lock, Edit3, Camera } from 'lucide-react';
 
 const IC = "w-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-mint)]";
 
@@ -18,9 +18,41 @@ const PLANS = [
   { name: 'Enterprise', price: 'Custom', features: ['Unlimited everything', 'Unlimited users', 'Multi-tenant', 'Priority support', 'Custom integrations'], current: false },
 ];
 
+// Design tokens
+const D = {
+  mint: '#1db97a',
+  mintGlow: 'rgba(29,185,122,0.12)',
+  red: '#ef4444',
+  purple: '#a78bfa',
+};
+
+const FieldLabel = ({ children }: { children: React.ReactNode }) => (
+  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: 'var(--color-text-muted)', marginBottom: 5 }}>
+    {children}
+  </div>
+);
+
+const FieldValue = ({ icon: Icon, value, extra }: { icon?: React.ElementType; value: string; extra?: React.ReactNode }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--color-text-primary)', fontWeight: 500 }}>
+    {Icon && <Icon size={14} color="var(--color-text-secondary)" />}
+    <span>{value}</span>
+    {extra}
+  </div>
+);
+
 export const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('General');
   const [toast, setToast] = useState('');
+
+  // Profile state
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [profile, setProfile] = useState({ name: 'Admin User', phone: '+1 (555) 123-4567', location: 'New York, USA' });
+  const [draft, setDraft] = useState({ ...profile });
+
+  // Maintenance mode
+  const [maintenance, setMaintenance] = useState(false);
+
   const [general, setGeneral] = useState({
     companyName: 'Pharmacy Inc', email: 'admin@pharmacy.in', phone: '+91 22 1234 5678',
     timezone: 'IST (UTC+5:30)', currency: 'INR (₹)', language: 'English',
@@ -32,6 +64,18 @@ export const Settings: React.FC = () => {
   });
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
+
+  const startEdit = () => { setDraft({ ...profile }); setEditing(true); };
+  const cancelEdit = () => { setDraft({ ...profile }); setEditing(false); };
+  const saveProfile = () => {
+    setSaving(true);
+    setTimeout(() => {
+      setProfile({ ...draft });
+      setSaving(false);
+      setEditing(false);
+      showToast('Profile updated successfully!');
+    }, 1000);
+  };
 
   const tabs = [
     { id: 'General', icon: SettingsIcon },
@@ -71,44 +115,159 @@ export const Settings: React.FC = () => {
 
         {/* Content */}
         <div className="flex-1 space-y-4">
-          {/* GENERAL */}
+
+          {/* ── GENERAL ── */}
           {activeTab === 'General' && (
-            <div className="bg-[var(--color-card-bg)] border border-[var(--color-border)] rounded-xl p-6 space-y-4">
-              <h3 className="font-semibold text-[var(--color-text-primary)] flex items-center gap-2"><SettingsIcon className="w-4 h-4 text-[var(--color-mint)]" />General Settings</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Timezone</label>
-                  <select value={general.timezone} onChange={e => setGeneral(g => ({ ...g, timezone: e.target.value }))} className={IC}>
-                    <option>IST (UTC+5:30)</option><option>UTC</option><option>EST (UTC-5)</option><option>PST (UTC-8)</option>
-                  </select></div>
-                <div><label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Currency</label>
-                  <select value={general.currency} onChange={e => setGeneral(g => ({ ...g, currency: e.target.value }))} className={IC}>
-                    <option>INR (₹)</option><option>USD ($)</option><option>EUR (€)</option><option>GBP (£)</option>
-                  </select></div>
-                <div><label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Language</label>
-                  <select value={general.language} onChange={e => setGeneral(g => ({ ...g, language: e.target.value }))} className={IC}>
-                    <option>English</option><option>Hindi</option><option>Tamil</option><option>Marathi</option>
-                  </select></div>
-              </div>
-              <div className="space-y-3 pt-2 border-t border-[var(--color-border)]">
-                {[
-                  { label: 'Maintenance Mode', desc: 'Temporarily disable the app for maintenance', key: 'maintenance', value: false },
-                  { label: 'Debug Mode', desc: 'Enable verbose logging for debugging', key: 'debug', value: false },
-                  { label: 'Two-Factor Authentication', desc: 'Require 2FA for all admin logins', key: '2fa', value: true },
-                ].map(item => (
-                  <div key={item.key} className="flex items-center justify-between py-2">
-                    <div>
-                      <div className="text-sm font-medium text-[var(--color-text-primary)]">{item.label}</div>
-                      <div className="text-xs text-[var(--color-text-muted)]">{item.desc}</div>
+            <div className="space-y-4">
+
+              {/* Profile Card */}
+              <div className="bg-[var(--color-card-bg)] border border-[var(--color-border)] rounded-xl p-6">
+
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                  <h3 className="font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+                    <User className="w-4 h-4 text-[var(--color-mint)]" /> My Profile
+                  </h3>
+                  {!editing ? (
+                    <button
+                      onClick={startEdit}
+                      style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 500, color: 'var(--color-mint)' }}
+                    >
+                      <Edit3 size={13} /> Edit Profile
+                    </button>
+                  ) : (
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button
+                        onClick={cancelEdit}
+                        style={{ background: 'transparent', border: '1px solid rgba(29,185,122,0.25)', borderRadius: 8, padding: '6px 14px', fontSize: 13, fontWeight: 500, color: 'var(--color-text-secondary)', cursor: 'pointer' }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={saveProfile}
+                        disabled={saving}
+                        style={{ background: 'linear-gradient(135deg, #1db97a, #17a068)', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 13, fontWeight: 600, color: 'white', cursor: 'pointer', opacity: saving ? 0.85 : 1 }}
+                      >
+                        {saving ? 'Saving…' : 'Save Changes'}
+                      </button>
                     </div>
-                    <Toggle checked={item.value} onChange={() => {}} />
+                  )}
+                </div>
+
+                {/* Avatar */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 20 }}>
+                  <div style={{ width: 68, height: 68, borderRadius: '50%', background: 'linear-gradient(135deg, #ec4899, #a78bfa, #1db97a)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 700, color: 'white', flexShrink: 0 }}>
+                    AU
                   </div>
-                ))}
+                  <div>
+                    <button style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: '1px solid rgba(29,185,122,0.25)', borderRadius: 8, padding: '5px 12px', fontSize: 13, fontWeight: 600, color: D.mint, cursor: 'pointer', marginBottom: 4 }}>
+                      <Camera size={12} /> Upload Photo
+                    </button>
+                    <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>JPG or PNG, max size 2MB</div>
+                  </div>
+                </div>
+
+                <div style={{ borderTop: '1px solid rgba(29,185,122,0.10)', marginBottom: 20 }} />
+
+                {/* Fields Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px 32px' }}>
+
+                  {/* Full Name */}
+                  <div>
+                    <FieldLabel>Full Name</FieldLabel>
+                    {editing
+                      ? <input type="text" value={draft.name} onChange={e => setDraft(p => ({ ...p, name: e.target.value }))} className={IC} />
+                      : <FieldValue value={profile.name} />
+                    }
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <FieldLabel>Email Address</FieldLabel>
+                    <FieldValue
+                      icon={Mail}
+                      value="sanjayrs1306@gmail.com"
+                      extra={
+                        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-mint)', background: 'rgba(29,185,122,0.12)', padding: '2px 8px', borderRadius: 20 }}>
+                          ✓ Verified
+                        </span>
+                      }
+                    />
+                    {editing && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--color-text-muted)', marginTop: 4 }}>
+                        <Lock size={10} /> Email cannot be changed here
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Phone */}
+                  <div>
+                    <FieldLabel>Phone Number</FieldLabel>
+                    {editing
+                      ? <input type="tel" value={draft.phone} onChange={e => setDraft(p => ({ ...p, phone: e.target.value }))} className={IC} />
+                      : <FieldValue icon={Phone} value={profile.phone} />
+                    }
+                  </div>
+
+                  {/* Location */}
+                  <div>
+                    <FieldLabel>Location</FieldLabel>
+                    {editing
+                      ? <input type="text" value={draft.location} onChange={e => setDraft(p => ({ ...p, location: e.target.value }))} className={IC} />
+                      : <FieldValue icon={MapPin} value={profile.location} />
+                    }
+                  </div>
+
+                  {/* Role */}
+                  <div>
+                    <FieldLabel>Role</FieldLabel>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: 'white', background: '#ef4444', padding: '3px 10px', borderRadius: 20 }}>⊙ Admin</span>
+                      <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Full business control</span>
+                    </div>
+                    {editing && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--color-text-muted)', marginTop: 4 }}>
+                        <Lock size={10} /> Set by administrator
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Workspace */}
+                  <div>
+                    <FieldLabel>Workspace</FieldLabel>
+                    <FieldValue
+                      icon={Building}
+                      value="ABC Pharmacy"
+                      extra={
+                        <span style={{ fontSize: 11, fontWeight: 700, color: '#a78bfa', background: 'rgba(167,139,250,0.12)', padding: '2px 8px', borderRadius: 20 }}>
+                          Enterprise Plan
+                        </span>
+                      }
+                    />
+                  </div>
+
+                </div>
               </div>
-              <div className="flex justify-end pt-2">
-                <button onClick={() => showToast('Settings saved!')} className="flex items-center gap-2 px-4 py-2 bg-[var(--color-mint)] text-white rounded-lg font-medium text-sm hover:bg-[var(--color-mint-hover)] transition-colors">
-                  <Save className="w-4 h-4" />Save Settings
-                </button>
+
+              {/* Maintenance Mode Only */}
+              <div className="bg-[var(--color-card-bg)] border border-[var(--color-border)] rounded-xl p-6 space-y-4">
+                <h3 className="font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+                  <SettingsIcon className="w-4 h-4 text-[var(--color-mint)]" /> General Settings
+                </h3>
+                <div className="flex items-center justify-between py-2">
+                  <div>
+                    <div className="text-sm font-medium text-[var(--color-text-primary)]">Maintenance Mode</div>
+                    <div className="text-xs text-[var(--color-text-muted)]">Temporarily disable the app for maintenance</div>
+                  </div>
+                  <Toggle checked={maintenance} onChange={() => setMaintenance(m => !m)} />
+                </div>
+                <div className="flex justify-end">
+                  <button onClick={() => showToast('Settings saved!')} className="flex items-center gap-2 px-4 py-2 bg-[var(--color-mint)] text-white rounded-lg font-medium text-sm hover:bg-[var(--color-mint-hover)] transition-colors">
+                    <Save className="w-4 h-4" />Save Settings
+                  </button>
+                </div>
               </div>
+
             </div>
           )}
 
@@ -233,6 +392,7 @@ export const Settings: React.FC = () => {
               </div>
             </div>
           )}
+
         </div>
       </div>
     </div>

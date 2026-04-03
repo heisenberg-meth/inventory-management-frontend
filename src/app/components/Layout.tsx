@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { 
   Search, Bell, Sun, Moon, Menu, X, LogOut,
-  ChevronDown,
-  Home, Package, Grid3x3, ShoppingBag, ShoppingCart, BarChart3, Settings
+  ChevronDown, ChevronRight,
+  Home, Package, Grid3x3, ShoppingBag, ShoppingCart, BarChart3, Settings,
+  Building, Bell as BellIcon, CreditCard, Globe
 } from 'lucide-react';
 
 interface NavItem {
@@ -31,7 +32,20 @@ export const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [notifOpen, setNotifOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+    if (profileOpen) document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [profileOpen]);
 
   // Apply theme class to document
   useEffect(() => {
@@ -368,13 +382,143 @@ export const Layout: React.FC = () => {
               )}
             </button>
 
-            {/* User Avatar */}
-            <button 
-              onClick={() => navigate('/app/users')}
-              className="w-8 h-8 rounded-full bg-[var(--color-mint)] flex items-center justify-center text-white font-semibold text-sm hover:opacity-90 transition-opacity"
-            >
-              JD
-            </button>
+            {/* User Avatar + Profile Dropdown */}
+            <div ref={profileRef} style={{ position: 'relative' }}>
+              <button
+                onClick={() => { setProfileOpen(p => !p); setNotifOpen(false); }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  background: profileOpen ? 'rgba(29,185,122,0.10)' : 'transparent',
+                  border: '1px solid ' + (profileOpen ? 'rgba(29,185,122,0.25)' : 'transparent'),
+                  borderRadius: 10, padding: '4px 10px 4px 4px',
+                  cursor: 'pointer', transition: 'all 150ms'
+                }}
+              >
+                <div style={{
+                  width: 32, height: 32, borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #1db97a, #0d6e5a)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: 'white', fontWeight: 700, fontSize: 13, flexShrink: 0
+                }}>AU</div>
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)', display: 'none' }} className="sm:inline">Admin User</span>
+                <ChevronDown size={13} color="var(--color-text-muted)" style={{ transition: 'transform 150ms', transform: profileOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+              </button>
+
+              {/* Profile Dropdown */}
+              {profileOpen && (
+                <div style={{
+                  position: 'absolute', top: 48, right: 0, width: 280,
+                  background: 'var(--color-card-bg)', border: '1px solid var(--color-border)',
+                  borderRadius: 14, boxShadow: '0 12px 40px rgba(0,0,0,0.20)',
+                  zIndex: 1000, overflow: 'hidden',
+                  animation: 'profileDropIn 180ms ease-out',
+                }}>
+                  <style>{`
+                    @keyframes profileDropIn {
+                      from { opacity: 0; transform: translateY(-8px); }
+                      to   { opacity: 1; transform: translateY(0); }
+                    }
+                  `}</style>
+
+                  {/* User Card */}
+                  <div style={{ padding: '18px 18px 14px', borderBottom: '1px solid var(--color-border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{
+                        width: 48, height: 48, borderRadius: '50%', flexShrink: 0,
+                        background: 'linear-gradient(135deg, #1db97a, #0d6e5a)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: 'white', fontWeight: 700, fontSize: 16
+                      }}>AU</div>
+                      <div>
+                        <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-text-primary)' }}>Admin User</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: 'white', background: '#ef4444', padding: '2px 8px', borderRadius: 20 }}>⊙ Admin</span>
+                        </div>
+                        <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 3 }}>admin@abcpharma.com</div>
+                        <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginTop: 2 }}>ABC Pharmacy</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Menu Items */}
+                  <div style={{ padding: 8 }}>
+                    {[
+                      { icon: Settings, label: 'General Settings', action: () => { setProfileOpen(false); navigate('/app/settings'); }, chevron: true },
+                      { icon: Building, label: 'Company Profile', action: () => { setProfileOpen(false); navigate('/app/settings'); }, chevron: true },
+                      { icon: BellIcon, label: 'Notifications', action: () => { setProfileOpen(false); navigate('/app/settings'); }, chevron: true },
+                      { icon: CreditCard, label: 'Subscriptions', action: () => { setProfileOpen(false); navigate('/app/settings'); }, chevron: true },
+                    ].map(({ icon: Icon, label, action, chevron }) => (
+                      <button
+                        key={label}
+                        onClick={action}
+                        style={{
+                          width: '100%', height: 40, display: 'flex', alignItems: 'center',
+                          gap: 10, padding: '0 12px', borderRadius: 8, border: 'none',
+                          background: 'transparent', cursor: 'pointer', textAlign: 'left',
+                          color: 'var(--color-text-secondary)'
+                        }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-surface-secondary)'; (e.currentTarget as HTMLElement).style.color = 'var(--color-text-primary)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--color-text-secondary)'; }}
+                      >
+                        <Icon size={16} />
+                        <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>{label}</span>
+                        {chevron && <ChevronRight size={12} />}
+                      </button>
+                    ))}
+
+                    {/* Divider */}
+                    <div style={{ height: 1, background: 'var(--color-border)', margin: '4px 0' }} />
+
+                    {/* Dark Mode toggle */}
+                    <div style={{ height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px', color: 'var(--color-text-secondary)' }}>
+                      {isDark ? <Moon size={16} /> : <Sun size={16} />}
+                      <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>Dark Mode</span>
+                      <button
+                        onClick={() => setIsDark(p => !p)}
+                        style={{
+                          width: 44, height: 24, borderRadius: 12,
+                          background: isDark ? 'var(--color-mint)' : 'var(--color-surface-secondary)',
+                          border: 'none', cursor: 'pointer', position: 'relative', transition: 'background 200ms'
+                        }}
+                      >
+                        <div style={{
+                          width: 20, height: 20, borderRadius: '50%',
+                          background: isDark ? 'white' : 'var(--color-text-secondary)',
+                          position: 'absolute', top: 2,
+                          left: isDark ? 22 : 2,
+                          transition: 'left 200ms ease',
+                        }} />
+                      </button>
+                    </div>
+
+                    {/* Language */}
+                    <div style={{ height: 40, display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px', color: 'var(--color-text-secondary)' }}>
+                      <Globe size={16} />
+                      <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>Language</span>
+                      <span style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>English</span>
+                    </div>
+
+                    {/* Divider */}
+                    <div style={{ height: 1, background: 'var(--color-border)', margin: '4px 0' }} />
+
+                    {/* Sign Out */}
+                    <button
+                      onClick={() => { setProfileOpen(false); navigate('/login'); }}
+                      style={{
+                        width: '100%', height: 40, display: 'flex', alignItems: 'center',
+                        gap: 10, padding: '0 12px', borderRadius: 8, border: 'none',
+                        background: 'transparent', cursor: 'pointer',
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.08)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                    >
+                      <LogOut size={16} color="#ef4444" />
+                      <span style={{ fontSize: 13, fontWeight: 500, color: '#ef4444' }}>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 

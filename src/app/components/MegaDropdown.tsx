@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   Package, ShoppingCart, BarChart3, Settings, Download,
   Factory, Target, Sparkles, CreditCard, Wrench,
@@ -365,7 +365,7 @@ function ReviewsDropdown() {
   );
 }
 
-const dropdownContent: Record<DropdownId, () => JSX.Element> = {
+const dropdownContent: Record<DropdownId, () => React.ReactElement> = {
   features: FeaturesDropdown,
   solutions: SolutionsDropdown,
   pricing: PricingDropdown,
@@ -413,13 +413,12 @@ export function useMegaDropdown() {
 }
 
 export function MegaNavLinks({
-  activeDropdown, open, scheduleClose, textColor, scrollTo,
+  activeDropdown, open, scheduleClose, textColor,
 }: {
   activeDropdown: DropdownId | null;
   open: (id: DropdownId) => void;
   scheduleClose: () => void;
   textColor: string;
-  scrollTo: (id: string) => void;
 }) {
   return (
     <>
@@ -428,14 +427,13 @@ export function MegaNavLinks({
         return (
           <button
             key={id}
-            onClick={() => scrollTo(id)}
+            onClick={() => { isActive ? scheduleClose() : open(id); }}
             onMouseEnter={() => open(id)}
             onMouseLeave={scheduleClose}
             className="relative text-sm transition-all duration-150 flex items-center gap-1"
             style={{
               color: isActive ? '#1db97a' : textColor,
               paddingBottom: 4,
-              borderBottom: isActive ? '2px solid #1db97a' : '2px solid transparent',
               background: 'none', border: 'none', cursor: 'pointer',
               borderBottomWidth: 2,
               borderBottomStyle: 'solid',
