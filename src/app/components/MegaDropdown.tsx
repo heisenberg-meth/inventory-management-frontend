@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-=======
-import { useState } from 'react';
->>>>>>> 2f4b112e0ded5cfcd01cb6acffc79ccf165beb2a
+import React, { useState } from 'react';
 import {
   Package, ShoppingCart, BarChart3, Settings, Download,
   Factory, Target, Sparkles, CreditCard, Wrench,
@@ -368,11 +364,7 @@ function ReviewsDropdown() {
   );
 }
 
-<<<<<<< HEAD
-const dropdownContent: Record<DropdownId, () => React.ReactElement> = {
-=======
 const dropdownContent: Record<DropdownId, React.FC> = {
->>>>>>> 2f4b112e0ded5cfcd01cb6acffc79ccf165beb2a
   features: FeaturesDropdown,
   solutions: SolutionsDropdown,
   pricing: PricingDropdown,
@@ -403,7 +395,7 @@ export function MegaNavLinks({
         return (
           <button
             key={id}
-            onClick={() => { isActive ? scheduleClose() : open(id); }}
+            onClick={() => { if (isActive) { scheduleClose(); } else { open(id); } }}
             onMouseEnter={() => open(id)}
             onMouseLeave={scheduleClose}
             className="relative text-sm transition-all duration-150 flex items-center gap-1"
