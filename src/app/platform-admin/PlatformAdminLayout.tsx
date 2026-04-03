@@ -61,7 +61,10 @@ export const PlatformAdminLayout: React.FC = () => {
     '/admin/platform-admins': { title: 'Platform Admins', breadcrumb: 'PLATFORM ADMINISTRATION' },
     '/admin/payments': { title: 'Payments', breadcrumb: 'PAYMENT MANAGEMENT' },
     '/admin/subscriptions': { title: 'Plans', breadcrumb: 'PLANS & PRICING' },
+<<<<<<< HEAD
     // '/admin/subscriptions': { title: 'Revenue Engine', breadcrumb: 'SUBSCRIPTIONS' },
+=======
+>>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
     '/admin/support': { title: 'Support', breadcrumb: 'CUSTOMER SUPPORT' },
     '/admin/audit-logs': { title: 'Audit Logs', breadcrumb: 'SYSTEM AUDIT' },
     '/admin/reports': { title: 'Reports', breadcrumb: 'PLATFORM ANALYTICS' },

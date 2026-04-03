@@ -28,7 +28,12 @@ import {
   LayoutDashboard,
   Users,
 } from "lucide-react";
+<<<<<<< HEAD
 import { FaTwitter, FaLinkedin, FaGithub, FaFacebook } from "react-icons/fa";
+=======
+import { FaTwitter, FaLinkedin, FaGithub , FaFacebook } from "react-icons/fa";
+import { useMegaDropdown, MegaNavLinks, MegaDropdownPanel, MobileMegaMenu } from "../components/MegaDropdown";
+>>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Theme {
@@ -358,6 +363,9 @@ export function LandingPage() {
 
   const t = isDark ? darkTheme : lightTheme;
 
+  const { activeDropdown, open, scheduleClose, cancelClose, close } = useMegaDropdown();
+  const NAV_HEIGHT = 64;
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
@@ -481,16 +489,13 @@ export function LandingPage() {
 
             {/* Desktop Nav Links */}
             <div className="hidden md:flex items-center gap-8">
-              {["features", "solutions", "pricing", "testimonials"].map((id) => (
-                <button
-                  key={id}
-                  onClick={() => scrollTo(id)}
-                  className="capitalize text-sm transition-colors hover:opacity-80"
-                  style={{ color: t.textSecondary }}
-                >
-                  {id === "testimonials" ? "Reviews" : id.charAt(0).toUpperCase() + id.slice(1)}
-                </button>
-              ))}
+              <MegaNavLinks
+                activeDropdown={activeDropdown}
+                open={open}
+                scheduleClose={scheduleClose}
+                textColor={t.textSecondary}
+                scrollTo={(id) => { close(); scrollTo(id); }}
+              />
             </div>
 
             {/* Desktop Actions */}
@@ -533,11 +538,7 @@ export function LandingPage() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t px-4 py-4 space-y-2" style={{ background: t.navBg, borderColor: t.border }}>
-            {["features", "solutions", "pricing", "testimonials"].map((id) => (
-              <button key={id} onClick={() => scrollTo(id)} className="block w-full text-left px-3 py-2 rounded-lg text-sm capitalize" style={{ color: t.textSecondary }}>
-                {id === "testimonials" ? "Reviews" : id.charAt(0).toUpperCase() + id.slice(1)}
-              </button>
-            ))}
+            <MobileMegaMenu scrollTo={scrollTo} textColor={t.textSecondary} borderColor={t.border} />
             <div className="pt-2 flex flex-col gap-2">
               <button onClick={() => navigate("/login")} className="w-full py-2 rounded-lg text-sm border" style={{ borderColor: t.border, color: t.textPrimary }}>Sign In</button>
               <button onClick={() => navigate("/login")} className="w-full py-2 rounded-lg text-sm font-medium" style={{ background: "linear-gradient(135deg, #0F766E, #34D399)", color: "white" }}>Get Started</button>
@@ -545,6 +546,14 @@ export function LandingPage() {
           </div>
         )}
       </nav>
+
+      {/* Mega Dropdown Panel (renders outside nav for proper positioning) */}
+      <MegaDropdownPanel
+        activeDropdown={activeDropdown}
+        cancelClose={cancelClose}
+        scheduleClose={scheduleClose}
+        navHeight={NAV_HEIGHT}
+      />
 
       {/* ── Hero Section ───────────────────────────────────────────────────── */}
       <section id="hero" className="relative overflow-hidden pt-24 pb-16 lg:pt-32 lg:pb-24">
