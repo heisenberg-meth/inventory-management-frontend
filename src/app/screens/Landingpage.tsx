@@ -28,7 +28,7 @@ import {
   LayoutDashboard,
   Users,
 } from "lucide-react";
-import { FaTwitter, FaLinkedin, FaGithub , FaFacebook } from "react-icons/fa";
+import { FaTwitter, FaLinkedin, FaGithub, FaFacebook } from "react-icons/fa";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Theme {
@@ -189,8 +189,8 @@ function DashboardMockup({ t }: { t: Theme }) {
                         i % 3 === 0
                           ? "#34D399"
                           : i % 3 === 1
-                          ? "#0F766E"
-                          : "rgba(52,211,153,0.3)",
+                            ? "#0F766E"
+                            : "rgba(52,211,153,0.3)",
                     }}
                   />
                 </div>
@@ -218,7 +218,7 @@ function DashboardMockup({ t }: { t: Theme }) {
                 <div key={i} className="flex justify-between items-center py-1 border-b last:border-0" style={{ borderColor: t.border }}>
                   <span className="text-xs" style={{ color: t.textMuted }}>{inv}</span>
                   <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ background: "rgba(52,211,153,0.15)", color: "#34D399" }}>
-                    {["Paid","Pending","Shipped"][i]}
+                    {["Paid", "Pending", "Shipped"][i]}
                   </span>
                 </div>
               ))}
@@ -259,7 +259,7 @@ function ScreenMockup({ title, t, variant }: { title: string; t: Theme; variant:
       >
         <span className="text-xs font-medium" style={{ color: t.textSecondary }}>{title}</span>
         <div className="flex gap-1">
-          {[0,1,2].map(i => (
+          {[0, 1, 2].map(i => (
             <div key={i} className="w-2 h-2 rounded-full" style={{ background: [t.border, t.accent, t.primary][i] }} />
           ))}
         </div>
@@ -268,7 +268,7 @@ function ScreenMockup({ title, t, variant }: { title: string; t: Theme; variant:
         {variant === 0 && (
           <div className="space-y-2">
             <div className="grid grid-cols-3 gap-2">
-              {["#34D399","#60a5fa","#a78bfa"].map((c,i) => (
+              {["#34D399", "#60a5fa", "#a78bfa"].map((c, i) => (
                 <div key={i} className="rounded-lg p-2" style={{ background: t.bgSecondary }}>
                   <div className="h-2 rounded mb-1" style={{ background: c, width: "60%" }} />
                   <div className="h-1.5 rounded" style={{ background: t.border }} />
@@ -277,8 +277,8 @@ function ScreenMockup({ title, t, variant }: { title: string; t: Theme; variant:
             </div>
             <div className="h-16 rounded-lg" style={{ background: t.bgSecondary }}>
               <div className="flex items-end h-full gap-1 p-2">
-                {[40,70,55,85,65,90].map((h,i) => (
-                  <div key={i} className="flex-1 rounded-sm" style={{ height: `${h}%`, background: i%2===0 ? "#34D399" : "#0F766E" }} />
+                {[40, 70, 55, 85, 65, 90].map((h, i) => (
+                  <div key={i} className="flex-1 rounded-sm" style={{ height: `${h}%`, background: i % 2 === 0 ? "#34D399" : "#0F766E" }} />
                 ))}
               </div>
             </div>
@@ -287,16 +287,16 @@ function ScreenMockup({ title, t, variant }: { title: string; t: Theme; variant:
         {variant === 1 && (
           <div className="space-y-1.5">
             <div className="flex gap-2 pb-1 border-b" style={{ borderColor: t.border }}>
-              {["Name","SKU","Category","Stock"].map((h,i) => (
+              {["Name", "SKU", "Category", "Stock"].map((h, i) => (
                 <div key={i} className="flex-1 text-xs font-medium" style={{ color: t.textMuted }}>{h}</div>
               ))}
             </div>
-            {["Laptop Pro","Wireless Mouse","USB Hub"].map((item,i) => (
+            {["Laptop Pro", "Wireless Mouse", "USB Hub"].map((item, i) => (
               <div key={i} className="flex gap-2 items-center">
                 <div className="flex-1 text-xs" style={{ color: t.textPrimary }}>{item}</div>
-                <div className="flex-1 text-xs" style={{ color: t.textMuted }}>SKU-{100+i}</div>
+                <div className="flex-1 text-xs" style={{ color: t.textMuted }}>SKU-{100 + i}</div>
                 <div className="flex-1 text-xs" style={{ color: t.textMuted }}>Electronics</div>
-                <div className="flex-1 text-xs font-medium" style={{ color: i===2 ? "#fb923c" : "#34D399" }}>{[142,87,3][i]}</div>
+                <div className="flex-1 text-xs font-medium" style={{ color: i === 2 ? "#fb923c" : "#34D399" }}>{[142, 87, 3][i]}</div>
               </div>
             ))}
           </div>
@@ -304,7 +304,7 @@ function ScreenMockup({ title, t, variant }: { title: string; t: Theme; variant:
         {variant === 2 && (
           <div className="space-y-2">
             <div className="grid grid-cols-2 gap-2">
-              {[{l:"Total Items",v:"2,847",c:"#34D399"},{l:"Warehouses",v:"5",c:"#60a5fa"}].map((s,i) => (
+              {[{ l: "Total Items", v: "2,847", c: "#34D399" }, { l: "Warehouses", v: "5", c: "#60a5fa" }].map((s, i) => (
                 <div key={i} className="rounded-lg p-2" style={{ background: t.bgSecondary }}>
                   <div className="text-xs mb-1" style={{ color: t.textMuted }}>{s.l}</div>
                   <div className="text-sm font-bold" style={{ color: s.c }}>{s.v}</div>
@@ -312,14 +312,14 @@ function ScreenMockup({ title, t, variant }: { title: string; t: Theme; variant:
               ))}
             </div>
             <div className="space-y-1">
-              {["Warehouse A","Warehouse B","Warehouse C"].map((w,i) => (
+              {["Warehouse A", "Warehouse B", "Warehouse C"].map((w, i) => (
                 <div key={i}>
                   <div className="flex justify-between text-xs mb-0.5">
                     <span style={{ color: t.textMuted }}>{w}</span>
-                    <span style={{ color: t.textSecondary }}>{[78,65,90][i]}%</span>
+                    <span style={{ color: t.textSecondary }}>{[78, 65, 90][i]}%</span>
                   </div>
                   <div className="h-1.5 rounded-full" style={{ background: t.bgSecondary }}>
-                    <div className="h-full rounded-full" style={{ width: `${[78,65,90][i]}%`, background: i===0 ? "#34D399" : i===1 ? "#60a5fa" : "#a78bfa" }} />
+                    <div className="h-full rounded-full" style={{ width: `${[78, 65, 90][i]}%`, background: i === 0 ? "#34D399" : i === 1 ? "#60a5fa" : "#a78bfa" }} />
                   </div>
                 </div>
               ))}
@@ -329,12 +329,12 @@ function ScreenMockup({ title, t, variant }: { title: string; t: Theme; variant:
         {variant === 3 && (
           <div className="space-y-2">
             <div className="flex items-end gap-1 h-14">
-              {[55,70,45,80,60,90,75].map((h,i) => (
-                <div key={i} className="flex-1 rounded-sm" style={{ height: `${h}%`, background: `rgba(52,211,153,${0.3 + i*0.1})` }} />
+              {[55, 70, 45, 80, 60, 90, 75].map((h, i) => (
+                <div key={i} className="flex-1 rounded-sm" style={{ height: `${h}%`, background: `rgba(52,211,153,${0.3 + i * 0.1})` }} />
               ))}
             </div>
             <div className="grid grid-cols-2 gap-1.5">
-              {[{l:"Revenue",v:"$48.2K"},{l:"Growth",v:"+24%"},{l:"Top SKU",v:"LP-001"},{l:"Returns",v:"1.2%"}].map((s,i) => (
+              {[{ l: "Revenue", v: "$48.2K" }, { l: "Growth", v: "+24%" }, { l: "Top SKU", v: "LP-001" }, { l: "Returns", v: "1.2%" }].map((s, i) => (
                 <div key={i} className="rounded-lg p-1.5" style={{ background: t.bgSecondary }}>
                   <div className="text-xs" style={{ color: t.textMuted }}>{s.l}</div>
                   <div className="text-xs font-bold" style={{ color: [s.v.includes("+") ? "#34D399" : t.textPrimary][0] }}>{s.v}</div>
@@ -503,7 +503,7 @@ export function LandingPage() {
                 {isDark ? <Sun size={16} /> : <Moon size={16} />}
               </button>
               <button
-                onClick={() => navigate("/portal")}
+                onClick={() => navigate("/login?role=tenant-admin")}
                 className="px-4 py-2 rounded-lg text-sm font-medium border transition-colors"
                 style={{ borderColor: t.border, color: t.textPrimary, background: "transparent" }}
               >
@@ -617,7 +617,7 @@ export function LandingPage() {
               {/* Social proof */}
               <div className="flex items-center gap-4 justify-center lg:justify-start">
                 <div className="flex -space-x-2">
-                  {["https://images.unsplash.com/photo-1762522921456-cdfe882d36c3?w=40","https://images.unsplash.com/photo-1769071166862-8cc3a6f2ac5c?w=40","https://images.unsplash.com/photo-1768796373360-95d80c5830fb?w=40"].map((src, i) => (
+                  {["https://images.unsplash.com/photo-1762522921456-cdfe882d36c3?w=40", "https://images.unsplash.com/photo-1769071166862-8cc3a6f2ac5c?w=40", "https://images.unsplash.com/photo-1768796373360-95d80c5830fb?w=40"].map((src, i) => (
                     <img key={i} src={src} alt="user" className="w-8 h-8 rounded-full border-2 object-cover" style={{ borderColor: t.bg }} />
                   ))}
                 </div>

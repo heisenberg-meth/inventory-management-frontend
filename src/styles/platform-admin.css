@@ -1,7 +1,7 @@
 /* Platform Admin (Command Center) Theme Tokens */
 
-:root {
-  /* LIGHT MODE */
+.pa-root {
+  /* LIGHT MODE (Default) */
   --pa-sidebar-bg: #0d6e5a;
   --pa-topbar-bg: #ffffff;
   --pa-page-bg: #f0f4f8;
@@ -13,6 +13,8 @@
   --pa-teal: #0d6e5a;
   --pa-mint: #1db97a;
   --pa-red: #ef4444;
+  --pa-amber: #f59e0b;
+  --pa-blue: #3b82f6;
   --pa-blue-gray-bg: #f8f9fb;
   --pa-row-hover: #f8fbff;
 
@@ -25,11 +27,14 @@
   --pa-badge-suspended-text: #dc2626;
   --pa-badge-inactive-bg: #f1f5f9;
   --pa-badge-inactive-text: #64748b;
+
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--pa-text-near-black);
 }
 
-.dark.pa-root {
-  /* DARK MODE (Platform Admin) */
-  --pa-sidebar-bg: #0a1f18; /* Darker version of teal */
+/* DARK MODE - Scoped to .pa-root when .dark is present */
+.pa-root.dark, .dark .pa-root {
+  --pa-sidebar-bg: #0a1f18;
   --pa-topbar-bg: #122130;
   --pa-page-bg: #0a121d;
   --pa-card-bg: #162534;
@@ -37,9 +42,11 @@
   --pa-text-near-black: #f8faff;
   --pa-text-muted: #a1b0c3;
   --pa-text-light-gray: #718096;
-  --pa-teal: #1db97a; /* Use mint for active states in dark mode */
+  --pa-teal: #1db97a;
   --pa-mint: #0d6e5a;
   --pa-red: #ff5c5c;
+  --pa-amber: #f59e0b;
+  --pa-blue: #60a5fa;
   --pa-blue-gray-bg: rgba(255, 255, 255, 0.03);
   --pa-row-hover: rgba(255, 255, 255, 0.05);
 
@@ -53,7 +60,3 @@
   --pa-badge-inactive-text: #94a3b8;
 }
 
-.pa-root {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  color: var(--pa-text-near-black);
-}

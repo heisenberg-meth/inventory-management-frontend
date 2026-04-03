@@ -90,14 +90,14 @@ const logs: AuditLog[] = [
 
 const getActionBadge = (action: ActionType) => {
   switch (action) {
-    case 'TENANT_CREATED': return 'bg-[#0d6e5a] text-white';
-    case 'PLAN_ASSIGNED': return 'bg-[#2563eb] text-white';
-    case 'STOCK_UPDATED': return 'bg-[#f59e0b] text-white';
-    case 'USER_INVITED': return 'bg-[#7c3aed] text-white';
-    case 'LOGIN': return 'bg-[#e2e8f0] text-[#334155]';
-    case 'TENANT_SUSPENDED': return 'bg-[#ef4444] text-white';
-    case 'PAYMENT_FAILED': return 'bg-[#ef4444] text-white';
-    case 'INVOICE_GENERATED': return 'bg-[#e2e8f0] text-[#334155]';
+    case 'TENANT_CREATED': return 'bg-[var(--pa-teal)] text-white';
+    case 'PLAN_ASSIGNED': return 'bg-[var(--pa-blue)] text-white';
+    case 'STOCK_UPDATED': return 'bg-[var(--pa-amber)] text-white';
+    case 'USER_INVITED': return 'bg-purple-600 text-white';
+    case 'LOGIN': return 'bg-[var(--pa-blue-gray-bg)] text-[var(--pa-text-muted)]';
+    case 'TENANT_SUSPENDED': return 'bg-[var(--pa-red)] text-white';
+    case 'PAYMENT_FAILED': return 'bg-[var(--pa-red)] text-white';
+    case 'INVOICE_GENERATED': return 'bg-[var(--pa-blue-gray-bg)] text-[var(--pa-text-muted)]';
   }
 };
 
@@ -106,7 +106,7 @@ export const AuditLogs: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 pa-root">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* PAGE HEADER */}
       <PageHeader
         section="SYSTEM AUDIT"
@@ -119,22 +119,22 @@ export const AuditLogs: React.FC = () => {
       {/* ━━━ FILTER BAR ━━━ */}
       <div className="bg-[var(--pa-card-bg)] border border-[var(--pa-border)] rounded-[16px] p-[16px_20px] shadow-sm mb-4 flex items-center gap-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9aa5b4]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--pa-text-light-gray)]" />
           <input
             type="text"
             placeholder="Search by user, action, tenant, IP address..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-[40px] pl-10 pr-4 bg-transparent border-none focus:ring-0 text-[13px] text-[var(--pa-text-near-black)] placeholder-[#9aa5b4]"
+            className="w-full h-[40px] pl-10 pr-4 bg-transparent border-none focus:ring-0 text-[13px] text-[var(--pa-text-near-black)] placeholder-[var(--pa-text-light-gray)]"
           />
         </div>
         <div className="flex items-center gap-2">
           {['All Users', 'All Actions', 'All Tenants', 'Last 7 Days'].map((f) => (
-            <button key={f} className="h-[36px] px-4 bg-white border border-[#e2e8f0] rounded-[8px] text-[13px] font-[500] text-[#0d1b2a] flex items-center gap-2 hover:border-[#0d6e5a] transition-all">
-              {f} <ChevronDown className="w-3.5 h-3.5 text-[#9aa5b4]" />
+            <button key={f} className="h-[36px] px-4 bg-[var(--pa-card-bg)] border border-[var(--pa-border)] rounded-[8px] text-[13px] font-[500] text-[var(--pa-text-near-black)] flex items-center gap-2 hover:border-[var(--pa-teal)] hover:text-[var(--pa-teal)] transition-all">
+              {f} <ChevronDown className="w-3.5 h-3.5 text-[var(--pa-text-light-gray)]" />
             </button>
           ))}
-          <button className="h-[36px] px-4 border border-[#e2e8f0] rounded-[8px] text-[12px] font-[600] text-[#6b7a8d] flex items-center gap-1.5 hover:border-[#0d6e5a] hover:text-[#0d6e5a] transition-all ml-1">
+          <button className="h-[36px] px-4 border border-[var(--pa-border)] rounded-[8px] text-[12px] font-[600] text-[var(--pa-text-muted)] flex items-center gap-1.5 hover:border-[var(--pa-teal)] hover:text-[var(--pa-teal)] transition-all ml-1">
             <Download className="w-3.5 h-3.5" /> CSV
           </button>
         </div>
@@ -145,19 +145,19 @@ export const AuditLogs: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-[#fcfdfe]">
+              <tr className="bg-[var(--pa-blue-gray-bg)]/50">
                 {['TIMESTAMP', 'USER', 'ACTION', 'TENANT', 'IP ADDRESS', 'STATUS', 'DETAILS'].map((col) => (
-                  <th key={col} className={`px-6 py-[14px] text-[11px] font-[700] uppercase text-[#9aa5b4] tracking-[0.08em] border-b border-[#f0f4f8] ${col === 'DETAILS' ? 'text-right' : ''}`}>
+                  <th key={col} className={`px-6 py-[14px] text-[11px] font-[700] uppercase text-[var(--pa-text-light-gray)] tracking-[0.08em] border-b border-[var(--pa-border)] ${col === 'DETAILS' ? 'text-right' : ''}`}>
                     {col}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#f8f9fb]">
+            <tbody className="divide-y divide-[var(--pa-border)]">
               {logs.map((log) => (
                 <tr key={log.id} className="hover:bg-[var(--pa-row-hover)] transition-colors cursor-pointer group">
                   <td className="px-6 py-3">
-                    <span className="text-[12px] text-[#6b7a8d] font-medium whitespace-nowrap">{log.timestamp}</span>
+                    <span className="text-[12px] text-[var(--pa-text-muted)] font-medium whitespace-nowrap">{log.timestamp}</span>
                   </td>
                   <td className="px-6 py-3">
                     <span className="text-[13px] font-[600] text-[var(--pa-text-near-black)]">{log.user}</span>
@@ -167,15 +167,15 @@ export const AuditLogs: React.FC = () => {
                       {log.action}
                     </span>
                   </td>
-                  <td className="px-6 py-3 text-[13px] text-[#6b7a8d] font-medium">{log.tenant}</td>
+                  <td className="px-6 py-3 text-[13px] text-[var(--pa-text-muted)] font-medium">{log.tenant}</td>
                   <td className="px-6 py-3">
-                    <span className="text-[12px] text-[#6b7a8d] font-mono">{log.ip}</span>
+                    <span className="text-[12px] text-[var(--pa-text-muted)] font-mono">{log.ip}</span>
                   </td>
                   <td className="px-6 py-3">
                     <span className={`px-2.5 py-1 rounded-[4px] text-[11px] font-bold uppercase tracking-wider ${
                       log.status === 'Success'
-                        ? 'bg-[#dcfce7] text-[#15803d]'
-                        : 'bg-[#fee2e2] text-[#dc2626]'
+                        ? 'bg-[var(--pa-mint)]/10 text-[var(--pa-mint)]'
+                        : 'bg-[var(--pa-red)]/10 text-[var(--pa-red)]'
                     }`}>
                       {log.status}
                     </span>
@@ -183,7 +183,7 @@ export const AuditLogs: React.FC = () => {
                   <td className="px-6 py-3 text-right">
                     <button
                       onClick={() => setSelectedLog(log)}
-                      className="hover:text-[#0d6e5a] text-[#9aa5b4] transition-colors"
+                      className="hover:text-[var(--pa-teal)] text-[var(--pa-text-light-gray)] transition-colors"
                       title="View details"
                     >
                       <Eye className="w-4 h-4" />
@@ -194,11 +194,11 @@ export const AuditLogs: React.FC = () => {
             </tbody>
           </table>
         </div>
-        <div className="px-6 py-4 bg-[#fcfdfe] border-t border-[#f0f4f8] flex items-center justify-between">
-          <span className="text-[13px] text-[#6b7a8d]">Showing 1–8 of 4,284 log entries</span>
+        <div className="px-6 py-4 bg-[var(--pa-blue-gray-bg)]/50 border-t border-[var(--pa-border)] flex items-center justify-between">
+          <span className="text-[13px] text-[var(--pa-text-muted)]">Showing 1–8 of 4,284 log entries</span>
           <div className="flex items-center gap-1">
             {[1, 2, 3, '...', 536].map((p, i) => (
-              <button key={i} className={`w-8 h-8 rounded-[8px] text-[12px] font-[700] transition-all ${p === 1 ? 'bg-[#0d6e5a] text-white shadow-md' : 'text-[#6b7a8d] hover:bg-[#f1f5f9]'}`}>
+              <button key={i} className={`w-8 h-8 rounded-[8px] text-[12px] font-[700] transition-all ${p === 1 ? 'bg-[var(--pa-teal)] text-white shadow-md' : 'text-[var(--pa-text-muted)] hover:bg-[var(--pa-blue-gray-bg)]'}`}>
                 {p}
               </button>
             ))}
@@ -215,7 +215,7 @@ export const AuditLogs: React.FC = () => {
             {/* Header */}
             <div className="p-6 border-b border-[var(--pa-border)] flex items-center justify-between flex-shrink-0">
               <h3 className="text-[16px] font-[700] text-[var(--pa-text-near-black)]">Log Details</h3>
-              <button onClick={() => setSelectedLog(null)} className="p-2 text-[#9aa5b4] hover:text-[#0d1b2a] rounded-lg hover:bg-[#f1f5f9] transition-colors">
+              <button onClick={() => setSelectedLog(null)} className="p-2 text-[var(--pa-text-light-gray)] hover:text-[var(--pa-text-near-black)] rounded-lg hover:bg-[var(--pa-blue-gray-bg)] transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -229,14 +229,14 @@ export const AuditLogs: React.FC = () => {
                 { label: 'IP Address', value: selectedLog.ip },
               ].map((field) => (
                 <div key={field.label}>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-[#9aa5b4] mb-1">{field.label}</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--pa-text-light-gray)] mb-1">{field.label}</div>
                   <div className="text-[14px] font-[600] text-[var(--pa-text-near-black)]">{field.value}</div>
                 </div>
               ))}
 
               {/* Action */}
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[#9aa5b4] mb-1">Action</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--pa-text-light-gray)] mb-1">Action</div>
                 <span className={`px-2.5 py-1 rounded-[4px] text-[10px] font-[700] uppercase tracking-wider inline-block ${getActionBadge(selectedLog.action)}`}>
                   {selectedLog.action}
                 </span>
@@ -244,25 +244,25 @@ export const AuditLogs: React.FC = () => {
 
               {/* User Agent */}
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[#9aa5b4] mb-1">User Agent</div>
-                <div className="text-[12px] text-[#6b7a8d] leading-relaxed break-all">{selectedLog.userAgent}</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--pa-text-light-gray)] mb-1">User Agent</div>
+                <div className="text-[12px] text-[var(--pa-text-muted)] leading-relaxed break-all">{selectedLog.userAgent}</div>
               </div>
 
               {/* Request Payload */}
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[#9aa5b4] mb-2">Request Payload</div>
-                <pre className="bg-[#0d6e5a]/10 text-[#0d6e5a] rounded-[8px] p-4 text-[12px] font-mono leading-relaxed overflow-x-auto whitespace-pre">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--pa-text-light-gray)] mb-2">Request Payload</div>
+                <pre className="bg-[var(--pa-teal)]/10 text-[var(--pa-teal)] rounded-[8px] p-4 text-[12px] font-mono leading-relaxed overflow-x-auto whitespace-pre">
                   {selectedLog.payload}
                 </pre>
               </div>
 
               {/* Response */}
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[#9aa5b4] mb-1">Response</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--pa-text-light-gray)] mb-1">Response</div>
                 <span className={`px-2.5 py-1 rounded-[4px] text-[11px] font-bold uppercase tracking-wider inline-block ${
                   selectedLog.status === 'Success'
-                    ? 'bg-[#dcfce7] text-[#15803d]'
-                    : 'bg-[#fee2e2] text-[#dc2626]'
+                    ? 'bg-[var(--pa-mint)]/10 text-[var(--pa-mint)]'
+                    : 'bg-[var(--pa-red)]/10 text-[var(--pa-red)]'
                 }`}>
                   {selectedLog.responseCode}
                 </span>

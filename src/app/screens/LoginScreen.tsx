@@ -101,15 +101,15 @@ export const LoginScreen: React.FC = () => {
           </nav>
 
           {/* BACK LINK */}
-          <div className="pl-8 pt-5 text-left">
+          {/*<div className="pl-8 pt-5 text-left">
             <button
-              onClick={() => navigate('/portal')}
+              onClick={() => navigate('/')}   
               className="flex items-center gap-1.5 text-[12px] font-[500] text-text-secondary hover:text-mint transition-all group"
             >
               <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
               Return to selection
             </button>
-          </div>
+          </div>*/}
 
           {/* FORM CONTAINER */}
           <div className="flex-1 flex flex-col items-center justify-center p-6 px-10">
