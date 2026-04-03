@@ -126,7 +126,7 @@ export const PlatformAdminLayout: React.FC = () => {
 
           {/* Logout */}
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/')}
             className="w-full flex items-center gap-3 px-4 py-4 rounded-lg bg-[#ef4444]/15 text-[#ef4444] hover:bg-[#ef4444]/25 transition-all font-bold group"
           >
             <LogOut className="w-[18px] h-[18px] opacity-80" />
