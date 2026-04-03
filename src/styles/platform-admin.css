@@ -1,0 +1,59 @@
+/* Platform Admin (Command Center) Theme Tokens */
+
+:root {
+  /* LIGHT MODE */
+  --pa-sidebar-bg: #0d6e5a;
+  --pa-topbar-bg: #ffffff;
+  --pa-page-bg: #f0f4f8;
+  --pa-card-bg: #ffffff;
+  --pa-border: #e8edf2;
+  --pa-text-near-black: #0d1b2a;
+  --pa-text-muted: #6b7a8d;
+  --pa-text-light-gray: #9aa5b4;
+  --pa-teal: #0d6e5a;
+  --pa-mint: #1db97a;
+  --pa-red: #ef4444;
+  --pa-blue-gray-bg: #f8f9fb;
+  --pa-row-hover: #f8fbff;
+
+  /* Badges */
+  --pa-badge-active-bg: #dcfce7;
+  --pa-badge-active-text: #15803d;
+  --pa-badge-trial-bg: #fef9c3;
+  --pa-badge-trial-text: #92400e;
+  --pa-badge-suspended-bg: #fee2e2;
+  --pa-badge-suspended-text: #dc2626;
+  --pa-badge-inactive-bg: #f1f5f9;
+  --pa-badge-inactive-text: #64748b;
+}
+
+.dark.pa-root {
+  /* DARK MODE (Platform Admin) */
+  --pa-sidebar-bg: #0a1f18; /* Darker version of teal */
+  --pa-topbar-bg: #122130;
+  --pa-page-bg: #0a121d;
+  --pa-card-bg: #162534;
+  --pa-border: rgba(255, 255, 255, 0.08);
+  --pa-text-near-black: #f8faff;
+  --pa-text-muted: #a1b0c3;
+  --pa-text-light-gray: #718096;
+  --pa-teal: #1db97a; /* Use mint for active states in dark mode */
+  --pa-mint: #0d6e5a;
+  --pa-red: #ff5c5c;
+  --pa-blue-gray-bg: rgba(255, 255, 255, 0.03);
+  --pa-row-hover: rgba(255, 255, 255, 0.05);
+
+  --pa-badge-active-bg: rgba(21, 128, 61, 0.2);
+  --pa-badge-active-text: #4ade80;
+  --pa-badge-trial-bg: rgba(146, 64, 14, 0.2);
+  --pa-badge-trial-text: #fbbf24;
+  --pa-badge-suspended-bg: rgba(220, 38, 38, 0.2);
+  --pa-badge-suspended-text: #f87171;
+  --pa-badge-inactive-bg: rgba(100, 116, 139, 0.2);
+  --pa-badge-inactive-text: #94a3b8;
+}
+
+.pa-root {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--pa-text-near-black);
+}

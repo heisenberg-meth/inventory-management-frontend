@@ -503,14 +503,14 @@ export function LandingPage() {
                 {isDark ? <Sun size={16} /> : <Moon size={16} />}
               </button>
               <button
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/portal")}
                 className="px-4 py-2 rounded-lg text-sm font-medium border transition-colors"
                 style={{ borderColor: t.border, color: t.textPrimary, background: "transparent" }}
               >
                 Sign In
               </button>
               <button
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/portal")}
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
                 style={{ background: "linear-gradient(135deg, #0F766E, #34D399)", color: "white", boxShadow: "0 4px 14px rgba(52,211,153,0.35)" }}
               >

@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { 
-  Home, BarChart3, Brain, TrendingUp, Package, Grid3x3, Layers, 
-  PackagePlus, DollarSign, Sliders, Warehouse, ArrowLeftRight, 
-  AlertTriangle, Users, ShoppingCart, Truck, FileText, Receipt,
-  Users2, ShoppingBag, File, Activity, UserCog, Settings,
-  Search, Bell, Sun, Moon, Menu, X, LogOut
+  Search, Bell, Sun, Moon, Menu, X, LogOut,
+  ChevronDown,
+  Home, Package, Grid3x3, ShoppingBag, ShoppingCart, BarChart3, Settings
 } from 'lucide-react';
 
 interface NavItem {
-  icon: React.ElementType;
+  icon?: React.ElementType; // Optional icon for sub-items
   label: string;
   path: string;
   badge?: string;
@@ -18,6 +16,7 @@ interface NavItem {
 
 interface NavSection {
   title: string;
+  icon: React.ElementType;
   items: NavItem[];
 }
 
@@ -32,6 +31,7 @@ export const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [notifOpen, setNotifOpen] = useState(false);
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   // Apply theme class to document
   useEffect(() => {
@@ -48,60 +48,86 @@ export const Layout: React.FC = () => {
 
   const navSections: NavSection[] = [
     {
-      title: 'HOME',
+      title: 'Home',
+      icon: Home,
       items: [
-        { icon: Home, label: 'Overview', path: '/app' },
-        { icon: Brain, label: 'AI Dashboard', path: '/app/ai' },
-        { icon: TrendingUp, label: 'Analytics', path: '/app/analytics' },
+        { label: 'Dashboard', path: '/app' },
+        { label: 'AI Dashboard', path: '/app/ai' },
+        { label: 'Analytics', path: '/app/analytics' },
       ]
     },
     {
-      title: 'INVENTORY',
+      title: 'Inventory',
+      icon: Package,
       items: [
-        { icon: Package, label: 'Products', path: '/app/products' },
-        { icon: Grid3x3, label: 'Categories', path: '/app/categories' },
-        { icon: Layers, label: 'Item Groups', path: '/app/item-groups' },
-        { icon: PackagePlus, label: 'Composite Items', path: '/app/composite' },
-        { icon: DollarSign, label: 'Price Lists', path: '/app/price-lists' },
-        { icon: Sliders, label: 'Stock Adjustments', path: '/app/stock' },
-        { icon: Warehouse, label: 'Warehouses', path: '/app/warehouses' },
-        { icon: ArrowLeftRight, label: 'Stock Transfers', path: '/app/transfers' },
-        { icon: AlertTriangle, label: 'Low Stock Alerts', path: '/app/alerts', badge: '23', badgeColor: 'bg-[var(--color-danger)]' },
+        { label: 'Products', path: '/app/products' },
+        { label: 'Stock Adjustments', path: '/app/stock' },
+        { label: 'Warehouses', path: '/app/warehouses' },
+        { label: 'Shipments', path: '/app/shipments' },
+        { label: 'Stock Transfers', path: '/app/transfers' },
+        { label: 'Low Stock Alerts', path: '/app/alerts', badge: '23', badgeColor: 'bg-[var(--color-danger)]' },
       ]
     },
     {
-      title: 'SALES',
+      title: 'Items',
+      icon: Grid3x3,
       items: [
-        { icon: Users, label: 'Customers', path: '/app/customers' },
-        { icon: ShoppingCart, label: 'Sales Orders', path: '/app/orders' },
-        { icon: Truck, label: 'Shipments', path: '/app/shipments' },
-        { icon: FileText, label: 'Invoices', path: '/app/invoices' },
-        { icon: Receipt, label: 'Payments Received', path: '/app/payments' },
+        { label: 'Item Groups', path: '/app/item-groups' },
+        { label: 'Composite Items', path: '/app/composite' },
+        { label: 'Price Lists', path: '/app/price-lists' },
+        { label: 'Product List', path: '/app/products' },
+        { label: 'Categories', path: '/app/categories' },
       ]
     },
     {
-      title: 'PURCHASES',
+      title: 'Sales',
+      icon: ShoppingBag,
       items: [
-        { icon: Users2, label: 'Suppliers', path: '/app/suppliers' },
-        { icon: ShoppingBag, label: 'Purchase Orders', path: '/app/purchase-orders' },
-        { icon: File, label: 'Bills', path: '/app/bills' },
+        { label: 'Customers', path: '/app/customers' },
+        { label: 'Sales Orders', path: '/app/orders' },
+        { label: 'Invoices', path: '/app/invoices' },
+        { label: 'Payments Received', path: '/app/payments' },
       ]
     },
     {
-      title: 'REPORTS',
+      title: 'Purchases',
+      icon: ShoppingCart,
       items: [
-        { icon: BarChart3, label: 'Reports', path: '/app/reports' },
-        { icon: Activity, label: 'Activity Log', path: '/app/activity' },
+        { label: 'Suppliers', path: '/app/suppliers' },
+        { label: 'Purchase Orders', path: '/app/purchase-orders' },
+        { label: 'Bills', path: '/app/bills' },
       ]
     },
     {
-      title: 'SETTINGS',
+      title: 'Reports',
+      icon: BarChart3,
       items: [
-        { icon: UserCog, label: 'Users & Roles', path: '/app/users' },
-        { icon: Settings, label: 'Settings', path: '/app/settings' },
+        { label: 'Activity Log', path: '/app/activity' },
+      ]
+    },
+    {
+      title: 'Settings',
+      icon: Settings,
+      items: [
+        { label: 'User Roles', path: '/app/users' },
+        { label: 'Settings', path: '/app/settings' },
       ]
     },
   ];
+
+  // Auto-expand current section on mount or path change
+  useEffect(() => {
+    const currentSection = navSections.find(section => 
+      section.items.some(item => isActive(item.path))
+    );
+    if (currentSection) {
+      setExpandedSection(currentSection.title);
+    }
+  }, [location.pathname]);
+
+  const toggleSection = (title: string) => {
+    setExpandedSection(expandedSection === title ? null : title);
+  };
 
   const isActive = (path: string) => {
     if (path === '/app') return location.pathname === '/app';
@@ -160,46 +186,68 @@ export const Layout: React.FC = () => {
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex-1 overflow-y-auto py-4">
-          {navSections.map((section, idx) => (
-            <div key={idx} className="mb-6">
-              <div className="px-4 mb-2 text-[10px] font-semibold tracking-widest text-[var(--color-text-muted)] uppercase">
-                {section.title}
+        <div className="flex-1 overflow-y-auto py-2 scrollbar-thin scrollbar-thumb-[var(--color-border)]">
+          {navSections.map((section, idx) => {
+            const isExpanded = expandedSection === section.title;
+            const ParentIcon = section.icon;
+            const hasActiveChild = section.items.some(item => isActive(item.path));
+            
+            return (
+              <div key={idx} className="mb-1">
+                {/* Parent Menu Item */}
+                <button
+                  onClick={() => toggleSection(section.title)}
+                  className={`
+                    w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all
+                    ${hasActiveChild && !isExpanded
+                      ? 'text-[var(--color-mint)] font-medium' 
+                      : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text-primary)]'
+                    }
+                  `}
+                >
+                  <ParentIcon className={`w-4 h-4 flex-shrink-0 ${hasActiveChild ? 'text-[var(--color-mint)]' : ''}`} />
+                  <span className="flex-1 text-left font-medium">{section.title}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Submenu Items */}
+                <div className={`
+                  overflow-hidden transition-all duration-300 ease-in-out
+                  ${isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}
+                `}>
+                  <div className="space-y-0.5 py-1">
+                    {section.items.map((item) => {
+                      const active = isActive(item.path);
+                      return (
+                        <button
+                          key={item.path}
+                          onClick={() => {
+                            navigate(item.path);
+                            setSidebarOpen(false);
+                          }}
+                          className={`
+                            w-full flex items-center gap-3 pl-11 pr-4 py-2 text-[13px] transition-all
+                            ${active 
+                              ? 'text-[var(--color-mint)] font-medium bg-[var(--color-mint)]/5 rounded-r-full' 
+                              : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-secondary)]/50'
+                            }
+                          `}
+                        >
+                          <span className="flex-1 text-left">{item.label}</span>
+                          {item.badge && (
+                            <span className={`${item.badgeColor} text-white text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0`}>
+                              {item.badge}
+                            </span>
+                          )}
+                          {active && <div className="w-1 h-1 rounded-full bg-[var(--color-mint)] flex-shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-              <div className="space-y-1 px-2">
-                {section.items.map((item) => {
-                  const Icon = item.icon;
-                  const active = isActive(item.path);
-                  return (
-                    <button
-                      key={item.path}
-                      onClick={() => {
-                        navigate(item.path);
-                        setSidebarOpen(false);
-                      }}
-                      className={`
-                        w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
-                        ${active 
-                          ? 'bg-[var(--color-mint)] text-white' 
-                          : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text-primary)]'
-                        }
-                      `}
-                    >
-                      <Icon className="w-4 h-4 flex-shrink-0" />
-                      <span className="flex-1 text-left">{item.label}</span>
-                      {active && <div className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />}
-                      {item.badge && !active && (
-                        <span className={`${item.badgeColor} text-white text-xs px-2 py-0.5 rounded-full flex-shrink-0`}>
-                          {item.badge}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* User Card */}
