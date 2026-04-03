@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router';
 import { 
   ShieldCheck, 
   Building2, 
-  LayoutGrid,
   ArrowRight
 } from 'lucide-react';
+const ViyanLogo = '/viyan-logo.png';
 
 export const PortalSelection: React.FC = () => {
   const navigate = useNavigate();
@@ -19,12 +19,11 @@ export const PortalSelection: React.FC = () => {
       {/* Navbar */}
       <nav className="h-20 px-6 sm:px-12 flex items-center justify-between z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[var(--color-mint)] flex items-center justify-center shadow-[0_8px_16px_rgba(29,185,122,0.2)]">
-            <LayoutGrid className="w-6 h-6 text-white" />
+          <img src={ViyanLogo} alt="Viyan Info Tech" className="h-12 w-12 rounded-xl object-cover" style={{ boxShadow: '0 0 0 1.5px rgba(13,110,90,0.6), 0 0 6px rgba(13,110,90,0.35)' }} />
+          <div className="flex flex-col leading-none">
+            <span className="font-black text-[22px] tracking-wide text-[var(--color-text-primary)]" style={{ WebkitTextStroke: '1px rgba(13,110,90,0.6)', paintOrder: 'stroke fill' }}>VIYAN</span>
+            <span className="text-[11px] font-bold tracking-[0.22em]" style={{ color: "var(--color-mint)", WebkitTextStroke: '0.5px rgba(13,110,90,0.5)' }}>INFO TECH</span>
           </div>
-          <span className="text-xl font-bold text-[var(--color-text-primary)] tracking-tight">
-            StockFlow <span className="text-[var(--color-text-secondary)] font-normal">Pro</span>
-          </span>
         </div>
         
         <div className="flex items-center gap-6">

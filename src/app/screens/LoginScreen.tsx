@@ -8,6 +8,7 @@ import {
 // Import images for Vite
 import WarehouseImg from '../../assets/warehouse_platform_bg.png';
 import TenantImg from '../../assets/tenant_login_hero.png';
+const ViyanLogo = '/viyan-logo.png';
 
 export const LoginScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -79,10 +80,11 @@ export const LoginScreen: React.FC = () => {
           {/* TOP NAVBAR */}
           <nav className="h-[64px] min-h-[64px] px-8 flex items-center justify-between border-b border-text-muted/10">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-mint flex items-center justify-center shadow-md">
-                <BoxIcon className="w-5 h-5 text-white" />
+              <img src={ViyanLogo} alt="Viyan Info Tech" className="h-11 w-11 rounded-xl object-cover" style={{ boxShadow: '0 0 0 1.5px rgba(13,110,90,0.6), 0 0 6px rgba(13,110,90,0.35)' }} />
+              <div className="flex flex-col leading-none">
+                <span className="font-black text-[20px] tracking-wide text-text-primary" style={{ WebkitTextStroke: '1px rgba(13,110,90,0.6)', paintOrder: 'stroke fill' }}>VIYAN</span>
+                <span className="text-[10px] font-bold tracking-[0.22em]" style={{ color: "#1db97a", WebkitTextStroke: '0.5px rgba(13,110,90,0.5)' }}>INFO TECH</span>
               </div>
-              <span className="text-[15px] font-[700] text-text-primary tracking-tight">InventoryPro</span>
             </div>
 
             <div className="flex items-center gap-4">
