@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import {
-  BarChart3, FileText, TrendingUp, TrendingDown,
+  BarChart3, TrendingUp, TrendingDown,
   Building2, Users, CreditCard, Shield, Calendar
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar
 } from 'recharts';
-import { PageHeader } from '../components/PageHeader';
 
 const revenueData = [
   { month: 'Oct', value: 180000 },
@@ -143,7 +142,7 @@ export const PlatformReports: React.FC = () => {
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9aa5b4' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: '#9aa5b4' }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v / 100000}L`} />
                 <Tooltip
-                  formatter={(value: number) => [formatCurrency(value), 'Revenue']}
+                  formatter={(value) => [formatCurrency(Number(value)), 'Revenue']}
                   contentStyle={{ borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12 }}
                 />
                 <Area type="monotone" dataKey="value" stroke="#1db97a" strokeWidth={2.5} fill="url(#revGradient)" dot={{ r: 3, fill: '#1db97a', stroke: '#fff', strokeWidth: 2 }} />
@@ -174,7 +173,7 @@ export const PlatformReports: React.FC = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number, name: string) => [`${value}%`, name]}
+                  formatter={(value, name) => [`${value}%`, String(name)]}
                   contentStyle={{ borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12 }}
                 />
               </PieChart>
@@ -202,7 +201,7 @@ export const PlatformReports: React.FC = () => {
                 <XAxis type="number" tick={{ fontSize: 11, fill: '#9aa5b4' }} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="plan" tick={{ fontSize: 12, fill: '#334155', fontWeight: 600 }} axisLine={false} tickLine={false} width={80} />
                 <Tooltip
-                  formatter={(value: number) => [`${value} tenants`, 'Count']}
+                  formatter={(value) => [`${value} tenants`, 'Count']}
                   contentStyle={{ borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12 }}
                 />
                 <Bar dataKey="tenants" fill="#0d6e5a" radius={[0, 6, 6, 0]} barSize={24} />
