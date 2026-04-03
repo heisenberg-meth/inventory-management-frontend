@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Building2, Search, 
   CheckCircle2, XCircle, Clock,
@@ -168,7 +169,7 @@ export const Tenants: React.FC = () => {
                   <td className="px-6 py-4 text-[13px] text-[#6b7a8d]">{tenant.created}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-3 text-[#9aa5b4]">
-                      <button className="hover:text-[#0d6e5a] transition-colors"><Eye className="w-4 h-4" /></button>
+                      <Link to={`/admin/tenants/${tenant.id}`} className="hover:text-[#0d6e5a] transition-colors"><Eye className="w-4 h-4" /></Link>
                       <button className="hover:text-[#0ea5e9] transition-colors"><Edit3 className="w-4 h-4" /></button>
                       <button className="hover:text-[#ef4444] transition-colors"><ShieldAlert className="w-4 h-4" /></button>
                     </div>

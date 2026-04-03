@@ -54,7 +54,11 @@ export const PlatformAdminLayout: React.FC = () => {
     '/admin': { title: 'Command Center', breadcrumb: 'GLOBAL WORKSPACE' },
     '/admin/dashboard': { title: 'Command Center', breadcrumb: 'GLOBAL WORKSPACE' },
     '/admin/tenants': { title: 'Tenants', breadcrumb: 'TENANT MANAGEMENT' },
-    '/admin/subscriptions': { title: 'Revenue Engine', breadcrumb: 'SUBSCRIPTIONS' },
+    '/admin/tenants/1': { title: 'Tenant Profile', breadcrumb: 'TENANTS / ABC PHARMACY' },
+    '/admin/tenant-users': { title: 'Tenant Users', breadcrumb: 'USER MANAGEMENT' },
+    '/admin/platform-admins': { title: 'Platform Admins', breadcrumb: 'PLATFORM ADMINISTRATION' },
+    '/admin/payments': { title: 'Payments', breadcrumb: 'PAYMENT MANAGEMENT' },
+    '/admin/subscriptions': { title: 'Plans', breadcrumb: 'PLANS & PRICING' },
   };
 
   const currentHeader = headerMap[location.pathname] || { title: 'Command Center', breadcrumb: 'GLOBAL WORKSPACE' };
