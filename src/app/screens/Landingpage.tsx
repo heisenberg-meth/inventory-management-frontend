@@ -508,13 +508,13 @@ export function LandingPage() {
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-3">
-              <button
+              {/*<button
                 onClick={() => setIsDark(!isDark)}
                 className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
                 style={{ background: t.bgSecondary, color: t.textSecondary }}
               >
                 {isDark ? <Sun size={16} /> : <Moon size={16} />}
-              </button>
+              </button>*/}
               <button
                 onClick={() => navigate("/login?role=tenant-admin")}
                 className="px-4 py-2 rounded-lg text-sm font-medium border transition-colors"

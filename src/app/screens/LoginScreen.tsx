@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import {
   Building2, Mail, Lock, Eye, EyeOff, LayoutGrid,
-  Shield, ShieldCheck, Fingerprint, Info, Star, Zap, Sun, Moon
+  Shield, ShieldCheck, Fingerprint, Info, Star, Zap
 } from 'lucide-react';
 
 // Import images for Vite
@@ -23,27 +23,20 @@ export const LoginScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('ims-theme');
-    return saved !== null ? saved === 'dark' : true;
-  });
-
   const isPlatformAdmin = initialRole === 'platform-admin';
 
-  // Apply theme class on mount and when isDark changes
+  // Apply theme class on mount based on saved preference
   useEffect(() => {
-    if (isDark) {
+    const saved = localStorage.getItem('ims-theme');
+    const preferDark = saved !== null ? saved === 'dark' : true;
+    if (preferDark) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-  }, [isDark]);
+  }, []);
 
-  const toggleTheme = () => {
-    const next = !isDark;
-    setIsDark(next);
-    localStorage.setItem('ims-theme', next ? 'dark' : 'light');
-  };
+
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,21 +79,8 @@ export const LoginScreen: React.FC = () => {
                 <span className="text-[10px] font-bold tracking-[0.22em]" style={{ color: "#1db97a", WebkitTextStroke: '0.5px rgba(13,110,90,0.5)' }}>INFO TECH</span>
               </div>
             </div>
+            </nav>
 
-            <div className="flex items-center gap-4">
-              <button
-                onClick={toggleTheme}
-                className="p-1.5 rounded-lg bg-surface-secondary text-text-secondary hover:text-mint transition-all"
-                title={isDark ? "Light Mode" : "Dark Mode"}
-              >
-                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
-              <div className="w-[1px] h-3 bg-text-muted/20" />
-              <button className="h-7 px-3 border border-text-muted/20 text-text-secondary text-[12px] font-[600] rounded-lg hover:bg-surface-secondary transition-colors">
-                Help
-              </button>
-            </div>
-          </nav>
 
           {/* BACK LINK */}
           {/*<div className="pl-8 pt-5 text-left">
@@ -251,7 +231,7 @@ export const LoginScreen: React.FC = () => {
                 </div>
                 {!isPlatformAdmin && (
                   <div className="text-[9px] font-[700] text-text-muted tracking-[0.08em]">
-                    © 2026 StockFlow Systems
+                    © 2026 Viyan Infotech
                   </div>
                 )}
               </div>
@@ -275,7 +255,7 @@ export const LoginScreen: React.FC = () => {
             <div className="w-4 h-4 rounded-md bg-white flex items-center justify-center">
               <BoxIcon className={`w-3 text-mint`} />
             </div>
-            <span className="text-[11px] font-[600] text-white">StockFlow <span className="opacity-70 font-normal italic">Operations</span></span>
+            <span className="text-[11px] font-[600] text-white">Viyan Infotech</span>
           </div>
 
           {/* FEATURE HIGHLIGHTS */}
