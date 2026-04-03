@@ -504,11 +504,8 @@ export function LandingPage() {
                 {isDark ? <Sun size={16} /> : <Moon size={16} />}
               </button>
               <button
-<<<<<<< HEAD
                 onClick={() => navigate("/login?role=tenant-admin")}
-=======
                 onClick={() => navigate("/login?role=admin")}
->>>>>>> 2f4b112e0ded5cfcd01cb6acffc79ccf165beb2a
                 className="px-4 py-2 rounded-lg text-sm font-medium border transition-colors"
                 style={{ borderColor: t.border, color: t.textPrimary, background: "transparent" }}
               >
