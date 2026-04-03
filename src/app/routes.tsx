@@ -41,6 +41,9 @@ import { PlatformAdmins } from "./platform-admin/screens/PlatformAdmins";
 import { Payments } from "./platform-admin/screens/Payments";
 import { TenantProfile } from "./platform-admin/screens/TenantProfile";
 import { PlaceholderScreen } from "./platform-admin/screens/PlaceholderScreen";
+import { SupportTickets } from './platform-admin/screens/SupportTickets';
+import { AuditLogs } from './platform-admin/screens/AuditLogs';
+import { PlatformReports } from './platform-admin/screens/PlatformReports';
 
 export const router = createBrowserRouter([
   {
@@ -67,9 +70,18 @@ export const router = createBrowserRouter([
       { path: "platform-admins", element: <PlatformAdmins /> },
       { path: "payments", element: <Payments /> },
       { path: "subscriptions", element: <Subscriptions /> },
+<<<<<<< HEAD
       { path: "audit-logs", element: <PlaceholderScreen section="AUDIT LOGS" title="System Traceability" description="Immutable audit trails for all root-level and cluster actions across the ecosystem." /> },
       { path: "reports", element: <PlaceholderScreen section="REPORTS" title="Data Analytics Hub" description="Generate cross-cluster reports and visualize global performance metrics." /> },
       { path: "support", element: <PlaceholderScreen section="SUPPORT" title="Global Support Tickets" description="Handle L2/L3 support escalations and communicate with tenant administrators." /> },
+=======
+      { path: "tenant-users", element: <PlaceholderScreen section="TENANT USERS" title="Global Identity Pool" description="Manage user identities across all provisioned clusters and monitor access patterns." /> },
+      { path: "platform-admins", element: <PlaceholderScreen section="PLATFORM ADMINS" title="Super Admin Registry" description="Manage core platform administrators and define root-level access permissions." /> },
+      { path: "payments", element: <PlaceholderScreen section="PAYMENTS" title="Financial Data Core" description="Transaction logs, payout orchestrations, and revenue leakage detection." /> },
+      { path: "audit-logs", element: <AuditLogs /> },
+      { path: "reports", element: <PlatformReports /> },
+      { path: "support", element: <SupportTickets /> },
+>>>>>>> 9fbab388d5f8311cc40bdec89afeb260b74d8f2a
     ],
   },
   {
