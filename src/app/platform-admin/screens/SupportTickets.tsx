@@ -160,16 +160,16 @@ const Dropdown: React.FC<{
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="h-[36px] px-4 bg-white border border-[#e2e8f0] rounded-[8px] text-[13px] font-[500] text-[#0d1b2a] flex items-center gap-2 hover:border-[#0d6e5a] transition-all whitespace-nowrap"
+        className="h-[36px] px-4 bg-[var(--pa-card-bg)] border border-[var(--pa-border)] rounded-[8px] text-[13px] font-[500] text-[var(--pa-text-near-black)] flex items-center gap-2 hover:border-[var(--pa-teal)] transition-all whitespace-nowrap"
       >
-        {display} <ChevronDown className={`w-3.5 h-3.5 text-[#9aa5b4] transition-transform ${open ? 'rotate-180' : ''}`} />
+        {display} <ChevronDown className={`w-3.5 h-3.5 text-[var(--pa-text-light-gray)] transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="absolute top-full left-0 mt-1 bg-white border border-[#e2e8f0] rounded-[10px] shadow-xl z-[70] min-w-[160px] py-1 animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute top-full left-0 mt-1 bg-[var(--pa-card-bg)] border border-[var(--pa-border)] rounded-[10px] shadow-xl z-[70] min-w-[160px] py-1 animate-in fade-in zoom-in-95 duration-150">
           {allLabel && (
             <button
               onClick={() => { onChange(''); setOpen(false); }}
-              className={`w-full text-left px-4 py-2 text-[13px] hover:bg-[#f8f9fb] transition-colors ${!value ? 'text-[#0d6e5a] font-bold' : 'text-[#334155]'}`}
+              className={`w-full text-left px-4 py-2 text-[13px] hover:bg-[var(--pa-blue-gray-bg)] transition-colors ${!value ? 'text-[var(--pa-teal)] font-bold' : 'text-[var(--pa-text-near-black)]'}`}
             >
               {allLabel}
             </button>
@@ -178,7 +178,7 @@ const Dropdown: React.FC<{
             <button
               key={opt}
               onClick={() => { onChange(opt); setOpen(false); }}
-              className={`w-full text-left px-4 py-2 text-[13px] hover:bg-[#f8f9fb] transition-colors ${value === opt ? 'text-[#0d6e5a] font-bold' : 'text-[#334155]'}`}
+              className={`w-full text-left px-4 py-2 text-[13px] hover:bg-[var(--pa-blue-gray-bg)] transition-colors ${value === opt ? 'text-[var(--pa-teal)] font-bold' : 'text-[var(--pa-text-near-black)]'}`}
             >
               {opt}
             </button>
@@ -285,7 +285,7 @@ export const SupportTickets: React.FC = () => {
   const uniqueTenants = [...new Set(tickets.map(t => t.tenant))];
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 pa-root">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* PAGE HEADER */}
       <PageHeader
         section="CUSTOMER SUPPORT"
@@ -298,17 +298,10 @@ export const SupportTickets: React.FC = () => {
       {/* ━━━ SUPPORT METRIC CARDS (4) ━━━ */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
         {[
-<<<<<<< HEAD
-          { icon: Ticket, label: 'Open Tickets', value: '12', color: 'text-[var(--pa-amber)]', iconBg: 'bg-[var(--pa-amber)]/10', sub: null },
-          { icon: Clock, label: 'Pending Response', value: '4', color: 'text-[var(--pa-red)]', iconBg: 'bg-[var(--pa-red)]/10', sub: 'Needs attention' },
-          { icon: CheckCircle2, label: 'Resolved Today', value: '8', color: 'text-[var(--pa-mint)]', iconBg: 'bg-[var(--pa-mint)]/10', sub: null },
+          { icon: Ticket, label: 'Open Tickets', value: String(openCount), color: 'text-[var(--pa-amber)]', iconBg: 'bg-[var(--pa-amber)]/10', sub: null },
+          { icon: Clock, label: 'Pending Response', value: String(pendingCount), color: 'text-[var(--pa-red)]', iconBg: 'bg-[var(--pa-red)]/10', sub: 'Needs attention' },
+          { icon: CheckCircle2, label: 'Resolved Today', value: String(resolvedCount), color: 'text-[var(--pa-mint)]', iconBg: 'bg-[var(--pa-mint)]/10', sub: null },
           { icon: Star, label: 'Avg Rating', value: '4.8', color: 'text-[var(--pa-mint)]', iconBg: 'bg-[var(--pa-mint)]/10', sub: 'From closed tickets' },
-=======
-          { icon: Ticket, label: 'Open Tickets', value: String(openCount), color: 'text-[#f59e0b]', iconBg: 'bg-[#fef3c7]', sub: null },
-          { icon: Clock, label: 'Pending Response', value: String(pendingCount), color: 'text-[#ef4444]', iconBg: 'bg-[#fee2e2]', sub: 'Needs attention' },
-          { icon: CheckCircle2, label: 'Resolved Today', value: String(resolvedCount), color: 'text-[#1db97a]', iconBg: 'bg-[#dcfce7]', sub: null },
-          { icon: Star, label: 'Avg Rating', value: '4.8', color: 'text-[#1db97a]', iconBg: 'bg-[#dcfce7]', sub: 'From closed tickets' },
->>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
         ].map((m, i) => (
           <div key={i} className="bg-[var(--pa-card-bg)] border border-[var(--pa-border)] rounded-[16px] p-6 shadow-sm flex items-center justify-between group hover:shadow-lg transition-all duration-300">
             <div>
@@ -336,17 +329,9 @@ export const SupportTickets: React.FC = () => {
           />
         </div>
         <div className="flex items-center gap-2">
-<<<<<<< HEAD
-          {['All Status', 'All Priority', 'All Tenants'].map((f) => (
-            <button key={f} className="h-[36px] px-4 bg-[var(--pa-card-bg)] border border-[var(--pa-border)] rounded-[8px] text-[13px] font-[500] text-[var(--pa-text-near-black)] flex items-center gap-2 hover:border-[var(--pa-teal)] hover:text-[var(--pa-teal)] transition-all">
-              {f} <ChevronDown className="w-3.5 h-3.5 text-[var(--pa-text-light-gray)]" />
-            </button>
-          ))}
-=======
           <Dropdown label="Status" value={filterStatus} options={STATUSES} onChange={setFilterStatus} allLabel="All Status" />
           <Dropdown label="Priority" value={filterPriority} options={PRIORITIES} onChange={setFilterPriority} allLabel="All Priority" />
           <Dropdown label="Tenant" value={filterTenant} options={uniqueTenants} onChange={setFilterTenant} allLabel="All Tenants" />
->>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
         </div>
       </div>
 
@@ -363,19 +348,13 @@ export const SupportTickets: React.FC = () => {
                 ))}
               </tr>
             </thead>
-<<<<<<< HEAD
             <tbody className="divide-y divide-[var(--pa-border)]">
-              {tickets.map((ticket) => (
-                <tr key={ticket.id} className="hover:bg-[var(--pa-row-hover)] transition-colors cursor-pointer group">
-=======
-            <tbody className="divide-y divide-[#f8f9fb]">
               {filtered.map((ticket) => (
                 <tr
                   key={ticket.id}
                   onClick={() => openDrawer(ticket.id)}
-                  className={`hover:bg-[var(--pa-row-hover)] transition-colors cursor-pointer group ${selectedId === ticket.id ? 'bg-[#f0fdf4]' : ''}`}
+                  className={`hover:bg-[var(--pa-row-hover)] transition-colors cursor-pointer group ${selectedId === ticket.id ? 'bg-[var(--pa-row-hover)]' : ''}`}
                 >
->>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
                   <td className="px-6 py-4">
                     <span className="text-[12px] font-bold text-[var(--pa-teal)] tracking-wider">{ticket.id}</span>
                   </td>
@@ -402,47 +381,29 @@ export const SupportTickets: React.FC = () => {
                       {getStatusIcon(ticket.status)} {ticket.status}
                     </span>
                   </td>
-<<<<<<< HEAD
                   <td className="px-6 py-4 text-[13px] text-[var(--pa-text-muted)]">{ticket.created}</td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-2 text-[var(--pa-text-light-gray)]">
                       <button
-                        onClick={() => { setSelectedTicket(ticket); setReplyText(''); }}
-                        className="hover:text-[var(--pa-teal)] transition-colors"
-=======
-                  <td className="px-6 py-4 text-[13px] text-[#6b7a8d]">{ticket.created}</td>
-                  <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
-                    <div className="flex items-center justify-end gap-2">
-                      <button
                         onClick={() => openDrawer(ticket.id)}
-                        className="hover:text-[#0d6e5a] text-[#9aa5b4] transition-colors"
->>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
+                        className="hover:text-[var(--pa-teal)] transition-colors"
                         title="View ticket"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
                       {ticket.status !== 'Resolved' && ticket.assignedTo && (
                         <button
-<<<<<<< HEAD
-                          onClick={() => { setSelectedTicket(ticket); setReplyText(''); }}
-                          className="text-[11px] font-bold text-[var(--pa-teal)] hover:underline"
-=======
                           onClick={() => openDrawer(ticket.id)}
-                          className="text-[11px] font-bold text-[#0d6e5a] hover:underline"
->>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
+                          className="text-[11px] font-bold text-[var(--pa-teal)] hover:underline"
                         >
                           Reply
                         </button>
                       )}
                       {!ticket.assignedTo && (
-<<<<<<< HEAD
-                        <button className="text-[11px] font-bold text-amber-600 hover:underline flex items-center gap-1">
-=======
                         <button
                           onClick={() => openDrawer(ticket.id)}
-                          className="text-[11px] font-bold text-[#f59e0b] hover:underline flex items-center gap-1"
+                          className="text-[11px] font-bold text-[var(--pa-amber)] hover:underline flex items-center gap-1"
                         >
->>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
                           <UserPlus className="w-3 h-3" /> Assign
                         </button>
                       )}
@@ -452,7 +413,7 @@ export const SupportTickets: React.FC = () => {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-[14px] text-[#9aa5b4]">
+                  <td colSpan={8} className="px-6 py-12 text-center text-[14px] text-[var(--pa-text-light-gray)]">
                     No tickets match your filters.
                   </td>
                 </tr>
@@ -460,94 +421,30 @@ export const SupportTickets: React.FC = () => {
             </tbody>
           </table>
         </div>
-<<<<<<< HEAD
         <div className="px-6 py-4 bg-[var(--pa-blue-gray-bg)]/50 border-t border-[var(--pa-border)] flex items-center justify-between">
-          <span className="text-[13px] text-[var(--pa-text-muted)]">Showing 1–6 of 6 tickets</span>
-=======
-        <div className="px-6 py-4 bg-[#fcfdfe] border-t border-[#f0f4f8] flex items-center justify-between">
-          <span className="text-[13px] text-[#6b7a8d]">Showing {filtered.length} of {tickets.length} tickets</span>
->>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
+          <span className="text-[13px] text-[var(--pa-text-muted)]">Showing {filtered.length} of {tickets.length} tickets</span>
         </div>
       </div>
 
-      {/* ━━━ VIEW TICKET MODAL (light themed) ━━━ */}
+      {/* ━━━ VIEW TICKET MODAL ━━━ */}
       {selectedTicket && (
         <>
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[50]" onClick={() => setSelectedId(null)} />
 
-<<<<<<< HEAD
-          {/* Drawer */}
-          <div className="fixed top-0 right-0 h-full w-[440px] z-[60] bg-[var(--pa-card-bg)] border-l border-[var(--pa-border)] shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-            {/* Header */}
-            <div className="p-6 border-b border-[var(--pa-border)] flex items-center justify-between flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <span className="text-[16px] font-[700] text-[var(--pa-text-near-black)]">{selectedTicket.id}</span>
-                <span className={`px-2.5 py-1 rounded-[4px] text-[10px] font-bold tracking-wider ${getPriorityBadge(selectedTicket.priority)}`}>
-                  {selectedTicket.priority}
-                </span>
-              </div>
-              <button onClick={() => setSelectedTicket(null)} className="p-2 text-[var(--pa-text-light-gray)] hover:text-[var(--pa-text-near-black)] rounded-lg hover:bg-[var(--pa-blue-gray-bg)] transition-colors">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Tenant Info Row */}
-            <div className="px-6 py-4 bg-[var(--pa-blue-gray-bg)]/50 border-b border-[var(--pa-border)] flex items-center gap-4 flex-shrink-0">
-              <div className="w-8 h-8 rounded-full bg-[var(--pa-teal)]/10 flex items-center justify-center text-[var(--pa-teal)] text-[10px] font-[700]">
-                {initials(selectedTicket.tenant)}
-              </div>
-              <div className="flex-1">
-                <div className="text-[13px] font-[600] text-[var(--pa-text-near-black)]">{selectedTicket.tenant}</div>
-                <div className="text-[11px] text-[var(--pa-text-muted)]">{selectedTicket.contact}</div>
-              </div>
-              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${getStatusBadge(selectedTicket.status)}`}>
-                {selectedTicket.status}
-              </span>
-            </div>
-
-            {/* Subject & Description */}
-            <div className="px-6 py-4 border-b border-[var(--pa-border)] flex-shrink-0">
-              <h3 className="text-[16px] font-[600] text-[var(--pa-text-near-black)] mb-2">{selectedTicket.subject}</h3>
-              <p className="text-[14px] text-[var(--pa-text-muted)] leading-relaxed">{selectedTicket.description}</p>
-            </div>
-
-            {/* Chat Timeline */}
-            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 scrollbar-none">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--pa-text-light-gray)] mb-2">Conversation</div>
-              {selectedTicket.messages.map((msg, i) => (
-                <div key={i} className={`flex gap-3 ${msg.isAdmin ? 'flex-row-reverse' : ''}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${
-                    msg.isAdmin ? 'bg-[var(--pa-teal)] text-white' : 'bg-[var(--pa-blue-gray-bg)] text-[var(--pa-text-muted)]'
-                  }`}>
-                    {initials(msg.sender)}
-                  </div>
-                  <div className={`max-w-[300px] ${msg.isAdmin ? 'text-right' : ''}`}>
-                    <div className={`flex items-center gap-2 mb-1 ${msg.isAdmin ? 'justify-end' : ''}`}>
-                      <span className="text-[11px] font-[600] text-[var(--pa-text-near-black)]">{msg.sender}</span>
-                      <span className="text-[10px] text-[var(--pa-text-light-gray)]">{msg.time}</span>
-                    </div>
-                    <div className={`p-3 rounded-[12px] text-[13px] leading-relaxed ${
-                      msg.isAdmin
-                        ? 'bg-[var(--pa-teal)]/10 text-[var(--pa-teal)]'
-                        : 'bg-[var(--pa-blue-gray-bg)]/80 text-[var(--pa-text-near-black)]'
-                    }`}>
-                      {msg.text}
-                    </div>
-=======
           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-[720px] rounded-[16px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+            <div className="bg-[var(--pa-card-bg)] w-full max-w-[720px] rounded-[16px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col border border-[var(--pa-border)]">
               {/* Modal Header */}
-              <div className="p-[20px_28px] border-b border-[#e2e8f0] flex items-center justify-between flex-shrink-0">
+              <div className="p-[20px_28px] border-b border-[var(--pa-border)] flex items-center justify-between flex-shrink-0">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <div className="w-2 h-2 rounded-full bg-[#1db97a]" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b7a8d]">TICKET DETAILS</span>
+                    <div className="w-2 h-2 rounded-full bg-[var(--pa-mint)]" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--pa-text-muted)]">TICKET DETAILS</span>
                   </div>
-                  <h2 className="text-[18px] font-[700] text-[#0d1b2a]">
-                    View Ticket — <span className="text-[#0d6e5a]">{selectedTicket.id}</span>
+                  <h2 className="text-[18px] font-[700] text-[var(--pa-text-near-black)]">
+                    View Ticket — <span className="text-[var(--pa-teal)]">{selectedTicket.id}</span>
                   </h2>
                 </div>
-                <button onClick={() => setSelectedId(null)} className="p-2 text-[#9aa5b4] hover:text-[#0d1b2a] transition-colors rounded-lg hover:bg-[#f1f5f9]">
+                <button onClick={() => setSelectedId(null)} className="p-2 text-[var(--pa-text-light-gray)] hover:text-[var(--pa-text-near-black)] transition-colors rounded-lg hover:bg-[var(--pa-blue-gray-bg)]">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -557,90 +454,54 @@ export const SupportTickets: React.FC = () => {
                 {/* Row 1: Ticket ID | Status */}
                 <div className="grid grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[#6b7a8d] mb-2">Ticket ID</label>
+                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[var(--pa-text-light-gray)] mb-2">Ticket ID</label>
                     <input
                       type="text"
                       value={selectedTicket.id}
                       readOnly
-                      className="w-full h-11 bg-[#f8f9fb] border border-[#e2e8f0] rounded-[10px] px-4 text-[13px] text-[#6b7a8d] font-mono cursor-not-allowed"
+                      className="w-full h-11 bg-[var(--pa-blue-gray-bg)] border border-[var(--pa-border)] rounded-[10px] px-4 text-[13px] text-[var(--pa-text-muted)] font-mono cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[#6b7a8d] mb-2">Status</label>
+                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[var(--pa-text-light-gray)] mb-2">Status</label>
                     <select
                       value={editForm.status || selectedTicket.status}
                       onChange={(e) => setEditForm(prev => ({ ...prev, status: e.target.value as Status }))}
-                      className="w-full h-11 bg-[#f8f9fb] border border-[#e2e8f0] rounded-[10px] px-4 text-[13px] text-[#0d1b2a] appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0d6e5a]/20"
+                      className="w-full h-11 bg-[var(--pa-blue-gray-bg)] border border-[var(--pa-border)] rounded-[10px] px-4 text-[13px] text-[var(--pa-text-near-black)] appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--pa-teal)]/20"
                     >
                       {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
->>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
                   </div>
                 </div>
 
-<<<<<<< HEAD
-            {/* Reply Box (hidden for Resolved tickets) */}
-            {selectedTicket.status !== 'Resolved' && (
-              <div className="p-4 border-t border-[var(--pa-border)] flex-shrink-0">
-                <textarea
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                  placeholder="Type your reply..."
-                  className="w-full h-[80px] bg-[var(--pa-blue-gray-bg)]/50 border border-[var(--pa-border)] rounded-[10px] p-3 text-[13px] text-[var(--pa-text-near-black)] placeholder-[var(--pa-text-light-gray)] focus:outline-none focus:ring-2 focus:ring-[var(--pa-teal)]/20 resize-none transition-all"
-                />
-                <div className="flex justify-end mt-3">
-                  <button className="h-[40px] px-6 bg-[var(--pa-teal)] text-white rounded-[8px] text-[11px] font-bold uppercase tracking-[0.1em] shadow-lg shadow-[#0d6e5a]/10 hover:shadow-[#0d6e5a]/20 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-2 transition-colors">
-                    <Send className="w-3.5 h-3.5" />
-                    SEND REPLY
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Meta Panel */}
-            <div className="px-6 py-4 border-t border-[var(--pa-border)] bg-[var(--pa-blue-gray-bg)]/30 space-y-3 flex-shrink-0">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--pa-text-light-gray)] mb-2">Details</div>
-              {[
-                { label: 'Priority', value: selectedTicket.priority },
-                { label: 'Assigned To', value: selectedTicket.assignedTo || 'Unassigned' },
-                { label: 'Status', value: selectedTicket.status },
-                { label: 'Tenant', value: selectedTicket.tenant },
-                { label: 'Created', value: selectedTicket.created },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between">
-                  <span className="text-[12px] font-medium text-[var(--pa-text-muted)]">{item.label}</span>
-                  <span className="text-[12px] font-[600] text-[var(--pa-text-near-black)]">{item.value}</span>
-                </div>
-              ))}
-=======
                 {/* Row 2: Subject (full width) */}
                 <div>
-                  <label className="block text-[11px] font-[700] uppercase tracking-wider text-[#6b7a8d] mb-2">Subject</label>
+                  <label className="block text-[11px] font-[700] uppercase tracking-wider text-[var(--pa-text-light-gray)] mb-2">Subject</label>
                   <input
                     type="text"
                     value={editForm.subject ?? selectedTicket.subject}
                     onChange={(e) => setEditForm(prev => ({ ...prev, subject: e.target.value }))}
-                    className="w-full h-11 bg-[#f8f9fb] border border-[#e2e8f0] rounded-[10px] px-4 text-[13px] text-[#0d1b2a] focus:outline-none focus:ring-2 focus:ring-[#0d6e5a]/20"
+                    className="w-full h-11 bg-[var(--pa-blue-gray-bg)] border border-[var(--pa-border)] rounded-[10px] px-4 text-[13px] text-[var(--pa-text-near-black)] focus:outline-none focus:ring-2 focus:ring-[var(--pa-teal)]/20"
                   />
                 </div>
 
                 {/* Row 3: Tenant | Priority */}
                 <div className="grid grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[#6b7a8d] mb-2">Tenant</label>
+                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[var(--pa-text-light-gray)] mb-2">Tenant</label>
                     <input
                       type="text"
                       value={editForm.tenant ?? selectedTicket.tenant}
                       readOnly
-                      className="w-full h-11 bg-[#f8f9fb] border border-[#e2e8f0] rounded-[10px] px-4 text-[13px] text-[#6b7a8d] cursor-not-allowed"
+                      className="w-full h-11 bg-[var(--pa-blue-gray-bg)] border border-[var(--pa-border)] rounded-[10px] px-4 text-[13px] text-[var(--pa-text-muted)] cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[#6b7a8d] mb-2">Priority</label>
+                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[var(--pa-text-light-gray)] mb-2">Priority</label>
                     <select
                       value={editForm.priority || selectedTicket.priority}
                       onChange={(e) => setEditForm(prev => ({ ...prev, priority: e.target.value as Priority }))}
-                      className="w-full h-11 bg-[#f8f9fb] border border-[#e2e8f0] rounded-[10px] px-4 text-[13px] text-[#0d1b2a] appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0d6e5a]/20"
+                      className="w-full h-11 bg-[var(--pa-blue-gray-bg)] border border-[var(--pa-border)] rounded-[10px] px-4 text-[13px] text-[var(--pa-text-near-black)] appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--pa-teal)]/20"
                     >
                       {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
                     </select>
@@ -650,20 +511,20 @@ export const SupportTickets: React.FC = () => {
                 {/* Row 4: Reported By | Assigned To */}
                 <div className="grid grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[#6b7a8d] mb-2">Reported By</label>
+                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[var(--pa-text-light-gray)] mb-2">Reported By</label>
                     <input
                       type="text"
                       value={editForm.contact ?? selectedTicket.contact}
                       readOnly
-                      className="w-full h-11 bg-[#f8f9fb] border border-[#e2e8f0] rounded-[10px] px-4 text-[13px] text-[#6b7a8d] cursor-not-allowed"
+                      className="w-full h-11 bg-[var(--pa-blue-gray-bg)] border border-[var(--pa-border)] rounded-[10px] px-4 text-[13px] text-[var(--pa-text-muted)] cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[#6b7a8d] mb-2">Assigned To</label>
+                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[var(--pa-text-light-gray)] mb-2">Assigned To</label>
                     <select
                       value={editForm.assignedTo ?? selectedTicket.assignedTo ?? ''}
                       onChange={(e) => setEditForm(prev => ({ ...prev, assignedTo: e.target.value || null }))}
-                      className="w-full h-11 bg-[#f8f9fb] border border-[#e2e8f0] rounded-[10px] px-4 text-[13px] text-[#0d1b2a] appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0d6e5a]/20"
+                      className="w-full h-11 bg-[var(--pa-blue-gray-bg)] border border-[var(--pa-border)] rounded-[10px] px-4 text-[13px] text-[var(--pa-text-near-black)] appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--pa-teal)]/20"
                     >
                       <option value="">Unassigned</option>
                       {ASSIGNEES.map(a => <option key={a} value={a}>{a}</option>)}
@@ -674,68 +535,68 @@ export const SupportTickets: React.FC = () => {
                 {/* Row 5: Contact Email | Phone */}
                 <div className="grid grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[#6b7a8d] mb-2">Contact Email</label>
+                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[var(--pa-text-light-gray)] mb-2">Contact Email</label>
                     <input
                       type="email"
                       value={editForm.email ?? selectedTicket.email}
                       readOnly
-                      className="w-full h-11 bg-[#f8f9fb] border border-[#e2e8f0] rounded-[10px] px-4 text-[13px] text-[#6b7a8d] cursor-not-allowed"
+                      className="w-full h-11 bg-[var(--pa-blue-gray-bg)] border border-[var(--pa-border)] rounded-[10px] px-4 text-[13px] text-[var(--pa-text-muted)] cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[#6b7a8d] mb-2">Phone</label>
+                    <label className="block text-[11px] font-[700] uppercase tracking-wider text-[var(--pa-text-light-gray)] mb-2">Phone</label>
                     <input
                       type="text"
                       value={editForm.phone ?? selectedTicket.phone}
                       readOnly
-                      className="w-full h-11 bg-[#f8f9fb] border border-[#e2e8f0] rounded-[10px] px-4 text-[13px] text-[#6b7a8d] cursor-not-allowed"
+                      className="w-full h-11 bg-[var(--pa-blue-gray-bg)] border border-[var(--pa-border)] rounded-[10px] px-4 text-[13px] text-[var(--pa-text-muted)] cursor-not-allowed"
                     />
                   </div>
                 </div>
 
                 {/* Row 6: Description */}
                 <div>
-                  <label className="block text-[11px] font-[700] uppercase tracking-wider text-[#6b7a8d] mb-2">Description</label>
+                  <label className="block text-[11px] font-[700] uppercase tracking-wider text-[var(--pa-text-light-gray)] mb-2">Description</label>
                   <textarea
                     value={editForm.description ?? selectedTicket.description}
                     onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full h-[100px] bg-[#f8f9fb] border border-[#e2e8f0] rounded-[10px] p-4 text-[13px] text-[#0d1b2a] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#0d6e5a]/20 resize-none"
+                    className="w-full h-[100px] bg-[var(--pa-blue-gray-bg)] border border-[var(--pa-border)] rounded-[10px] p-4 text-[13px] text-[var(--pa-text-near-black)] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[var(--pa-teal)]/20 resize-none"
                   />
                 </div>
 
                 {/* Row 7: Add Reply */}
                 <div>
-                  <label className="block text-[11px] font-[700] uppercase tracking-wider text-[#6b7a8d] mb-2">Add Reply</label>
+                  <label className="block text-[11px] font-[700] uppercase tracking-wider text-[var(--pa-text-light-gray)] mb-2">Add Reply</label>
                   <textarea
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder="Type your reply to the tenant..."
-                    className="w-full h-[80px] bg-[#f8f9fb] border border-[#e2e8f0] rounded-[10px] p-4 text-[13px] text-[#0d1b2a] placeholder-[#9aa5b4] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#0d6e5a]/20 resize-none"
+                    className="w-full h-[80px] bg-[var(--pa-blue-gray-bg)] border border-[var(--pa-border)] rounded-[10px] p-4 text-[13px] text-[var(--pa-text-near-black)] placeholder-[var(--pa-text-light-gray)] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[var(--pa-teal)]/20 resize-none"
                   />
                 </div>
               </div>
 
               {/* Modal Footer */}
-              <div className="p-[20px_28px] border-t border-[#e2e8f0] flex items-center justify-between flex-shrink-0">
+              <div className="p-[20px_28px] border-t border-[var(--pa-border)] flex items-center justify-between flex-shrink-0">
                 <div className="flex items-center gap-3">
-                  <span className="text-[12px] text-[#6b7a8d]">Created {selectedTicket.created} · Last updated just now</span>
+                  <span className="text-[12px] text-[var(--pa-text-muted)]">Created {selectedTicket.created}</span>
                   <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
                     selectedTicket.priority === 'High' || selectedTicket.priority === 'Urgent'
-                      ? 'border-[#ef4444] text-[#ef4444]'
+                      ? 'border-[var(--pa-red)] text-[var(--pa-red)]'
                       : selectedTicket.priority === 'Medium'
-                        ? 'border-[#f59e0b] text-[#f59e0b]'
-                        : 'border-[#3b82f6] text-[#3b82f6]'
+                        ? 'border-[var(--pa-amber)] text-[var(--pa-amber)]'
+                        : 'border-[var(--pa-blue)] text-[var(--pa-blue)]'
                   }`}>
                     {selectedTicket.priority} priority
                   </span>
                   <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
                     selectedTicket.status === 'Resolved'
-                      ? 'border-[#1db97a] text-[#1db97a]'
+                      ? 'border-[var(--pa-mint)] text-[var(--pa-mint)]'
                       : selectedTicket.status === 'In Progress'
-                        ? 'border-[#3b82f6] text-[#3b82f6]'
+                        ? 'border-[var(--pa-blue)] text-[var(--pa-blue)]'
                         : selectedTicket.status === 'Urgent'
-                          ? 'border-[#ef4444] text-[#ef4444]'
-                          : 'border-[#f59e0b] text-[#f59e0b]'
+                          ? 'border-[var(--pa-red)] text-[var(--pa-red)]'
+                          : 'border-[var(--pa-amber)] text-[var(--pa-amber)]'
                   }`}>
                     {selectedTicket.status}
                   </span>
@@ -743,20 +604,19 @@ export const SupportTickets: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setSelectedId(null)}
-                    className="px-6 py-[10px] border border-[#e2e8f0] text-[#6b7a8d] text-[12px] font-[700] uppercase tracking-widest rounded-[10px] hover:bg-[#f1f5f9] hover:text-[#0d1b2a] transition-colors"
+                    className="px-6 py-[10px] border border-[var(--pa-border)] text-[var(--pa-text-muted)] text-[12px] font-[700] uppercase tracking-widest rounded-[10px] hover:bg-[var(--pa-blue-gray-bg)] hover:text-[var(--pa-text-near-black)] transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSaveChanges}
-                    className="px-6 py-[10px] bg-[#0d6e5a] text-white text-[12px] font-[700] uppercase tracking-widest rounded-[10px] shadow-lg shadow-[#0d6e5a]/20 hover:-translate-y-0.5 transition-all flex items-center gap-2"
+                    className="px-6 py-[10px] bg-[var(--pa-teal)] text-white text-[12px] font-[700] uppercase tracking-widest rounded-[10px] shadow-lg shadow-[var(--pa-teal)]/20 hover:-translate-y-0.5 transition-all flex items-center gap-2"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     SAVE CHANGES
                   </button>
                 </div>
               </div>
->>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
             </div>
           </div>
         </>
@@ -765,56 +625,56 @@ export const SupportTickets: React.FC = () => {
       {/* ━━━ CREATE TICKET MODAL ━━━ */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-[480px] rounded-[16px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-[24px_32px] border-b border-[#f0f4f8] flex items-center justify-between">
+          <div className="bg-[var(--pa-card-bg)] w-full max-w-[480px] rounded-[16px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-[var(--pa-border)]">
+            <div className="p-[24px_32px] border-b border-[var(--pa-border)] flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="w-2 h-2 rounded-full bg-[#1db97a]" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#6b7a8d]">NEW TICKET</span>
+                  <div className="w-2 h-2 rounded-full bg-[var(--pa-mint)]" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--pa-text-muted)]">NEW TICKET</span>
                 </div>
-                <h2 className="text-[20px] font-[700] text-[#0d1b2a]">Create Support Ticket</h2>
+                <h2 className="text-[20px] font-[700] text-[var(--pa-text-near-black)]">Create Support Ticket</h2>
               </div>
-              <button onClick={() => setShowCreateModal(false)} className="p-2 text-[#9aa5b4] hover:text-[#0d1b2a] transition-colors rounded-lg hover:bg-[#f1f5f9]">
+              <button onClick={() => setShowCreateModal(false)} className="p-2 text-[var(--pa-text-light-gray)] hover:text-[var(--pa-text-near-black)] transition-colors rounded-lg hover:bg-[var(--pa-blue-gray-bg)]">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="p-[32px] space-y-6">
               <div>
-                <label className="block text-[12px] font-[700] uppercase tracking-wider text-[#6b7a8d] mb-2 px-1">Subject</label>
+                <label className="block text-[12px] font-[700] uppercase tracking-wider text-[var(--pa-text-light-gray)] mb-2 px-1">Subject</label>
                 <input
                   type="text"
                   value={newSubject}
                   onChange={(e) => setNewSubject(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleCreateTicket(); }}
                   placeholder="Describe the issue..."
-                  className="w-full h-11 bg-[#f8f9fb] border-none rounded-xl px-4 text-[13px] text-[#0d1b2a] focus:ring-2 focus:ring-[#0d6e5a]/10"
+                  className="w-full h-11 bg-[var(--pa-blue-gray-bg)] border-none rounded-xl px-4 text-[13px] text-[var(--pa-text-near-black)] focus:ring-2 focus:ring-[var(--pa-teal)]/10"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="block text-[12px] font-[700] uppercase tracking-wider text-[#6b7a8d] mb-2 px-1">Tenant</label>
+                <label className="block text-[12px] font-[700] uppercase tracking-wider text-[var(--pa-text-light-gray)] mb-2 px-1">Tenant</label>
                 <select
                   value={newTenant}
                   onChange={(e) => setNewTenant(e.target.value)}
-                  className="w-full h-11 bg-[#f8f9fb] border-none rounded-xl px-4 text-[13px] text-[#0d1b2a] focus:ring-2 focus:ring-[#0d6e5a]/10 appearance-none"
+                  className="w-full h-11 bg-[var(--pa-blue-gray-bg)] border-none rounded-xl px-4 text-[13px] text-[var(--pa-text-near-black)] focus:ring-2 focus:ring-[var(--pa-teal)]/10 appearance-none"
                 >
                   {TENANTS.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
             </div>
 
-            <div className="p-8 border-t border-[#f0f4f8] flex items-center justify-end gap-4">
+            <div className="p-8 border-t border-[var(--pa-border)] flex items-center justify-end gap-4">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="px-6 py-[14px] border border-[#e2e8f0] text-[#6b7a8d] text-[13px] font-[700] uppercase tracking-widest rounded-[12px] hover:bg-[#f8f9fb] transition-colors"
+                className="px-6 py-[14px] border border-[var(--pa-border)] text-[var(--pa-text-muted)] text-[13px] font-[700] uppercase tracking-widest rounded-[12px] hover:bg-[var(--pa-blue-gray-bg)] transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateTicket}
                 disabled={!newSubject.trim()}
-                className="px-8 py-[14px] bg-[#0d6e5a] text-white text-[13px] font-[700] uppercase tracking-widest rounded-[12px] shadow-lg shadow-[#0d6e5a]/20 hover:-translate-y-0.5 transition-all disabled:opacity-40 disabled:pointer-events-none flex items-center gap-2"
+                className="px-8 py-[14px] bg-[var(--pa-teal)] text-white text-[13px] font-[700] uppercase tracking-widest rounded-[12px] shadow-lg shadow-[var(--pa-teal)]/20 hover:-translate-y-0.5 transition-all disabled:opacity-40 disabled:pointer-events-none flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 CREATE TICKET

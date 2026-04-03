@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import {
   Building2, Mail, Lock, Eye, EyeOff, LayoutGrid,
-  Shield, ShieldCheck, Fingerprint, Info, Star, ChevronLeft, Zap, Sun, Moon
+  Shield, ShieldCheck, Fingerprint, Info, Star, Zap, Sun, Moon
 } from 'lucide-react';
 
 // Import images for Vite

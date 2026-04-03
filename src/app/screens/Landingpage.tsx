@@ -28,12 +28,8 @@ import {
   LayoutDashboard,
   Users,
 } from "lucide-react";
-<<<<<<< HEAD
 import { FaTwitter, FaLinkedin, FaGithub, FaFacebook } from "react-icons/fa";
-=======
-import { FaTwitter, FaLinkedin, FaGithub , FaFacebook } from "react-icons/fa";
 import { useMegaDropdown, MegaNavLinks, MegaDropdownPanel, MobileMegaMenu } from "../components/MegaDropdown";
->>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Theme {

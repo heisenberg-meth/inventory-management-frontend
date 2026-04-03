@@ -142,7 +142,6 @@ export const PlatformReports: React.FC = () => {
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--pa-text-light-gray)' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: 'var(--pa-text-light-gray)' }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v / 100000}L`} />
                 <Tooltip
-<<<<<<< HEAD
                   formatter={(value: unknown) => [formatCurrency(typeof value === 'number' ? value : 0), 'Revenue']}
                   contentStyle={{ 
                     backgroundColor: 'var(--pa-card-bg)',
@@ -152,10 +151,6 @@ export const PlatformReports: React.FC = () => {
                     color: 'var(--pa-text-near-black)'
                   }}
                   itemStyle={{ color: 'var(--pa-text-near-black)' }}
-=======
-                  formatter={(value) => [formatCurrency(Number(value)), 'Revenue']}
-                  contentStyle={{ borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12 }}
->>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
                 />
                 <Area type="monotone" dataKey="value" stroke="var(--pa-mint)" strokeWidth={2.5} fill="url(#revGradient)" dot={{ r: 3, fill: 'var(--pa-mint)', stroke: '#fff', strokeWidth: 2 }} />
               </AreaChart>
@@ -185,7 +180,6 @@ export const PlatformReports: React.FC = () => {
                   ))}
                 </Pie>
                 <Tooltip
-<<<<<<< HEAD
                   formatter={(value: unknown, name: unknown) => [`${String(value)}%`, String(name || '')]}
                   contentStyle={{ 
                     backgroundColor: 'var(--pa-card-bg)',
@@ -195,10 +189,6 @@ export const PlatformReports: React.FC = () => {
                     color: 'var(--pa-text-near-black)'
                   }}
                   itemStyle={{ color: 'var(--pa-text-near-black)' }}
-=======
-                  formatter={(value, name) => [`${value}%`, String(name)]}
-                  contentStyle={{ borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12 }}
->>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -226,7 +216,6 @@ export const PlatformReports: React.FC = () => {
                 <XAxis type="number" tick={{ fontSize: 11, fill: 'var(--pa-text-light-gray)' }} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="plan" tick={{ fontSize: 12, fill: 'var(--pa-text-near-black)', fontWeight: 600 }} axisLine={false} tickLine={false} width={80} />
                 <Tooltip
-<<<<<<< HEAD
                   formatter={(value: unknown) => [`${String(value)} tenants`, 'Count']}
                   contentStyle={{ 
                     backgroundColor: 'var(--pa-card-bg)',
@@ -236,10 +225,6 @@ export const PlatformReports: React.FC = () => {
                     color: 'var(--pa-text-near-black)'
                   }}
                   itemStyle={{ color: 'var(--pa-text-near-black)' }}
-=======
-                  formatter={(value) => [`${value} tenants`, 'Count']}
-                  contentStyle={{ borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12 }}
->>>>>>> 379b52d19fb8079b5ab2bc7856a36b635801c31b
                 />
                 <Bar dataKey="tenants" fill="var(--pa-teal)" radius={[0, 6, 6, 0]} barSize={24} />
               </BarChart>
