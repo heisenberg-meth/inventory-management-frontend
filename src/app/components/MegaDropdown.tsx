@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-=======
-import { useState } from 'react';
->>>>>>> 2f4b112e0ded5cfcd01cb6acffc79ccf165beb2a
+import React, { useState } from 'react';
 import {
   Package, ShoppingCart, BarChart3, Settings, Download,
   Factory, Target, Sparkles, CreditCard, Wrench,
@@ -124,9 +120,9 @@ const ratings = [
 
 function SectionHeading({ icon: Icon, heading }: { icon: React.ElementType; heading: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid #e8f5f0' }}>
-      <Icon size={18} color="#0d6e5a" />
-      <span style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', color: '#0d1b2a', letterSpacing: '0.06em' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid var(--color-border)' }}>
+      <Icon size={18} color="var(--color-mint)" />
+      <span style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-primary)', letterSpacing: '0.06em' }}>
         {heading}
       </span>
     </div>
@@ -146,8 +142,8 @@ function LinkItem({ label, onClick }: { label: string; onClick?: () => void }) {
         paddingLeft: hovered ? 14 : 10,
         borderRadius: 6,
         fontSize: 14, fontWeight: 400,
-        color: hovered ? '#1db97a' : '#4a6670',
-        background: hovered ? 'rgba(29,185,122,0.06)' : 'transparent',
+        color: hovered ? 'var(--color-mint)' : 'var(--color-text-secondary)',
+        background: hovered ? 'var(--color-mint-glow)' : 'transparent',
         cursor: 'pointer',
         transition: 'all 150ms ease',
       }}
@@ -166,17 +162,17 @@ function DescLinkItem({ emoji, label, desc }: { emoji?: string; label: string; d
       style={{
         padding: '10px 10px',
         borderRadius: 6,
-        borderLeft: hovered ? '3px solid #1db97a' : '3px solid transparent',
-        background: hovered ? 'rgba(29,185,122,0.05)' : 'transparent',
+        borderLeft: hovered ? '3px solid var(--color-mint)' : '3px solid transparent',
+        background: hovered ? 'var(--color-mint-glow)' : 'transparent',
         cursor: 'pointer',
         transition: 'all 150ms ease',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         {emoji && <span style={{ fontSize: 14 }}>{emoji}</span>}
-        <span style={{ fontSize: 14, fontWeight: 600, color: '#0d1b2a' }}>{label}</span>
+        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)' }}>{label}</span>
       </div>
-      {desc && <div style={{ fontSize: 12, color: '#6b7a8d', marginTop: 2, marginLeft: emoji ? 20 : 0 }}>{desc}</div>}
+      {desc && <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 2, marginLeft: emoji ? 20 : 0 }}>{desc}</div>}
     </div>
   );
 }
@@ -191,14 +187,14 @@ function PlanRow({ label, price }: { label: string; price?: string }) {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '10px 10px',
         borderRadius: 6,
-        borderBottom: '1px solid #f0f4f8',
-        background: hovered ? 'rgba(29,185,122,0.05)' : 'transparent',
+        borderBottom: '1px solid var(--color-border)',
+        background: hovered ? 'var(--color-mint-glow)' : 'transparent',
         cursor: 'pointer',
         transition: 'all 150ms ease',
       }}
     >
-      <span style={{ fontSize: 14, fontWeight: 600, color: '#0d1b2a' }}>{label}</span>
-      {price && <span style={{ fontSize: 13, color: '#1db97a', fontWeight: 500 }}>{price}</span>}
+      <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)' }}>{label}</span>
+      {price && <span style={{ fontSize: 13, color: 'var(--color-mint)', fontWeight: 500 }}>{price}</span>}
     </div>
   );
 }
@@ -209,7 +205,7 @@ function StarRating({ count }: { count: number }) {
   return (
     <span style={{ display: 'inline-flex', gap: 1 }}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <span key={i} style={{ fontSize: 14, color: i < full || (i === full && half) ? '#f59e0b' : '#e2e8f0' }}>★</span>
+        <span key={i} style={{ fontSize: 14, color: i < full || (i === full && half) ? 'var(--color-warning)' : 'var(--color-border)' }}>★</span>
       ))}
     </span>
   );
@@ -226,14 +222,14 @@ function FeaturesDropdown() {
           <div>{section.links.map((link, j) => <LinkItem key={j} label={link.label} />)}</div>
           {i === 3 && (
             <div style={{
-              marginTop: 16, background: '#f0fdf9', borderRadius: 10,
-              border: '1px solid #d1fae5', padding: 16,
+              marginTop: 16, background: 'var(--color-mint-glow)', borderRadius: 10,
+              border: '1px solid var(--color-border)', padding: 16,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Download size={16} color="#0d6e5a" />
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#0d6e5a' }}>Download Feature List</span>
+                <Download size={16} color="var(--color-mint)" />
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-mint)' }}>Download Feature List</span>
               </div>
-              <div style={{ fontSize: 12, color: '#6b7a8d', marginTop: 4 }}>Get the complete PDF guide</div>
+              <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 4 }}>Get the complete PDF guide</div>
             </div>
           )}
         </div>
@@ -254,7 +250,7 @@ function SolutionsDropdown() {
         <div>{solutionsUseCase.map((link, i) => <DescLinkItem key={i} {...link} />)}</div>
       </div>
       <div style={{
-        background: 'linear-gradient(135deg, #0d6e5a, #1db97a)',
+        background: 'linear-gradient(135deg, var(--color-mint-hover), var(--color-mint))',
         borderRadius: 14, padding: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
       }}>
         <div>
@@ -262,20 +258,20 @@ function SolutionsDropdown() {
             <Sparkles size={18} color="white" />
             <span style={{
               fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
-              background: 'white', color: '#0d6e5a', padding: '2px 8px', borderRadius: 4, letterSpacing: '0.06em',
+              background: 'white', color: 'var(--color-mint-hover)', padding: '2px 8px', borderRadius: 4, letterSpacing: '0.06em',
             }}>FEATURED</span>
           </div>
           <div style={{ fontSize: 18, fontWeight: 700, color: 'white', marginBottom: 8 }}>See IMS in action</div>
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.5, marginBottom: 16 }}>
+          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)', lineHeight: 1.5, marginBottom: 16 }}>
             Book a live demo with our product team.
           </div>
         </div>
         <div>
           <button style={{
-            width: '100%', height: 36, background: 'white', color: '#0d6e5a',
+            width: '100%', height: 36, background: 'white', color: 'var(--color-mint-hover)',
             borderRadius: 8, border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer',
           }}>Book a Demo →</button>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textAlign: 'center', marginTop: 8 }}>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', textAlign: 'center', marginTop: 8 }}>
             15-min session · Free · No commitment
           </div>
         </div>
@@ -296,18 +292,18 @@ function PricingDropdown() {
         <div>{pricingAddons.map((link, i) => <LinkItem key={i} label={link.label} />)}</div>
       </div>
       <div style={{
-        background: '#f0fdf9', border: '1px solid #d1fae5',
+        background: 'var(--color-mint-glow)', border: '1px solid var(--color-border)',
         borderRadius: 12, padding: 20,
       }}>
-        <div style={{ fontSize: 15, fontWeight: 600, color: '#0d1b2a', marginBottom: 8 }}>Not sure which plan?</div>
-        <div style={{ fontSize: 13, color: '#6b7a8d', lineHeight: 1.5, marginBottom: 16 }}>
+        <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: 8 }}>Not sure which plan?</div>
+        <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
           Answer 3 quick questions and we'll recommend the best plan for your business.
         </div>
         <button style={{
-          width: '100%', height: 36, background: '#0d6e5a', color: 'white',
+          width: '100%', height: 36, background: 'var(--color-mint)', color: 'white',
           borderRadius: 8, border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer',
         }}>Find My Plan →</button>
-        <div style={{ fontSize: 12, color: '#1db97a', textAlign: 'center', marginTop: 10, cursor: 'pointer' }}>
+        <div style={{ fontSize: 12, color: 'var(--color-mint)', textAlign: 'center', marginTop: 10, cursor: 'pointer' }}>
           Or compare all plans ›
         </div>
       </div>
@@ -327,40 +323,40 @@ function ReviewsDropdown() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {ratings.map((r, i) => (
             <div key={i} style={{
-              background: 'white', border: '1px solid #e8f5f0', borderRadius: 8,
+              background: 'var(--color-card-bg)', border: '1px solid var(--color-border)', borderRadius: 8,
               padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#4a6670' }}>{r.platform}</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-secondary)' }}>{r.platform}</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <StarRating count={r.stars} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#0d1b2a' }}>{r.score}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text-primary)' }}>{r.score}</span>
               </div>
             </div>
           ))}
         </div>
       </div>
       <div style={{
-        background: 'white', border: '1px solid #e8f5f0',
+        background: 'var(--color-card-bg)', border: '1px solid var(--color-border)',
         borderRadius: 14, padding: 20,
       }}>
         <div style={{ marginBottom: 12 }}><StarRating count={5} /></div>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
-          <Quote size={16} color="#1db97a" style={{ flexShrink: 0, marginTop: 2 }} />
-          <p style={{ fontSize: 15, fontWeight: 400, color: '#0d1b2a', fontStyle: 'italic', lineHeight: 1.6, margin: 0 }}>
+          <Quote size={16} color="var(--color-mint)" style={{ flexShrink: 0, marginTop: 2 }} />
+          <p style={{ fontSize: 15, fontWeight: 400, color: 'var(--color-text-primary)', fontStyle: 'italic', lineHeight: 1.6, margin: 0 }}>
             IMS transformed how we manage our 3 pharmacy branches.
             The expiry tracking saved us ₹2.4L in spoilage last year.
           </p>
         </div>
-        <div style={{ borderTop: '1px solid #f0f4f8', margin: '12px 0' }} />
+        <div style={{ borderTop: '1px solid var(--color-border)', margin: '12px 0' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
-            width: 36, height: 36, borderRadius: '50%', background: '#0d6e5a',
+            width: 36, height: 36, borderRadius: '50%', background: 'var(--color-mint)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: 'white', fontSize: 12, fontWeight: 700,
           }}>RK</div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#0d1b2a' }}>Ravi Kumar</div>
-            <div style={{ fontSize: 12, color: '#6b7a8d' }}>ABC Pharmacy Chain</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>Ravi Kumar</div>
+            <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>ABC Pharmacy Chain</div>
           </div>
         </div>
       </div>
@@ -368,11 +364,7 @@ function ReviewsDropdown() {
   );
 }
 
-<<<<<<< HEAD
-const dropdownContent: Record<DropdownId, () => React.ReactElement> = {
-=======
 const dropdownContent: Record<DropdownId, React.FC> = {
->>>>>>> 2f4b112e0ded5cfcd01cb6acffc79ccf165beb2a
   features: FeaturesDropdown,
   solutions: SolutionsDropdown,
   pricing: PricingDropdown,
@@ -482,11 +474,11 @@ export function MegaDropdownPanel({
           transition: activeDropdown
             ? 'opacity 180ms ease-out, transform 180ms ease-out, visibility 0ms'
             : 'opacity 140ms ease-in, transform 140ms ease-in, visibility 0ms 140ms',
-          background: '#ffffff',
-          borderTop: '2px solid #1db97a',
-          borderBottom: '1px solid #e8f5f0',
+          background: 'var(--color-card-bg)',
+          borderTop: '2px solid var(--color-mint)',
+          borderBottom: '1px solid var(--color-border)',
           borderRadius: '0 0 16px 16px',
-          boxShadow: '0 12px 40px rgba(13,110,90,0.12)',
+          boxShadow: '0 12px 40px rgba(0,0,0,0.2)',
           padding: '32px 0',
         }}
       >
