@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="vG1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5DFBB0"/>
+      <stop offset="50%" stop-color="#1db97a"/>
+      <stop offset="100%" stop-color="#0d6e5a"/>
+    </linearGradient>
+    <linearGradient id="vG2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7FFFD4"/>
+      <stop offset="100%" stop-color="#0d6e5a"/>
+    </linearGradient>
+    <linearGradient id="rG" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0d6e5a" stop-opacity="0.1"/>
+      <stop offset="40%" stop-color="#1db97a" stop-opacity="0.9"/>
+      <stop offset="80%" stop-color="#5DFBB0"/>
+      <stop offset="100%" stop-color="#0d6e5a" stop-opacity="0.2"/>
+    </linearGradient>
+    <filter id="g">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- V left arm -->
+  <polygon points="28,15 42,15 62,85 55,85" fill="url(#vG1)" filter="url(#g)"/>
+  <!-- V right arm -->
+  <polygon points="78,15 92,15 65,85 58,85" fill="url(#vG2)" filter="url(#g)"/>
+  <!-- center highlight -->
+  <polygon points="55,72 60,88 65,72" fill="#5DFBB0" opacity="0.5"/>
+  <!-- right arm shadow -->
+  <polygon points="78,15 85,15 63,82 59,82" fill="#0d6e5a" opacity="0.35"/>
+
+  <!-- Orbital ring front arc -->
+  <path d="M 15 65 Q 40 38, 60 35 Q 80 32, 105 48" fill="none" stroke="url(#rG)" stroke-width="3" stroke-linecap="round" filter="url(#g)" opacity="0.85"/>
+
+  <!-- Sparkle -->
+  <g filter="url(#g)" opacity="0.8">
+    <line x1="90" y1="12" x2="90" y2="22" stroke="white" stroke-width="1.2"/>
+    <line x1="85" y1="17" x2="95" y2="17" stroke="white" stroke-width="1.2"/>
+  </g>
+</svg>

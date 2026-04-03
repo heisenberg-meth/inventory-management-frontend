@@ -28,8 +28,10 @@ import {
   LayoutDashboard,
   Users,
 } from "lucide-react";
+const ViyanLogo = '/viyan-logo.png';
 import { FaTwitter, FaLinkedin, FaGithub, FaFacebook } from "react-icons/fa";
-import { useMegaDropdown, MegaNavLinks, MegaDropdownPanel, MobileMegaMenu } from "../components/MegaDropdown";
+import { useMegaDropdown } from "../components/useMegaDropdown";
+import { MegaNavLinks, MegaDropdownPanel, MobileMegaMenu } from "../components/MegaDropdown";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Theme {
@@ -474,13 +476,12 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => scrollTo("hero")}>
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0F766E, #34D399)" }}>
-                <Boxes size={18} color="white" />
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollTo("hero")}>
+              <img src={ViyanLogo} alt="Viyan Info Tech" className="h-12 w-12 rounded-xl object-cover" style={{ boxShadow: '0 0 0 1.5px rgba(13,110,90,0.6), 0 0 6px rgba(13,110,90,0.35)' }} />
+              <div className="flex flex-col leading-none">
+                <span className="font-black text-[22px] tracking-wide" style={{ color: t.textPrimary, WebkitTextStroke: '1px rgba(13,110,90,0.6)', paintOrder: 'stroke fill' }}>VIYAN</span>
+                <span className="text-[11px] font-bold tracking-[0.22em]" style={{ color: "#1db97a", WebkitTextStroke: '0.5px rgba(13,110,90,0.5)' }}>INFO TECH</span>
               </div>
-              <span className="font-bold text-lg" style={{ color: t.textPrimary }}>
-                IMS<span style={{ color: t.accent }}>.</span>
-              </span>
             </div>
 
             {/* Desktop Nav Links */}
@@ -503,7 +504,11 @@ export function LandingPage() {
                 {isDark ? <Sun size={16} /> : <Moon size={16} />}
               </button>
               <button
+<<<<<<< HEAD
                 onClick={() => navigate("/login?role=tenant-admin")}
+=======
+                onClick={() => navigate("/login?role=admin")}
+>>>>>>> 2f4b112e0ded5cfcd01cb6acffc79ccf165beb2a
                 className="px-4 py-2 rounded-lg text-sm font-medium border transition-colors"
                 style={{ borderColor: t.border, color: t.textPrimary, background: "transparent" }}
               >
@@ -1065,13 +1070,12 @@ export function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
             {/* Brand column */}
             <div className="col-span-2">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0F766E, #34D399)" }}>
-                  <Boxes size={18} color="white" />
+              <div className="flex items-center gap-3 mb-4">
+                <img src={ViyanLogo} alt="Viyan Info Tech" className="h-12 w-12 rounded-xl object-cover" style={{ boxShadow: '0 0 0 1.5px rgba(13,110,90,0.6), 0 0 6px rgba(13,110,90,0.35)' }} />
+                <div className="flex flex-col leading-none">
+                  <span className="font-black text-[22px] tracking-wide text-white" style={{ WebkitTextStroke: '1px rgba(13,110,90,0.6)', paintOrder: 'stroke fill' }}>VIYAN</span>
+                  <span className="text-[11px] font-bold tracking-[0.22em]" style={{ color: "#1db97a", WebkitTextStroke: '0.5px rgba(13,110,90,0.5)' }}>INFO TECH</span>
                 </div>
-                <span className="font-bold text-lg text-white">
-                  IMS<span style={{ color: "#34D399" }}>.</span>
-                </span>
               </div>
               <p className="text-sm mb-6 leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
                 The modern inventory management platform for businesses that demand clarity, speed, and scale.
@@ -1118,7 +1122,7 @@ export function LandingPage() {
           {/* Bottom bar */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
             <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
-              © 2026 IMS — Inventory Management System. All rights reserved.
+              © 2026 Viyan Info Tech. All rights reserved.
             </p>
             <div className="flex items-center gap-2 text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
               <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />

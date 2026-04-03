@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <defs>
+    <linearGradient id="vGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5DFBB0"/>
+      <stop offset="50%" stop-color="#1db97a"/>
+      <stop offset="100%" stop-color="#0d6e5a"/>
+    </linearGradient>
+    <linearGradient id="vGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7FFFD4"/>
+      <stop offset="100%" stop-color="#0d6e5a"/>
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0d6e5a" stop-opacity="0.1"/>
+      <stop offset="30%" stop-color="#1db97a" stop-opacity="0.9"/>
+      <stop offset="70%" stop-color="#5DFBB0"/>
+      <stop offset="100%" stop-color="#0d6e5a" stop-opacity="0.2"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glowStrong">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <radialGradient id="bgGrad" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#0a2e23"/>
+      <stop offset="100%" stop-color="#020c08"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background removed for transparent logo -->
+
+  <!-- Particle dots -->
+  <circle cx="80" cy="120" r="1" fill="#1db97a" opacity="0.4"/>
+  <circle cx="320" cy="100" r="1.2" fill="#5DFBB0" opacity="0.5"/>
+  <circle cx="100" cy="250" r="0.8" fill="#1db97a" opacity="0.3"/>
+  <circle cx="300" cy="220" r="1" fill="#5DFBB0" opacity="0.4"/>
+  <circle cx="150" cy="80" r="0.6" fill="#7FFFD4" opacity="0.3"/>
+  <circle cx="260" cy="280" r="0.9" fill="#1db97a" opacity="0.35"/>
+  <circle cx="340" cy="180" r="0.7" fill="#5DFBB0" opacity="0.3"/>
+  <circle cx="65" cy="200" r="1.1" fill="#1db97a" opacity="0.25"/>
+
+  <!-- Orbital ring (behind V) - back arc -->
+  <ellipse cx="200" cy="185" rx="130" ry="50" fill="none" stroke="url(#ringGrad)" stroke-width="3.5" opacity="0.3" transform="rotate(-15 200 185)"/>
+
+  <!-- V Shape - left arm -->
+  <polygon points="130,80 160,80 205,230 185,230" fill="url(#vGrad)" filter="url(#glow)"/>
+  <!-- V Shape - right arm -->
+  <polygon points="240,80 270,80 215,230 195,230" fill="url(#vGrad2)" filter="url(#glow)"/>
+  <!-- V center highlight -->
+  <polygon points="185,200 200,240 215,200" fill="#5DFBB0" opacity="0.5"/>
+  <!-- Left arm inner edge highlight -->
+  <line x1="148" y1="80" x2="198" y2="228" stroke="#7FFFD4" stroke-width="1" opacity="0.5"/>
+  <!-- Right arm inner edge shadow -->
+  <polygon points="240,80 255,80 208,225 200,225" fill="#0d6e5a" opacity="0.4"/>
+
+  <!-- Orbital ring (in front of V) - front arc -->
+  <path d="M 90 205 Q 130 155, 200 148 Q 270 140, 310 165" fill="none" stroke="url(#ringGrad)" stroke-width="4" stroke-linecap="round" filter="url(#glow)" opacity="0.9"/>
+
+  <!-- Sparkle top-right -->
+  <g filter="url(#glowStrong)" opacity="0.9">
+    <line x1="285" y1="75" x2="285" y2="95" stroke="#5DFBB0" stroke-width="1.5"/>
+    <line x1="275" y1="85" x2="295" y2="85" stroke="#5DFBB0" stroke-width="1.5"/>
+  </g>
+  <!-- Sparkle small -->
+  <g filter="url(#glow)" opacity="0.6">
+    <line x1="115" y1="105" x2="115" y2="115" stroke="#5DFBB0" stroke-width="1"/>
+    <line x1="110" y1="110" x2="120" y2="110" stroke="#5DFBB0" stroke-width="1"/>
+  </g>
+
+  <!-- VIYAN text -->
+  <text x="200" y="310" text-anchor="middle" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="48" font-weight="800" letter-spacing="8" fill="#1db97a" filter="url(#glow)">VIYAN</text>
+
+  <!-- INFO TECH text -->
+  <text x="200" y="345" text-anchor="middle" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="12" fill="#1db97a" opacity="0.9">INFO TECH</text>
+
+  <!-- Subtle underline for INFO TECH -->
+  <line x1="120" y1="355" x2="280" y2="355" stroke="#1db97a" stroke-width="1" opacity="0.3"/>
+</svg>

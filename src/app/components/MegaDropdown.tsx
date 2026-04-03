@@ -1,10 +1,15 @@
+<<<<<<< HEAD
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+=======
+import { useState } from 'react';
+>>>>>>> 2f4b112e0ded5cfcd01cb6acffc79ccf165beb2a
 import {
   Package, ShoppingCart, BarChart3, Settings, Download,
   Factory, Target, Sparkles, CreditCard, Wrench,
   Star, Trophy, Quote,
   ChevronDown,
 } from 'lucide-react';
+import type { DropdownId } from './useMegaDropdown';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 interface DropdownLink {
@@ -19,8 +24,6 @@ interface DropdownSection {
   heading: string;
   links: DropdownLink[];
 }
-
-type DropdownId = 'features' | 'solutions' | 'pricing' | 'testimonials';
 
 // ─── Dropdown Data ──────────────────────────────────────────────────────────
 const featuresData: DropdownSection[] = [
@@ -71,19 +74,19 @@ const featuresData: DropdownSection[] = [
 ];
 
 const solutionsIndustry: DropdownLink[] = [
-  { emoji: '💊', label: 'Pharmacy', desc: 'Expiry tracking, batch management' },
-  { emoji: '🛒', label: 'Supermarket', desc: 'Barcode billing, fast checkout' },
-  { emoji: '🏭', label: 'Warehouse', desc: 'Bulk storage, location tracking' },
-  { emoji: '🏪', label: 'Retail', desc: 'POS integration, sales sync' },
+  {  label: 'Pharmacy', desc: 'Expiry tracking, batch management' },
+  {   label: 'Supermarket', desc: 'Barcode billing, fast checkout' },
+  {  label: 'Warehouse', desc: 'Bulk storage, location tracking' },
+  {   label: 'Retail', desc: 'POS integration, sales sync' },
 ];
 
 const solutionsUseCase: DropdownLink[] = [
-  { emoji: '📦', label: 'Inventory Control', desc: 'Manage and track items end-to-end' },
-  { emoji: '🏭', label: 'Warehouse Management', desc: 'Control stock across locations' },
-  { emoji: '📡', label: 'Multi-channel Selling', desc: 'Sync stock, streamline sales' },
-  { emoji: '📋', label: 'Order Management', desc: 'Manage sales and purchases' },
-  { emoji: '🚚', label: 'Order Fulfillment', desc: 'Pick, pack, and ship centrally' },
-  { emoji: '🔄', label: 'Stock Transfers', desc: 'Move inventory between locations' },
+  {   label: 'Inventory Control', desc: 'Manage and track items end-to-end' },
+  {  label: 'Warehouse Management', desc: 'Control stock across locations' },
+  {  label: 'Multi-channel Selling', desc: 'Sync stock, streamline sales' },
+  {  label: 'Order Management', desc: 'Manage sales and purchases' },
+  {  label: 'Order Fulfillment', desc: 'Pick, pack, and ship centrally' },
+  {  label: 'Stock Transfers', desc: 'Move inventory between locations' },
 ];
 
 const pricingPlans: DropdownLink[] = [
@@ -365,7 +368,11 @@ function ReviewsDropdown() {
   );
 }
 
+<<<<<<< HEAD
 const dropdownContent: Record<DropdownId, () => React.ReactElement> = {
+=======
+const dropdownContent: Record<DropdownId, React.FC> = {
+>>>>>>> 2f4b112e0ded5cfcd01cb6acffc79ccf165beb2a
   features: FeaturesDropdown,
   solutions: SolutionsDropdown,
   pricing: PricingDropdown,
@@ -379,38 +386,7 @@ const NAV_ITEMS: { id: DropdownId; label: string }[] = [
   { id: 'testimonials', label: 'Reviews' },
 ];
 
-// ─── Exported Hook + Components ─────────────────────────────────────────────
-
-export function useMegaDropdown() {
-  const [activeDropdown, setActiveDropdown] = useState<DropdownId | null>(null);
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const open = useCallback((id: DropdownId) => {
-    if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
-    setActiveDropdown(id);
-  }, []);
-
-  const scheduleClose = useCallback(() => {
-    closeTimer.current = setTimeout(() => setActiveDropdown(null), 100);
-  }, []);
-
-  const cancelClose = useCallback(() => {
-    if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
-  }, []);
-
-  const close = useCallback(() => {
-    setActiveDropdown(null);
-  }, []);
-
-  // Escape key
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setActiveDropdown(null); };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, []);
-
-  return { activeDropdown, open, scheduleClose, cancelClose, close };
-}
+// ─── Exported Components ────────────────────────────────────────────────────
 
 export function MegaNavLinks({
   activeDropdown, open, scheduleClose, textColor,

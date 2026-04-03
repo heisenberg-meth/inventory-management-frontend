@@ -86,15 +86,13 @@ export const PlatformAdminLayout: React.FC = () => {
         `}
       >
         {/* Logo Area */}
-        <div className="h-[72px] flex items-center px-8 flex-shrink-0">
+        <div className="h-[72px] flex items-center px-6 flex-shrink-0">
           <div className="flex items-center gap-3">
-             <div className="w-8 h-8 rounded bg-white flex items-center justify-center shadow-lg">
-               <ShieldCheck className="w-5 h-5 text-[#0d6e5a]" />
-             </div>
-             <div>
-               <div className="text-white text-[13px] font-extrabold tracking-widest">COMMAND</div>
-               <div className="text-white/60 text-[10px] font-bold tracking-[0.2em] -mt-1">CENTER</div>
-             </div>
+            <img src="/viyan-logo.png" alt="Viyan Info Tech" className="h-10 w-10 object-contain rounded-lg" style={{ boxShadow: '0 0 0 1.5px rgba(13,110,90,0.6), 0 0 6px rgba(13,110,90,0.35)' }} />
+            <div className="flex flex-col leading-none">
+              <span className="text-white text-[14px] font-extrabold tracking-widest" style={{ WebkitTextStroke: '1px rgba(13,110,90,0.6)', paintOrder: 'stroke fill' }}>VIYAN</span>
+              <span className="text-[#1db97a] text-[9px] font-bold tracking-[0.2em] mt-0.5" style={{ WebkitTextStroke: '0.5px rgba(13,110,90,0.5)' }}>INFO TECH</span>
+            </div>
           </div>
         </div>
 
