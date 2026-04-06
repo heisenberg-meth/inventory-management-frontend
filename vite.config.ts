@@ -11,7 +11,7 @@ export default defineConfig({
     allowedHosts: ["synaptical-handlike-betsy.ngrok-free.dev"],
     proxy: {
       "/api": {
-        target: "http://localhost:8080",
+        target: "https://synaptical-handlike-betsy.ngrok-free.dev",
         changeOrigin: true,
       },
     },
