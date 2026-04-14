@@ -574,8 +574,15 @@ export function LandingPage() {
   };
 
   return (
-    <div style={{ background: t.bg, color: t.textPrimary, minHeight: "100vh", fontFamily: "Inter, sans-serif", transition: "background 0.3s, color 0.3s" }}>
-
+    <div
+      style={{
+        background: t.bg,
+        color: t.textPrimary,
+        minHeight: "100vh",
+        fontFamily: "Inter, sans-serif",
+        transition: "background 0.3s, color 0.3s",
+      }}
+    >
       {/* ── Navbar ─────────────────────────────────────────────────────────── */}
       <nav
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
@@ -588,13 +595,45 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollTo("hero")}>
-              <img src={ViyanLogo} alt="Viyan Info Tech" className="h-12 w-12 rounded-xl object-cover" style={{ boxShadow: '0 0 0 1.5px rgba(13,110,90,0.6), 0 0 6px rgba(13,110,90,0.35)' }} />
+            <a
+              href="https://viyaninfo.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 cursor-pointer"
+            >
+              <img
+                src={ViyanLogo}
+                alt="Viyan Info Tech"
+                className="h-12 w-12 rounded-xl object-cover"
+                style={{
+                  boxShadow:
+                    "0 0 0 1.5px rgba(13,110,90,0.6), 0 0 6px rgba(13,110,90,0.35)",
+                }}
+              />
+
               <div className="flex flex-col leading-none">
-                <span className="font-black text-[22px] tracking-wide" style={{ color: t.textPrimary, WebkitTextStroke: '1px rgba(13,110,90,0.6)', paintOrder: 'stroke fill' }}>VIYAN</span>
-                <span className="text-[11px] font-bold tracking-[0.22em]" style={{ color: "#1db97a", WebkitTextStroke: '0.5px rgba(13,110,90,0.5)' }}>INFO TECH</span>
+                <span
+                  className="font-black text-[22px] tracking-wide"
+                  style={{
+                    color: t.textPrimary,
+                    WebkitTextStroke: "1px rgba(13,110,90,0.6)",
+                    paintOrder: "stroke fill",
+                  }}
+                >
+                  VIYAN
+                </span>
+
+                <span
+                  className="text-[11px] font-bold tracking-[0.22em]"
+                  style={{
+                    color: "#1db97a",
+                    WebkitTextStroke: "0.5px rgba(13,110,90,0.5)",
+                  }}
+                >
+                  INFO TECH
+                </span>
               </div>
-            </div>
+            </a>
 
             {/* Desktop Nav Links */}
             <div className="hidden md:flex items-center gap-8">
@@ -618,14 +657,22 @@ export function LandingPage() {
               <button
                 onClick={() => navigate("/login?role=tenant-admin")}
                 className="px-4 py-2 rounded-lg text-sm font-medium border transition-colors"
-                style={{ borderColor: t.border, color: t.textPrimary, background: "transparent" }}
+                style={{
+                  borderColor: t.border,
+                  color: t.textPrimary,
+                  background: "transparent",
+                }}
               >
                 Sign In
               </button>
               <button
                 onClick={() => navigate("/portal")}
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
-                style={{ background: "linear-gradient(135deg, #0F766E, #34D399)", color: "white", boxShadow: "0 4px 14px rgba(52,211,153,0.35)" }}
+                style={{
+                  background: "linear-gradient(135deg, #0F766E, #34D399)",
+                  color: "white",
+                  boxShadow: "0 4px 14px rgba(52,211,153,0.35)",
+                }}
               >
                 Get Started
               </button>
@@ -633,10 +680,18 @@ export function LandingPage() {
 
             {/* Mobile controls */}
             <div className="flex md:hidden items-center gap-2">
-              <button onClick={() => setIsDark(!isDark)} className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: t.bgSecondary, color: t.textSecondary }}>
+              <button
+                onClick={() => setIsDark(!isDark)}
+                className="w-9 h-9 rounded-lg flex items-center justify-center"
+                style={{ background: t.bgSecondary, color: t.textSecondary }}
+              >
                 {isDark ? <Sun size={16} /> : <Moon size={16} />}
               </button>
-              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: t.bgSecondary, color: t.textSecondary }}>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="w-9 h-9 rounded-lg flex items-center justify-center"
+                style={{ background: t.bgSecondary, color: t.textSecondary }}
+              >
                 {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
               </button>
             </div>
@@ -645,11 +700,33 @@ export function LandingPage() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t px-4 py-4 space-y-2" style={{ background: t.navBg, borderColor: t.border }}>
-            <MobileMegaMenu scrollTo={scrollTo} textColor={t.textSecondary} borderColor={t.border} />
+          <div
+            className="md:hidden border-t px-4 py-4 space-y-2"
+            style={{ background: t.navBg, borderColor: t.border }}
+          >
+            <MobileMegaMenu
+              scrollTo={scrollTo}
+              textColor={t.textSecondary}
+              borderColor={t.border}
+            />
             <div className="pt-2 flex flex-col gap-2">
-              <button onClick={() => navigate("/login")} className="w-full py-2 rounded-lg text-sm border" style={{ borderColor: t.border, color: t.textPrimary }}>Sign In</button>
-              <button onClick={() => navigate("/login")} className="w-full py-2 rounded-lg text-sm font-medium" style={{ background: "linear-gradient(135deg, #0F766E, #34D399)", color: "white" }}>Get Started</button>
+              <button
+                onClick={() => navigate("/login")}
+                className="w-full py-2 rounded-lg text-sm border"
+                style={{ borderColor: t.border, color: t.textPrimary }}
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => navigate("/login")}
+                className="w-full py-2 rounded-lg text-sm font-medium"
+                style={{
+                  background: "linear-gradient(135deg, #0F766E, #34D399)",
+                  color: "white",
+                }}
+              >
+                Get Started
+              </button>
             </div>
           </div>
         )}
@@ -664,13 +741,25 @@ export function LandingPage() {
       />
 
       {/* ── Hero Section ───────────────────────────────────────────────────── */}
-      <section id="hero" className="relative overflow-hidden pt-24 pb-16 lg:pt-32 lg:pb-24">
+      <section
+        id="hero"
+        className="relative overflow-hidden pt-24 pb-16 lg:pt-32 lg:pb-24"
+      >
         {/* Background gradients */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full opacity-20 blur-3xl" style={{ background: "radial-gradient(circle, #34D399, #0F766E)" }} />
-          <div className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full opacity-10 blur-3xl" style={{ background: "radial-gradient(circle, #0F766E, #022C22)" }} />
+          <div
+            className="absolute -top-40 -right-40 w-96 h-96 rounded-full opacity-20 blur-3xl"
+            style={{ background: "radial-gradient(circle, #34D399, #0F766E)" }}
+          />
+          <div
+            className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full opacity-10 blur-3xl"
+            style={{ background: "radial-gradient(circle, #0F766E, #022C22)" }}
+          />
           {!isDark && (
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] opacity-5 blur-3xl rounded-full" style={{ background: "#34D399" }} />
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] opacity-5 blur-3xl rounded-full"
+              style={{ background: "#34D399" }}
+            />
           )}
         </div>
 
@@ -679,7 +768,11 @@ export function LandingPage() {
           <div className="flex justify-center mb-6">
             <div
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm border"
-              style={{ background: isDark ? "rgba(52,211,153,0.1)" : "#F0FDF9", borderColor: "rgba(52,211,153,0.3)", color: t.primary }}
+              style={{
+                background: isDark ? "rgba(52,211,153,0.1)" : "#F0FDF9",
+                borderColor: "rgba(52,211,153,0.3)",
+                color: t.primary,
+              }}
             >
               <Zap size={14} />
               <span>Inventory Management Reimagined</span>
@@ -711,21 +804,33 @@ export function LandingPage() {
                   for Modern Businesses
                 </span>
               </h1>
-              <p className="mb-8 text-lg leading-relaxed" style={{ color: t.textSecondary }}>
-                Manage products, stock, orders, and reports in one powerful platform.
-                From small shops to enterprise warehouses — IMS scales with you.
+              <p
+                className="mb-8 text-lg leading-relaxed"
+                style={{ color: t.textSecondary }}
+              >
+                Manage products, stock, orders, and reports in one powerful
+                platform. From small shops to enterprise warehouses — IMS scales
+                with you.
               </p>
               <div className="flex flex-wrap gap-4 justify-center lg:justify-start mb-10">
                 <button
                   onClick={() => navigate("/login")}
                   className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all"
-                  style={{ background: "linear-gradient(135deg, #0F766E, #34D399)", color: "white", boxShadow: "0 8px 24px rgba(52,211,153,0.35)" }}
+                  style={{
+                    background: "linear-gradient(135deg, #0F766E, #34D399)",
+                    color: "white",
+                    boxShadow: "0 8px 24px rgba(52,211,153,0.35)",
+                  }}
                 >
                   Get Started Free <ArrowRight size={16} />
                 </button>
                 <button
                   className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold border transition-all"
-                  style={{ borderColor: t.border, color: t.textPrimary, background: t.cardBg }}
+                  style={{
+                    borderColor: t.border,
+                    color: t.textPrimary,
+                    background: t.cardBg,
+                  }}
                 >
                   <Clock size={16} style={{ color: t.accent }} /> Book a Demo
                 </button>
@@ -734,22 +839,41 @@ export function LandingPage() {
               {/* Social proof */}
               <div className="flex items-center gap-4 justify-center lg:justify-start">
                 <div className="flex -space-x-2">
-                  {["https://images.unsplash.com/photo-1762522921456-cdfe882d36c3?w=40", "https://images.unsplash.com/photo-1769071166862-8cc3a6f2ac5c?w=40", "https://images.unsplash.com/photo-1768796373360-95d80c5830fb?w=40"].map((src, i) => (
-                    <img key={i} src={src} alt="user" className="w-8 h-8 rounded-full border-2 object-cover" style={{ borderColor: t.bg }} />
+                  {[
+                    "https://images.unsplash.com/photo-1762522921456-cdfe882d36c3?w=40",
+                    "https://images.unsplash.com/photo-1769071166862-8cc3a6f2ac5c?w=40",
+                    "https://images.unsplash.com/photo-1768796373360-95d80c5830fb?w=40",
+                  ].map((src, i) => (
+                    <img
+                      key={i}
+                      src={src}
+                      alt="user"
+                      className="w-8 h-8 rounded-full border-2 object-cover"
+                      style={{ borderColor: t.bg }}
+                    />
                   ))}
                 </div>
                 <div>
                   <div className="flex items-center gap-1 mb-0.5">
-                    {[...Array(5)].map((_, i) => <Star key={i} size={12} fill="#34D399" color="#34D399" />)}
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={12} fill="#34D399" color="#34D399" />
+                    ))}
                   </div>
-                  <p className="text-xs" style={{ color: t.textMuted }}>Trusted by 2,500+ businesses</p>
+                  <p className="text-xs" style={{ color: t.textMuted }}>
+                    Trusted by 2,500+ businesses
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Right mockup */}
             <div className="relative">
-              <div className="absolute -inset-4 rounded-3xl opacity-20 blur-2xl" style={{ background: "linear-gradient(135deg, #34D399, #0F766E)" }} />
+              <div
+                className="absolute -inset-4 rounded-3xl opacity-20 blur-2xl"
+                style={{
+                  background: "linear-gradient(135deg, #34D399, #0F766E)",
+                }}
+              />
               <div className="relative">
                 <DashboardMockup t={t} />
               </div>
@@ -758,22 +882,43 @@ export function LandingPage() {
                 className="absolute -bottom-4 -left-4 flex items-center gap-2 px-3 py-2 rounded-xl shadow-lg border"
                 style={{ background: t.cardBg, borderColor: t.border }}
               >
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(52,211,153,0.15)" }}>
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{ background: "rgba(52,211,153,0.15)" }}
+                >
                   <TrendingUp size={16} color="#34D399" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold" style={{ color: "#34D399" }}>+24% Growth</div>
-                  <div className="text-xs" style={{ color: t.textMuted }}>vs last month</div>
+                  <div
+                    className="text-xs font-bold"
+                    style={{ color: "#34D399" }}
+                  >
+                    +24% Growth
+                  </div>
+                  <div className="text-xs" style={{ color: t.textMuted }}>
+                    vs last month
+                  </div>
                 </div>
               </div>
               <div
                 className="absolute -top-4 -right-2 flex items-center gap-2 px-3 py-2 rounded-xl shadow-lg border"
                 style={{ background: t.cardBg, borderColor: t.border }}
               >
-                <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: "rgba(52,211,153,0.2)" }}>
-                  <div className="w-2 h-2 rounded-full" style={{ background: "#34D399" }} />
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center"
+                  style={{ background: "rgba(52,211,153,0.2)" }}
+                >
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ background: "#34D399" }}
+                  />
                 </div>
-                <span className="text-xs font-medium" style={{ color: t.textSecondary }}>Live Tracking Active</span>
+                <span
+                  className="text-xs font-medium"
+                  style={{ color: t.textSecondary }}
+                >
+                  Live Tracking Active
+                </span>
               </div>
             </div>
           </div>
@@ -781,12 +926,31 @@ export function LandingPage() {
       </section>
 
       {/* ── Trusted By Strip ───────────────────────────────────────────────── */}
-      <section className="py-10 border-y" style={{ borderColor: t.border, background: t.bgSecondary }}>
+      <section
+        className="py-10 border-y"
+        style={{ borderColor: t.border, background: t.bgSecondary }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm mb-6" style={{ color: t.textMuted }}>TRUSTED BY LEADING BRANDS ACROSS INDUSTRIES</p>
+          <p
+            className="text-center text-sm mb-6"
+            style={{ color: t.textMuted }}
+          >
+            TRUSTED BY LEADING BRANDS ACROSS INDUSTRIES
+          </p>
           <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-16">
-            {["RetailMax", "PharmaCare", "FreshMart", "LogiHub", "StockPro", "WarehouseX"].map((brand) => (
-              <div key={brand} className="font-bold text-lg tracking-tight" style={{ color: t.textMuted, opacity: 0.6 }}>
+            {[
+              "RetailMax",
+              "PharmaCare",
+              "FreshMart",
+              "LogiHub",
+              "StockPro",
+              "WarehouseX",
+            ].map((brand) => (
+              <div
+                key={brand}
+                className="font-bold text-lg tracking-tight"
+                style={{ color: t.textMuted, opacity: 0.6 }}
+              >
                 {brand}
               </div>
             ))}
@@ -799,14 +963,30 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section header */}
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm mb-4 border" style={{ background: isDark ? "rgba(52,211,153,0.08)" : "#F0FDF9", borderColor: "rgba(52,211,153,0.25)", color: "#0F766E" }}>
+            <div
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm mb-4 border"
+              style={{
+                background: isDark ? "rgba(52,211,153,0.08)" : "#F0FDF9",
+                borderColor: "rgba(52,211,153,0.25)",
+                color: "#0F766E",
+              }}
+            >
               <Zap size={14} /> Everything You Need
             </div>
-            <h2 className="mb-4" style={{ fontSize: "clamp(1.5rem, 3vw, 2.5rem)", fontWeight: 700, color: t.textPrimary }}>
+            <h2
+              className="mb-4"
+              style={{
+                fontSize: "clamp(1.5rem, 3vw, 2.5rem)",
+                fontWeight: 700,
+                color: t.textPrimary,
+              }}
+            >
               Powerful Features Built for Growth
             </h2>
             <p className="max-w-2xl mx-auto" style={{ color: t.textSecondary }}>
-              From product cataloging to multi-warehouse management — every feature is designed to eliminate chaos and bring clarity to your operations.
+              From product cataloging to multi-warehouse management — every
+              feature is designed to eliminate chaos and bring clarity to your
+              operations.
             </p>
           </div>
 
@@ -821,22 +1001,43 @@ export function LandingPage() {
                   boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = "0 12px 40px rgba(52,211,153,0.12)";
-                  (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(52,211,153,0.4)";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow =
+                    "0 12px 40px rgba(52,211,153,0.12)";
+                  (e.currentTarget as HTMLDivElement).style.borderColor =
+                    "rgba(52,211,153,0.4)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)";
-                  (e.currentTarget as HTMLDivElement).style.borderColor = t.border;
+                  (e.currentTarget as HTMLDivElement).style.boxShadow =
+                    "0 1px 3px rgba(0,0,0,0.04)";
+                  (e.currentTarget as HTMLDivElement).style.borderColor =
+                    t.border;
                 }}
               >
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110"
-                  style={{ background: "linear-gradient(135deg, rgba(15,118,110,0.15), rgba(52,211,153,0.15))" }}
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(15,118,110,0.15), rgba(52,211,153,0.15))",
+                  }}
                 >
                   <f.icon size={22} style={{ color: "#34D399" }} />
                 </div>
-                <h3 className="mb-2" style={{ fontSize: "1rem", fontWeight: 600, color: t.textPrimary }}>{f.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: t.textSecondary }}>{f.desc}</p>
+                <h3
+                  className="mb-2"
+                  style={{
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    color: t.textPrimary,
+                  }}
+                >
+                  {f.title}
+                </h3>
+                <p
+                  className="text-sm leading-relaxed"
+                  style={{ color: t.textSecondary }}
+                >
+                  {f.desc}
+                </p>
               </div>
             ))}
           </div>
@@ -851,27 +1052,53 @@ export function LandingPage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm mb-4 border" style={{ background: isDark ? "rgba(52,211,153,0.08)" : "#F0FDF9", borderColor: "rgba(52,211,153,0.25)", color: "#0F766E" }}>
+            <div
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm mb-4 border"
+              style={{
+                background: isDark ? "rgba(52,211,153,0.08)" : "#F0FDF9",
+                borderColor: "rgba(52,211,153,0.25)",
+                color: "#0F766E",
+              }}
+            >
               <Globe size={14} /> Simple Process
             </div>
-            <h2 className="mb-4" style={{ fontSize: "clamp(1.5rem, 3vw, 2.5rem)", fontWeight: 700, color: t.textPrimary }}>
+            <h2
+              className="mb-4"
+              style={{
+                fontSize: "clamp(1.5rem, 3vw, 2.5rem)",
+                fontWeight: 700,
+                color: t.textPrimary,
+              }}
+            >
               Up and Running in Minutes
             </h2>
             <p className="max-w-xl mx-auto" style={{ color: t.textSecondary }}>
-              Our streamlined onboarding gets your inventory system running faster than you can brew a coffee.
+              Our streamlined onboarding gets your inventory system running
+              faster than you can brew a coffee.
             </p>
           </div>
 
           <div className="relative">
             {/* Connector line (desktop) */}
-            <div className="absolute top-10 left-0 right-0 h-0.5 hidden lg:block" style={{ background: `linear-gradient(to right, transparent, rgba(52,211,153,0.4), transparent)` }} />
+            <div
+              className="absolute top-10 left-0 right-0 h-0.5 hidden lg:block"
+              style={{
+                background: `linear-gradient(to right, transparent, rgba(52,211,153,0.4), transparent)`,
+              }}
+            />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
               {steps.map((step, i) => (
-                <div key={i} className="relative flex flex-col items-center text-center">
+                <div
+                  key={i}
+                  className="relative flex flex-col items-center text-center"
+                >
                   <div
                     className="relative w-20 h-20 rounded-2xl flex items-center justify-center mb-5 z-10"
-                    style={{ background: "linear-gradient(135deg, #022C22, #0F766E)", boxShadow: "0 8px 24px rgba(52,211,153,0.25)" }}
+                    style={{
+                      background: "linear-gradient(135deg, #022C22, #0F766E)",
+                      boxShadow: "0 8px 24px rgba(52,211,153,0.25)",
+                    }}
                   >
                     <step.icon size={28} color="#34D399" />
                     <div
@@ -881,9 +1108,28 @@ export function LandingPage() {
                       {i + 1}
                     </div>
                   </div>
-                  <div className="text-xs font-bold mb-2 tracking-wider" style={{ color: t.accent }}>STEP {step.step}</div>
-                  <h3 className="mb-2" style={{ fontSize: "1rem", fontWeight: 600, color: t.textPrimary }}>{step.title}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: t.textSecondary }}>{step.desc}</p>
+                  <div
+                    className="text-xs font-bold mb-2 tracking-wider"
+                    style={{ color: t.accent }}
+                  >
+                    STEP {step.step}
+                  </div>
+                  <h3
+                    className="mb-2"
+                    style={{
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                      color: t.textPrimary,
+                    }}
+                  >
+                    {step.title}
+                  </h3>
+                  <p
+                    className="text-sm leading-relaxed"
+                    style={{ color: t.textSecondary }}
+                  >
+                    {step.desc}
+                  </p>
                 </div>
               ))}
             </div>
@@ -895,14 +1141,29 @@ export function LandingPage() {
       <section className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm mb-4 border" style={{ background: isDark ? "rgba(52,211,153,0.08)" : "#F0FDF9", borderColor: "rgba(52,211,153,0.25)", color: "#0F766E" }}>
+            <div
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm mb-4 border"
+              style={{
+                background: isDark ? "rgba(52,211,153,0.08)" : "#F0FDF9",
+                borderColor: "rgba(52,211,153,0.25)",
+                color: "#0F766E",
+              }}
+            >
               <Building2 size={14} /> Built for Every Industry
             </div>
-            <h2 className="mb-4" style={{ fontSize: "clamp(1.5rem, 3vw, 2.5rem)", fontWeight: 700, color: t.textPrimary }}>
+            <h2
+              className="mb-4"
+              style={{
+                fontSize: "clamp(1.5rem, 3vw, 2.5rem)",
+                fontWeight: 700,
+                color: t.textPrimary,
+              }}
+            >
               Tailored for Your Domain
             </h2>
             <p className="max-w-xl mx-auto" style={{ color: t.textSecondary }}>
-              Industry-specific features that solve the real challenges of your sector — out of the box.
+              Industry-specific features that solve the real challenges of your
+              sector — out of the box.
             </p>
           </div>
 
@@ -919,10 +1180,21 @@ export function LandingPage() {
                     alt={ind.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(2,44,34,0.85))" }} />
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        "linear-gradient(to bottom, transparent 40%, rgba(2,44,34,0.85))",
+                    }}
+                  />
                   <div
                     className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold"
-                    style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)", color: "white", border: "1px solid rgba(255,255,255,0.2)" }}
+                    style={{
+                      background: "rgba(255,255,255,0.15)",
+                      backdropFilter: "blur(8px)",
+                      color: "white",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                    }}
                   >
                     <ind.icon size={12} color={ind.color} />
                     {ind.title}
@@ -932,8 +1204,16 @@ export function LandingPage() {
                   <div className="space-y-2">
                     {ind.features.map((feat, j) => (
                       <div key={j} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: ind.color }} />
-                        <span className="text-sm" style={{ color: t.textSecondary }}>{feat}</span>
+                        <div
+                          className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                          style={{ background: ind.color }}
+                        />
+                        <span
+                          className="text-sm"
+                          style={{ color: t.textSecondary }}
+                        >
+                          {feat}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -945,17 +1225,35 @@ export function LandingPage() {
       </section>
 
       {/* ── Product Showcase ───────────────────────────────────────────────── */}
-      <section className="py-20 lg:py-28" style={{ background: isDark ? t.bgSecondary : t.sectionAlt }}>
+      <section
+        className="py-20 lg:py-28"
+        style={{ background: isDark ? t.bgSecondary : t.sectionAlt }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm mb-4 border" style={{ background: isDark ? "rgba(52,211,153,0.08)" : "#F0FDF9", borderColor: "rgba(52,211,153,0.25)", color: "#0F766E" }}>
+            <div
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm mb-4 border"
+              style={{
+                background: isDark ? "rgba(52,211,153,0.08)" : "#F0FDF9",
+                borderColor: "rgba(52,211,153,0.25)",
+                color: "#0F766E",
+              }}
+            >
               <LayoutDashboard size={14} /> Product Preview
             </div>
-            <h2 className="mb-4" style={{ fontSize: "clamp(1.5rem, 3vw, 2.5rem)", fontWeight: 700, color: t.textPrimary }}>
+            <h2
+              className="mb-4"
+              style={{
+                fontSize: "clamp(1.5rem, 3vw, 2.5rem)",
+                fontWeight: 700,
+                color: t.textPrimary,
+              }}
+            >
               See It in Action
             </h2>
             <p className="max-w-xl mx-auto" style={{ color: t.textSecondary }}>
-              Explore the key screens of your inventory management platform — beautiful, intuitive, and powerful.
+              Explore the key screens of your inventory management platform —
+              beautiful, intuitive, and powerful.
             </p>
           </div>
 
@@ -967,10 +1265,16 @@ export function LandingPage() {
                 onClick={() => setActiveShowcase(i)}
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
                 style={{
-                  background: activeShowcase === i ? "linear-gradient(135deg, #0F766E, #34D399)" : t.cardBg,
+                  background:
+                    activeShowcase === i
+                      ? "linear-gradient(135deg, #0F766E, #34D399)"
+                      : t.cardBg,
                   color: activeShowcase === i ? "white" : t.textSecondary,
                   border: `1px solid ${activeShowcase === i ? "transparent" : t.border}`,
-                  boxShadow: activeShowcase === i ? "0 4px 14px rgba(52,211,153,0.3)" : "none",
+                  boxShadow:
+                    activeShowcase === i
+                      ? "0 4px 14px rgba(52,211,153,0.3)"
+                      : "none",
                 }}
               >
                 {tab}
@@ -984,7 +1288,10 @@ export function LandingPage() {
               <div
                 key={i}
                 className="cursor-pointer transition-all duration-300"
-                style={{ transform: activeShowcase === i ? "scale(1.02)" : "scale(1)", opacity: activeShowcase === i ? 1 : 0.7 }}
+                style={{
+                  transform: activeShowcase === i ? "scale(1.02)" : "scale(1)",
+                  opacity: activeShowcase === i ? 1 : 0.7,
+                }}
                 onClick={() => setActiveShowcase(i)}
               >
                 <ScreenMockup title={tab} t={t} variant={i} />
@@ -998,14 +1305,29 @@ export function LandingPage() {
       <section id="pricing" className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm mb-4 border" style={{ background: isDark ? "rgba(52,211,153,0.08)" : "#F0FDF9", borderColor: "rgba(52,211,153,0.25)", color: "#0F766E" }}>
+            <div
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm mb-4 border"
+              style={{
+                background: isDark ? "rgba(52,211,153,0.08)" : "#F0FDF9",
+                borderColor: "rgba(52,211,153,0.25)",
+                color: "#0F766E",
+              }}
+            >
               <Star size={14} /> Simple Pricing
             </div>
-            <h2 className="mb-4" style={{ fontSize: "clamp(1.5rem, 3vw, 2.5rem)", fontWeight: 700, color: t.textPrimary }}>
+            <h2
+              className="mb-4"
+              style={{
+                fontSize: "clamp(1.5rem, 3vw, 2.5rem)",
+                fontWeight: 700,
+                color: t.textPrimary,
+              }}
+            >
               Plans That Grow With You
             </h2>
             <p className="max-w-xl mx-auto" style={{ color: t.textSecondary }}>
-              No hidden fees. Cancel anytime. All plans include a 14-day free trial.
+              No hidden fees. Cancel anytime. All plans include a 14-day free
+              trial.
             </p>
           </div>
 
@@ -1015,36 +1337,94 @@ export function LandingPage() {
                 key={i}
                 className="relative rounded-2xl border flex flex-col transition-all duration-300"
                 style={{
-                  background: plan.highlight ? "linear-gradient(160deg, #022C22, #0F766E)" : t.cardBg,
+                  background: plan.highlight
+                    ? "linear-gradient(160deg, #022C22, #0F766E)"
+                    : t.cardBg,
                   borderColor: plan.highlight ? "#34D399" : t.border,
-                  boxShadow: plan.highlight ? "0 20px 60px rgba(52,211,153,0.25)" : "0 1px 3px rgba(0,0,0,0.04)",
+                  boxShadow: plan.highlight
+                    ? "0 20px 60px rgba(52,211,153,0.25)"
+                    : "0 1px 3px rgba(0,0,0,0.04)",
                   transform: plan.highlight ? "scale(1.03)" : "scale(1)",
                 }}
               >
                 {plan.highlight && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold" style={{ background: "#34D399", color: "#022C22" }}>
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold"
+                    style={{ background: "#34D399", color: "#022C22" }}
+                  >
                     Most Popular
                   </div>
                 )}
                 <div className="p-6 flex-1">
                   <div className="mb-4">
-                    <h3 className="mb-1" style={{ fontSize: "1.1rem", fontWeight: 700, color: plan.highlight ? "white" : t.textPrimary }}>{plan.name}</h3>
-                    <p className="text-sm" style={{ color: plan.highlight ? "rgba(255,255,255,0.7)" : t.textSecondary }}>{plan.desc}</p>
+                    <h3
+                      className="mb-1"
+                      style={{
+                        fontSize: "1.1rem",
+                        fontWeight: 700,
+                        color: plan.highlight ? "white" : t.textPrimary,
+                      }}
+                    >
+                      {plan.name}
+                    </h3>
+                    <p
+                      className="text-sm"
+                      style={{
+                        color: plan.highlight
+                          ? "rgba(255,255,255,0.7)"
+                          : t.textSecondary,
+                      }}
+                    >
+                      {plan.desc}
+                    </p>
                   </div>
                   <div className="flex items-baseline gap-1 mb-6">
-                    <span style={{ fontSize: "2.5rem", fontWeight: 800, color: plan.highlight ? "#34D399" : t.textPrimary }}>{plan.price}</span>
-                    {plan.period && <span style={{ color: plan.highlight ? "rgba(255,255,255,0.6)" : t.textMuted }}>{plan.period}</span>}
+                    <span
+                      style={{
+                        fontSize: "2.5rem",
+                        fontWeight: 800,
+                        color: plan.highlight ? "#34D399" : t.textPrimary,
+                      }}
+                    >
+                      {plan.price}
+                    </span>
+                    {plan.period && (
+                      <span
+                        style={{
+                          color: plan.highlight
+                            ? "rgba(255,255,255,0.6)"
+                            : t.textMuted,
+                        }}
+                      >
+                        {plan.period}
+                      </span>
+                    )}
                   </div>
                   <div className="space-y-3 mb-8">
                     {plan.features.map((feat, j) => (
                       <div key={j} className="flex items-center gap-3">
                         <div
                           className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ background: plan.highlight ? "rgba(52,211,153,0.2)" : isDark ? "rgba(52,211,153,0.1)" : "#F0FDF9" }}
+                          style={{
+                            background: plan.highlight
+                              ? "rgba(52,211,153,0.2)"
+                              : isDark
+                                ? "rgba(52,211,153,0.1)"
+                                : "#F0FDF9",
+                          }}
                         >
                           <Check size={11} color="#34D399" />
                         </div>
-                        <span className="text-sm" style={{ color: plan.highlight ? "rgba(255,255,255,0.85)" : t.textSecondary }}>{feat}</span>
+                        <span
+                          className="text-sm"
+                          style={{
+                            color: plan.highlight
+                              ? "rgba(255,255,255,0.85)"
+                              : t.textSecondary,
+                          }}
+                        >
+                          {feat}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -1055,8 +1435,16 @@ export function LandingPage() {
                     className="w-full py-3 rounded-xl text-sm font-semibold transition-all"
                     style={
                       plan.highlight
-                        ? { background: "#34D399", color: "#022C22", boxShadow: "0 4px 14px rgba(52,211,153,0.4)" }
-                        : { background: "transparent", color: t.textPrimary, border: `1px solid ${t.border}` }
+                        ? {
+                            background: "#34D399",
+                            color: "#022C22",
+                            boxShadow: "0 4px 14px rgba(52,211,153,0.4)",
+                          }
+                        : {
+                            background: "transparent",
+                            color: t.textPrimary,
+                            border: `1px solid ${t.border}`,
+                          }
                     }
                   >
                     {plan.cta}
@@ -1069,17 +1457,36 @@ export function LandingPage() {
       </section>
 
       {/* ── Testimonials ───────────────────────────────────────────────────── */}
-      <section id="testimonials" className="py-20 lg:py-28" style={{ background: isDark ? t.bgSecondary : t.sectionAlt }}>
+      <section
+        id="testimonials"
+        className="py-20 lg:py-28"
+        style={{ background: isDark ? t.bgSecondary : t.sectionAlt }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm mb-4 border" style={{ background: isDark ? "rgba(52,211,153,0.08)" : "#F0FDF9", borderColor: "rgba(52,211,153,0.25)", color: "#0F766E" }}>
+            <div
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm mb-4 border"
+              style={{
+                background: isDark ? "rgba(52,211,153,0.08)" : "#F0FDF9",
+                borderColor: "rgba(52,211,153,0.25)",
+                color: "#0F766E",
+              }}
+            >
               <Star size={14} /> Customer Stories
             </div>
-            <h2 className="mb-4" style={{ fontSize: "clamp(1.5rem, 3vw, 2.5rem)", fontWeight: 700, color: t.textPrimary }}>
+            <h2
+              className="mb-4"
+              style={{
+                fontSize: "clamp(1.5rem, 3vw, 2.5rem)",
+                fontWeight: 700,
+                color: t.textPrimary,
+              }}
+            >
               Loved by Operations Teams
             </h2>
             <p className="max-w-xl mx-auto" style={{ color: t.textSecondary }}>
-              See how businesses like yours transformed their inventory operations with IMS.
+              See how businesses like yours transformed their inventory
+              operations with IMS.
             </p>
           </div>
 
@@ -1095,16 +1502,32 @@ export function LandingPage() {
                 }}
               >
                 <div className="flex items-center gap-1 mb-4">
-                  {[...Array(t_.rating)].map((_, j) => <Star key={j} size={14} fill="#34D399" color="#34D399" />)}
+                  {[...Array(t_.rating)].map((_, j) => (
+                    <Star key={j} size={14} fill="#34D399" color="#34D399" />
+                  ))}
                 </div>
-                <p className="text-sm leading-relaxed mb-6 flex-1" style={{ color: t.textSecondary }}>
+                <p
+                  className="text-sm leading-relaxed mb-6 flex-1"
+                  style={{ color: t.textSecondary }}
+                >
                   "{t_.quote}"
                 </p>
                 <div className="flex items-center gap-3">
-                  <img src={t_.img} alt={t_.name} className="w-10 h-10 rounded-full object-cover" />
+                  <img
+                    src={t_.img}
+                    alt={t_.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
                   <div>
-                    <div className="text-sm font-semibold" style={{ color: t.textPrimary }}>{t_.name}</div>
-                    <div className="text-xs" style={{ color: t.textMuted }}>{t_.role}</div>
+                    <div
+                      className="text-sm font-semibold"
+                      style={{ color: t.textPrimary }}
+                    >
+                      {t_.name}
+                    </div>
+                    <div className="text-xs" style={{ color: t.textMuted }}>
+                      {t_.role}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1120,8 +1543,19 @@ export function LandingPage() {
               { value: "4.9/5", label: "Average Rating" },
             ].map((stat, i) => (
               <div key={i} className="text-center">
-                <div className="mb-1" style={{ fontSize: "2rem", fontWeight: 800, color: "#34D399" }}>{stat.value}</div>
-                <div className="text-sm" style={{ color: t.textSecondary }}>{stat.label}</div>
+                <div
+                  className="mb-1"
+                  style={{
+                    fontSize: "2rem",
+                    fontWeight: 800,
+                    color: "#34D399",
+                  }}
+                >
+                  {stat.value}
+                </div>
+                <div className="text-sm" style={{ color: t.textSecondary }}>
+                  {stat.label}
+                </div>
               </div>
             ))}
           </div>
@@ -1130,10 +1564,21 @@ export function LandingPage() {
 
       {/* ── CTA Section ────────────────────────────────────────────────────── */}
       <section className="py-20 lg:py-28 relative overflow-hidden">
-        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #022C22 0%, #0F766E 100%)" }} />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(135deg, #022C22 0%, #0F766E 100%)",
+          }}
+        />
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full opacity-20 blur-3xl" style={{ background: "#34D399" }} />
-          <div className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full opacity-10 blur-3xl" style={{ background: "#34D399" }} />
+          <div
+            className="absolute -top-20 -right-20 w-96 h-96 rounded-full opacity-20 blur-3xl"
+            style={{ background: "#34D399" }}
+          />
+          <div
+            className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full opacity-10 blur-3xl"
+            style={{ background: "#34D399" }}
+          />
         </div>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <h2
@@ -1148,66 +1593,139 @@ export function LandingPage() {
             Start managing inventory{" "}
             <span style={{ color: "#34D399" }}>smarter</span> today.
           </h2>
-          <p className="mb-10 text-lg" style={{ color: "rgba(255,255,255,0.75)" }}>
-            Join 2,500+ businesses already running on IMS. Free 14-day trial — no credit card required.
+          <p
+            className="mb-10 text-lg"
+            style={{ color: "rgba(255,255,255,0.75)" }}
+          >
+            Join 2,500+ businesses already running on IMS. Free 14-day trial —
+            no credit card required.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <button
               onClick={() => navigate("/login")}
               className="flex items-center gap-2 px-8 py-4 rounded-xl font-semibold transition-all"
-              style={{ background: "#34D399", color: "#022C22", boxShadow: "0 8px 28px rgba(52,211,153,0.4)", fontSize: "1rem" }}
+              style={{
+                background: "#34D399",
+                color: "#022C22",
+                boxShadow: "0 8px 28px rgba(52,211,153,0.4)",
+                fontSize: "1rem",
+              }}
             >
               Start Free Trial <ArrowRight size={18} />
             </button>
             <button
               className="flex items-center gap-2 px-8 py-4 rounded-xl font-semibold border transition-all"
-              style={{ borderColor: "rgba(255,255,255,0.3)", color: "white", background: "rgba(255,255,255,0.08)", fontSize: "1rem" }}
+              style={{
+                borderColor: "rgba(255,255,255,0.3)",
+                color: "white",
+                background: "rgba(255,255,255,0.08)",
+                fontSize: "1rem",
+              }}
             >
               <Clock size={18} /> Book a Demo
             </button>
           </div>
-          <p className="mt-6 text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
+          <p
+            className="mt-6 text-sm"
+            style={{ color: "rgba(255,255,255,0.5)" }}
+          >
             Setup takes under 5 minutes · No credit card needed · Cancel anytime
           </p>
         </div>
       </section>
 
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
-      <footer className="border-t py-16" style={{ background: isDark ? "#030f0a" : "#0F172A", borderColor: "rgba(255,255,255,0.08)" }}>
+      <footer
+        className="border-t py-16"
+        style={{
+          background: isDark ? "#030f0a" : "#0F172A",
+          borderColor: "rgba(255,255,255,0.08)",
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
             {/* Brand column */}
             <div className="col-span-2">
               <div className="flex items-center gap-3 mb-4">
-                <img src={ViyanLogo} alt="Viyan Info Tech" className="h-12 w-12 rounded-xl object-cover" style={{ boxShadow: '0 0 0 1.5px rgba(13,110,90,0.6), 0 0 6px rgba(13,110,90,0.35)' }} />
+                <img
+                  src={ViyanLogo}
+                  alt="Viyan Info Tech"
+                  className="h-12 w-12 rounded-xl object-cover"
+                  style={{
+                    boxShadow:
+                      "0 0 0 1.5px rgba(13,110,90,0.6), 0 0 6px rgba(13,110,90,0.35)",
+                  }}
+                />
                 <div className="flex flex-col leading-none">
-                  <span className="font-black text-[22px] tracking-wide text-white" style={{ WebkitTextStroke: '1px rgba(13,110,90,0.6)', paintOrder: 'stroke fill' }}>VIYAN</span>
-                  <span className="text-[11px] font-bold tracking-[0.22em]" style={{ color: "#1db97a", WebkitTextStroke: '0.5px rgba(13,110,90,0.5)' }}>INFO TECH</span>
+                  <span
+                    className="font-black text-[22px] tracking-wide text-white"
+                    style={{
+                      WebkitTextStroke: "1px rgba(13,110,90,0.6)",
+                      paintOrder: "stroke fill",
+                    }}
+                  >
+                    VIYAN
+                  </span>
+                  <span
+                    className="text-[11px] font-bold tracking-[0.22em]"
+                    style={{
+                      color: "#1db97a",
+                      WebkitTextStroke: "0.5px rgba(13,110,90,0.5)",
+                    }}
+                  >
+                    INFO TECH
+                  </span>
                 </div>
               </div>
-              <p className="text-sm mb-6 leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
-                The modern inventory management platform for businesses that demand clarity, speed, and scale.
+              <p
+                className="text-sm mb-6 leading-relaxed"
+                style={{ color: "rgba(255,255,255,0.45)" }}
+              >
+                The modern inventory management platform for businesses that
+                demand clarity, speed, and scale.
               </p>
               <div className="flex items-center gap-3">
-                {[FaTwitter, FaLinkedin, FaGithub, FaFacebook].map((Icon, i) => (
-                  <a
-                    key={i}
-                    href="#"
-                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
-                    style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.5)" }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(52,211,153,0.15)"; (e.currentTarget as HTMLAnchorElement).style.color = "#34D399"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.07)"; (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.5)"; }}
-                  >
-                    <Icon size={15} />
-                  </a>
-                ))}
+                {[FaTwitter, FaLinkedin, FaGithub, FaFacebook].map(
+                  (Icon, i) => (
+                    <a
+                      key={i}
+                      href="#"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+                      style={{
+                        background: "rgba(255,255,255,0.07)",
+                        color: "rgba(255,255,255,0.5)",
+                      }}
+                      onMouseEnter={(e) => {
+                        (
+                          e.currentTarget as HTMLAnchorElement
+                        ).style.background = "rgba(52,211,153,0.15)";
+                        (e.currentTarget as HTMLAnchorElement).style.color =
+                          "#34D399";
+                      }}
+                      onMouseLeave={(e) => {
+                        (
+                          e.currentTarget as HTMLAnchorElement
+                        ).style.background = "rgba(255,255,255,0.07)";
+                        (e.currentTarget as HTMLAnchorElement).style.color =
+                          "rgba(255,255,255,0.5)";
+                      }}
+                    >
+                      <Icon size={15} />
+                    </a>
+                  ),
+                )}
               </div>
             </div>
 
             {/* Link columns */}
             {Object.entries(footerLinks).map(([section, links]) => (
               <div key={section}>
-                <h4 className="text-sm font-semibold mb-4" style={{ color: "white" }}>{section}</h4>
+                <h4
+                  className="text-sm font-semibold mb-4"
+                  style={{ color: "white" }}
+                >
+                  {section}
+                </h4>
                 <ul className="space-y-3">
                   {links.map((link) => (
                     <li key={link}>
@@ -1215,8 +1733,14 @@ export function LandingPage() {
                         href="#"
                         className="text-sm transition-colors"
                         style={{ color: "rgba(255,255,255,0.4)" }}
-                        onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#34D399"; }}
-                        onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.4)"; }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLAnchorElement).style.color =
+                            "#34D399";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLAnchorElement).style.color =
+                            "rgba(255,255,255,0.4)";
+                        }}
                       >
                         {link}
                       </a>
@@ -1228,11 +1752,17 @@ export function LandingPage() {
           </div>
 
           {/* Bottom bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+          <div
+            className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t"
+            style={{ borderColor: "rgba(255,255,255,0.08)" }}
+          >
             <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
               © 2026 Viyan Info Tech. All rights reserved.
             </p>
-            <div className="flex items-center gap-2 text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
+            <div
+              className="flex items-center gap-2 text-sm"
+              style={{ color: "rgba(255,255,255,0.35)" }}
+            >
               <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
               All systems operational
             </div>
