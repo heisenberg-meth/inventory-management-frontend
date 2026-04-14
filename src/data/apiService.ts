@@ -26,6 +26,10 @@ export interface Product {
   zone?: string;
   rack?: string;
   bin?: string;
+  batchNumber?: string;
+  expiryDate?: string;
+  salePrice?: number;
+  reorderLevel?: number;
 }
 
 export interface User {
@@ -211,37 +215,45 @@ export const api = {
 
 // Auth
 export const login = (credentials: Record<string, string>) => api.post<ApiResponse<null>>('/auth/login', credentials);
-export const signup = (userData: Record<string, unknown>) => api.post<ApiResponse<null>>('/api/auth/signup', userData);
+export const signup = (userData: Record<string, unknown>) => api.post<ApiResponse<null>>('/auth/signup', userData);
 
 // Tenant Products
-export const getProducts = async (): Promise<Product[]> => {
-  const data = await api.get<PagedResponse<Product> | Product[]>('/tenant/products');
+export const getProducts = async (page = 0, size = 10): Promise<Product[]> => {
+  const data = await api.get<PagedResponse<Product> | Product[]>(`/tenant/products?page=${page}&size=${size}`);
   const products = Array.isArray(data) ? data : data?.content;
   
   if (!products) return [];
 
-  return products.map((p) => ({
+  return (products as Product[]).map((p) => ({
     ...p,
     id: p.id,
     name: p.name,
-    batch: p.batch_number,
-    expiry: p.expiry_date,
-    price: `₹${p.sale_price}`,
-    threshold: p.reorder_level,
+    batch: p.batchNumber || p.batch_number,
+    expiry: p.expiryDate || p.expiry_date,
+    price: `₹${p.salePrice || p.sale_price || 0}`,
+    threshold: p.reorderLevel || p.reorder_level || 10,
     max: 1000,
-    status: p.stock === 0 ? 'Out of Stock' : (p.stock <= (p.reorder_level || 50) ? 'Low Stock' : 'Active')
+    status: (p.stock || 0) === 0 ? 'Out of Stock' : ((p.stock || 0) <= (p.reorderLevel || p.reorder_level || 50) ? 'Low Stock' : 'Active')
   }));
 };
-export const getCategories = () => api.get<Category[]>('/tenant/products/categories');
-export const getBrands = () => api.get<Brand[]>('/tenant/products/brands');
+export const getLowStockProducts = async (): Promise<Product[]> => {
+  const products = await getProducts(0, 500); 
+  return products.filter(p => p.status === 'Low Stock' || p.status === 'Out of Stock');
+};
+export const getCategories = async (): Promise<Category[]> => {
+  const data = await api.get<PagedResponse<Category> | Category[]>('/tenant/categories');
+  const categories = Array.isArray(data) ? data : data?.content;
+  return categories || [];
+};
+export const getBrands = () => Promise.resolve([]); // Not implemented in backend yet
 
 // Tenant Suppliers & Customers
-export const getSuppliers = () => api.get<Supplier[]>('/tenant/suppliers');
-export const getCustomers = () => api.get<Customer[]>('/tenant/customers');
+export const getSuppliers = () => api.get<PagedResponse<Supplier> | Supplier[]>('/tenant/suppliers').then(res => Array.isArray(res) ? res : res.content || []);
+export const getCustomers = () => api.get<PagedResponse<Customer> | Customer[]>('/tenant/customers').then(res => Array.isArray(res) ? res : res.content || []);
 
 // Tenant Orders & Invoices
-export const getSalesOrders = () => api.get<unknown[]>('/tenant/orders/sales');
-export const getPurchaseOrders = () => api.get<unknown[]>('/tenant/orders/purchase');
+export const getSalesOrders = () => api.get<PagedResponse<SalesOrder>>('/tenant/orders?type=sale').then(res => res.content || []);
+export const getPurchaseOrders = () => api.get<PagedResponse<SalesOrder>>('/tenant/orders?type=purchase').then(res => res.content || []);
 export const getInvoices = () => api.get<Invoice[]>('/tenant/invoices');
 export const getPayments = () => api.get<Payment[]>('/tenant/payments');
 
@@ -254,6 +266,18 @@ export const getStockTransfers = () => api.get<StockTransfer[]>('/tenant/stock/t
 export const getStockByLocation = (locId: string | number) => api.get<Record<string, unknown>>(`/tenant/stock/by-location?locationId=${locId}`);
 
 // Platform
-export const getPlatformStats = () => api.get<PlatformStats>('/platform/stats');
+export const getPlatformStats = async (): Promise<PlatformStats> => {
+  const data = await api.get<PlatformStatsResponse>('/platform/stats');
+  return {
+    totalTenants: data.total_tenants || 0,
+    activeTenants: data.total_tenants || 0, // Mocking active as total for now
+    totalSubscriptions: 0,
+    systemHealth: "Excellent",
+  };
+};
+
+interface PlatformStatsResponse {
+  total_tenants: number;
+}
 export const getTenants = () => api.get<Tenant[]>('/platform/tenants');
 export const getAuditLogs = () => api.get<AuditLog[]>('/platform/audit/logs');

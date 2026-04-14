@@ -1,53 +1,58 @@
 import React from 'react';
-import { 
-  Building2, CheckCircle2, IndianRupee, Ticket, 
-  ArrowUpRight, TrendingUp,
-  Activity, Database, HardDrive, Cpu, CheckCircle
-} from 'lucide-react';
+import {
+  Building2,
+  CheckCircle2,
+  IndianRupee,
+  Ticket,
+  Activity,
+  Database,
+  HardDrive,
+  Cpu,
+  CheckCircle,
+} from "lucide-react";
 import { 
   Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   AreaChart, Area, PieChart, Pie, Cell 
 } from 'recharts';
+import { getPlatformStats, type PlatformStats } from '../../data/apiService';
 
-const signupData = [
-  { month: "Oct", signups: 40 },
-  { month: "Nov", signups: 52 },
-  { month: "Dec", signups: 45 },
-  { month: "Jan", signups: 68 },
-  { month: "Feb", signups: 82 },
-  { month: "Mar", signups: 96 },
-];
 
-const revenueData = [
-  { month: 'Oct', revenue: 120000 },
-  { month: 'Nov', revenue: 180000 },
-  { month: 'Dec', revenue: 150000 },
-  { month: 'Jan', revenue: 290000 },
-  { month: 'Feb', revenue: 350000 },
-  { month: 'Mar', revenue: 428500 },
-];
-
+// PLACEHOLDERS for charts as they might not have real backend implementation yet
+const signupData: { month: string; signups: number }[] = [];
+const revenueData: { month: string; revenue: number }[] = [];
 const planData = [
-  { name: 'Free', value: 71, color: 'var(--pa-text-light-gray)' },
-  { name: 'Pro', value: 43, color: 'var(--pa-teal)' },
-  { name: 'Enterprise', value: 28, color: '#f59e0b' },
+  { name: 'Free', value: 0, color: 'var(--pa-text-light-gray)' },
+  { name: 'Pro', value: 0, color: 'var(--pa-teal)' },
+  { name: 'Enterprise', value: 0, color: '#f59e0b' },
 ];
-
 const healthMetrics = [
-  { label: 'API Response Time', value: '98ms', progress: 85, status: 'Excellent', statusColor: 'mint', icon: Activity },
-  { label: 'Database Load', value: '42%', progress: 65, status: 'Normal', statusColor: 'mint', icon: Database },
-  { label: 'Storage Used', value: '54%', progress: 54, status: 'Moderate', statusColor: 'amber', icon: HardDrive },
-  { label: 'Active Sessions', value: '284', progress: 75, status: 'Normal', statusColor: 'mint', icon: Cpu },
+  { label: 'API Response Time', value: '--', progress: 0, status: 'Normal', statusColor: 'mint', icon: Activity },
+  { label: 'Database Load', value: '--', progress: 0, status: 'Normal', statusColor: 'mint', icon: Database },
+  { label: 'Storage Used', value: '--', progress: 0, status: 'Normal', statusColor: 'amber', icon: HardDrive },
+  { label: 'Active Sessions', value: '--', progress: 0, status: 'Normal', statusColor: 'mint', icon: Cpu },
 ];
-
-const recentTenants = [
-  { name: 'ABC Pharmacy', type: 'Pharmacy', plan: 'Enterprise', status: 'Active', joined: 'Today' },
-  { name: 'FreshMart', type: 'Supermarket', plan: 'Pro', status: 'Active', joined: 'Yesterday' },
-  { name: 'Central WH', type: 'Warehouse', plan: 'Pro', status: 'Active', joined: '2 days ago' },
-  { name: 'QuickRetail', type: 'Retail', plan: 'Free', status: 'Trial', joined: '3 days ago' },
-];
+const recentTenants: { name: string; type: string; plan: string; status: string; joined: string }[] = [];
 
 export const GlobalDashboard: React.FC = () => {
+  const [stats, setStats] = React.useState<PlatformStats | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    setLoading(true);
+    try {
+      const data = await getPlatformStats();
+      setStats(data);
+    } catch (err) {
+      console.error('Failed to fetch platform stats:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8" /> {/* Spacer for Topbar Title */}
@@ -60,13 +65,11 @@ export const GlobalDashboard: React.FC = () => {
             <div className="w-[44px] h-[44px] bg-[var(--pa-teal)] rounded-[10px] flex items-center justify-center text-white">
               <Building2 className="w-5 h-5" />
             </div>
-            <div className="text-[12px] font-semibold text-[var(--pa-mint)] flex items-center gap-1">
-              <ArrowUpRight className="w-3 h-3" />
-              ↑ 8 this month
-            </div>
           </div>
           <div>
-            <div className="text-[28px] font-[700] text-[var(--pa-text-near-black)]">142</div>
+            <div className="text-[28px] font-[700] text-[var(--pa-text-near-black)]">
+              {loading ? '...' : stats?.totalTenants}
+            </div>
             <div className="text-[12px] font-medium text-[var(--pa-text-muted)] uppercase tracking-wider">Total Tenants</div>
           </div>
         </div>
@@ -77,12 +80,11 @@ export const GlobalDashboard: React.FC = () => {
             <div className="w-[44px] h-[44px] bg-[var(--pa-teal)] rounded-[10px] flex items-center justify-center text-white">
               <CheckCircle2 className="w-5 h-5" />
             </div>
-            <div className="text-[12px] font-semibold text-[#1db97a]">
-              97.2% active rate
-            </div>
           </div>
           <div>
-            <div className="text-[28px] font-[700] text-[var(--pa-text-near-black)]">138</div>
+            <div className="text-[28px] font-[700] text-[var(--pa-text-near-black)]">
+              {loading ? '...' : stats?.activeTenants}
+            </div>
             <div className="text-[12px] font-medium text-[var(--pa-text-muted)] uppercase tracking-wider">Active Tenants</div>
           </div>
         </div>
@@ -93,13 +95,9 @@ export const GlobalDashboard: React.FC = () => {
             <div className="w-[44px] h-[44px] bg-[var(--pa-teal)] rounded-[10px] flex items-center justify-center text-white">
               <IndianRupee className="w-5 h-5" />
             </div>
-            <div className="text-[12px] font-semibold text-[var(--pa-mint)] flex items-center gap-1">
-              <TrendingUp className="w-3 h-3" />
-              ↑ 18% vs last month
-            </div>
           </div>
           <div>
-            <div className="text-[28px] font-[700] text-[var(--pa-text-near-black)]">₹4,28,500</div>
+            <div className="text-[28px] font-[700] text-[var(--pa-text-near-black)]">₹0</div>
             <div className="text-[12px] font-medium text-[var(--pa-text-muted)] uppercase tracking-wider">Monthly Revenue (MRR)</div>
           </div>
         </div>
@@ -110,12 +108,9 @@ export const GlobalDashboard: React.FC = () => {
             <div className="w-[44px] h-[44px] bg-[var(--pa-amber)]/15 rounded-[10px] flex items-center justify-center text-[var(--pa-amber)]">
               <Ticket className="w-5 h-5" />
             </div>
-            <div className="text-[12px] font-semibold text-[var(--pa-amber)]">
-              4 unresolved
-            </div>
           </div>
           <div>
-            <div className="text-[28px] font-[700] text-[var(--pa-amber)]">12</div>
+            <div className="text-[28px] font-[700] text-[var(--pa-amber)]">0</div>
             <div className="text-[12px] font-medium text-[var(--pa-text-muted)] uppercase tracking-wider">Open Support Tickets</div>
           </div>
         </div>

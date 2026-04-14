@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit, Trash2, Search, X, Check, Grid3x3 } from 'lucide-react';
-import { CATEGORIES as INITIAL_CATEGORIES } from '../data/mockData';
 import { getCategories } from '../data/apiService';
 
-type Category = typeof INITIAL_CATEGORIES[number];
+interface Category {
+  id: number | string;
+  name: string;
+  description: string;
+  productCount: number;
+  status: string;
+}
 
 const IC = "w-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-mint)]";
 
@@ -19,29 +24,29 @@ export const Categories: React.FC = () => {
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
-  useEffect(() => {
-    fetchCats();
-  }, []);
-
-  const fetchCats = async () => {
+  const fetchCats = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getCategories();
       setCats(data as Category[]);
     } catch (err) {
       console.error('Failed to fetch categories:', err);
-      // Fallback to mock data if API fails during initial connection Phase
-      setCats(INITIAL_CATEGORIES);
+      showToast('Error fetching data from server');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchCats();
+  }, [fetchCats]);
 
   const openAdd = () => { setEditing(null); setForm({ name: '', description: '', status: 'Active' }); setShowModal(true); };
   const openEdit = (c: Category) => { setEditing(c); setForm({ name: c.name, description: c.description, status: c.status }); setShowModal(true); };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name.trim()) return;
+    // Local state update for now, but in a real scenario we'd call api.post/put
     if (editing) {
       setCats(prev => prev.map(c => c.id === editing.id ? { ...c, ...form } : c));
       showToast('Category updated!');

@@ -1,9 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Eye, Search, X, Check, ShoppingBag, Truck } from 'lucide-react';
-import { PURCHASE_ORDERS as INITIAL_POS, SUPPLIERS } from '../data/mockData';
-import { getPurchaseOrders } from '../data/apiService';
+import { getPurchaseOrders, getSuppliers, type Supplier } from '../data/apiService';
 
-type PO = typeof INITIAL_POS[number];
+interface PO {
+  id: string;
+  supplier: string;
+  date: string;
+  expectedDelivery: string;
+  items: number;
+  total: number;
+  status: string;
+}
+
+interface ApiOrder {
+  id: string;
+  customer?: string;
+  supplier?: string;
+  expected_delivery?: string;
+  expectedDelivery?: string;
+  date: string;
+  items?: number;
+  total?: number;
+  status?: string;
+}
 
 const IC = "w-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-mint)]";
 
@@ -19,38 +38,55 @@ const statusColor = (s: string) => {
 
 export const PurchaseOrders: React.FC = () => {
   const [orders, setOrders] = useState<PO[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showCreate, setShowCreate] = useState(false);
   const [viewingOrder, setViewingOrder] = useState<PO | null>(null);
   const [toast, setToast] = useState('');
-  const [form, setForm] = useState({ supplier: SUPPLIERS[0].name, expectedDelivery: '', notes: '' });
+  const [form, setForm] = useState({ supplierId: '', expectedDelivery: '', notes: '' });
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
   useEffect(() => {
-    fetchOrders();
+    fetchInitialData();
   }, []);
 
-  const fetchOrders = async () => {
+  const fetchInitialData = async () => {
     setLoading(true);
     try {
-      const data = await getPurchaseOrders();
-      setOrders(data as PO[]);
+      const [orderData, supplierData] = await Promise.all([
+        getPurchaseOrders(),
+        getSuppliers()
+      ]);
+      const mappedOrders = (orderData as ApiOrder[]).map(o => ({
+        id: o.id,
+        supplier: o.customer || o.supplier || 'Unknown',
+        date: o.date,
+        expectedDelivery: o.expected_delivery || o.expectedDelivery || o.date,
+        items: o.items ?? 0,
+        total: o.total ?? 0,
+        status: o.status ?? 'Pending'
+      }));
+      setOrders(mappedOrders);
+      setSuppliers(supplierData);
+      if (supplierData.length > 0) {
+        setForm(f => ({ ...f, supplierId: String(supplierData[0].id) }));
+      }
     } catch (err) {
-      console.error('Failed to fetch purchase orders:', err);
-      setOrders(INITIAL_POS);
+      console.error('Failed to fetch initial data:', err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleCreate = () => {
-    if (!form.supplier) return;
+    const selectedSupplier = suppliers.find(s => String(s.id) === form.supplierId);
+    if (!selectedSupplier) return;
     const newPO: PO = {
       id: `PO-2024-00${orders.length + 1}`,
-      supplier: form.supplier,
+      supplier: selectedSupplier.name,
       date: new Date().toISOString().split('T')[0],
       expectedDelivery: form.expectedDelivery || '2024-04-01',
       items: 0,
@@ -167,8 +203,8 @@ export const PurchaseOrders: React.FC = () => {
             </div>
             <div className="p-6 space-y-4">
               <div><label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Supplier <span className="text-[var(--color-danger)]">*</span></label>
-                <select value={form.supplier} onChange={e => setForm(f => ({ ...f, supplier: e.target.value }))} className={IC}>
-                  {SUPPLIERS.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
+                <select value={form.supplierId} onChange={e => setForm(f => ({ ...f, supplierId: e.target.value }))} className={IC}>
+                  {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select></div>
               <div><label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Expected Delivery</label>
                 <input type="date" value={form.expectedDelivery} onChange={e => setForm(f => ({ ...f, expectedDelivery: e.target.value }))} className={IC} /></div>

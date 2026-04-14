@@ -1,8 +1,23 @@
 import React, { useState } from 'react';
 import { Plus, Edit, Trash2, Search, X, Check, Shield, Key } from 'lucide-react';
-import { USERS as INITIAL_USERS, ROLES, PERMISSIONS, ROLE_PERMISSIONS } from '../data/mockData';
 
-type User = typeof INITIAL_USERS[number];
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  avatar: string;
+  lastLogin: string;
+}
+
+interface Role {
+  id: number;
+  name: string;
+  description: string;
+  userCount: number;
+  color: string;
+}
 
 const IC = "w-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-mint)]";
 
@@ -20,8 +35,10 @@ const roleColor = (role: string) => {
 };
 
 export const UsersRoles: React.FC = () => {
-  const [users, setUsers] = useState<User[]>(INITIAL_USERS);
-  const [roles] = useState(ROLES);
+  const [users, setUsers] = useState<User[]>([]);
+  const [roles] = useState<Role[]>([]);
+  const [permissions] = useState<string[]>([]);
+  const [rolePermissions] = useState<Record<string, string[]>>({});
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('Users');
   const [showModal, setShowModal] = useState(false);
@@ -169,11 +186,11 @@ export const UsersRoles: React.FC = () => {
               </div>
               <p className="text-sm text-[var(--color-text-secondary)]">{role.description}</p>
               <div className="mt-4 flex flex-wrap gap-1.5">
-                {(ROLE_PERMISSIONS[role.name] || []).slice(0, 4).map(perm => (
+                {(rolePermissions[role.name] || []).slice(0, 4).map(perm => (
                   <span key={perm} className="px-2 py-0.5 bg-[var(--color-surface-secondary)] text-xs text-[var(--color-text-secondary)] rounded-full">{perm}</span>
                 ))}
-                {(ROLE_PERMISSIONS[role.name] || []).length > 4 && (
-                  <span className="px-2 py-0.5 bg-[var(--color-mint)]/20 text-xs text-[var(--color-mint)] rounded-full">+{(ROLE_PERMISSIONS[role.name] || []).length - 4} more</span>
+                {(rolePermissions[role.name] || []).length > 4 && (
+                  <span className="px-2 py-0.5 bg-[var(--color-mint)]/20 text-xs text-[var(--color-mint)] rounded-full">+{(rolePermissions[role.name] || []).length - 4} more</span>
                 )}
               </div>
             </div>
@@ -199,11 +216,11 @@ export const UsersRoles: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--color-border)]">
-                {PERMISSIONS.map(perm => (
+                {permissions.map(perm => (
                   <tr key={perm} className="hover:bg-[var(--color-surface-secondary)] transition-colors">
                     <td className="px-4 py-2.5 text-sm text-[var(--color-text-primary)]">{perm}</td>
                     {roles.map(role => {
-                      const hasPerm = (ROLE_PERMISSIONS[role.name] || []).includes(perm);
+                      const hasPerm = (rolePermissions[role.name] || []).includes(perm);
                       return (
                         <td key={role.id} className="px-4 py-2.5 text-center">
                           <div className={`w-5 h-5 rounded-full mx-auto flex items-center justify-center text-xs ${hasPerm ? 'bg-[var(--color-mint)]/20 text-[var(--color-mint)]' : 'bg-[var(--color-surface-secondary)] text-[var(--color-text-muted)]'}`}>

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit, Trash2, Search, X, Check, Users, Phone, Mail, Eye } from 'lucide-react';
-import { CUSTOMERS as INITIAL_CUSTOMERS } from '../data/mockData';
 import { getCustomers, type Customer as CustomerType } from '../data/apiService';
 
 
@@ -20,22 +19,22 @@ export const Customers: React.FC = () => {
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
-
-  const fetchCustomers = async () => {
+  const fetchCustomers = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getCustomers();
       setCustomers(data);
     } catch (err) {
       console.error('Failed to fetch customers:', err);
-      setCustomers(INITIAL_CUSTOMERS as CustomerType[]);
+      showToast('Connection to server failed');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchCustomers();
+  }, [fetchCustomers]);
 
   const openAdd = () => { setEditing(null); setForm({ name: '', contact: '', email: '', phone: '', type: 'Hospital', status: 'Active' }); setShowModal(true); };
   const openEdit = (c: CustomerType) => { setEditing(c); setForm({ name: c.name, contact: c.contact, email: c.email, phone: c.phone, type: c.type, status: c.status }); setShowModal(true); };

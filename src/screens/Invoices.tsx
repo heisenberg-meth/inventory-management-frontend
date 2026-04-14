@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Printer, Download, X, Eye } from 'lucide-react';
 import { getInvoices, type Invoice } from '../data/apiService';
-import { SALES_ORDERS as MOCK_ORDERS } from '../data/mockData';
+
 
 const statusColor = (s: string) => {
   switch (s) {
@@ -13,18 +13,6 @@ const statusColor = (s: string) => {
     default: return 'bg-gray-500/20 text-gray-400';
   }
 };
-
-const MOCK_INVOICE_ITEMS = [
-  { name: "Paracetamol 500mg", qty: 50, unit: "Strip", rate: 45, amount: 2250 },
-  {
-    name: "Amoxicillin 250mg",
-    qty: 20,
-    unit: "Strip",
-    rate: 120,
-    amount: 2400,
-  },
-  { name: "Vitamin D3 60K", qty: 30, unit: "Box", rate: 55, amount: 1650 },
-];
 
 export const Invoices: React.FC = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -44,19 +32,6 @@ export const Invoices: React.FC = () => {
       setInvoices(data);
     } catch (err) {
       console.error('Failed to fetch invoices:', err);
-      // Fallback to mock data mapped to Invoice structure
-      const mapped = MOCK_ORDERS.map((o, i) => ({
-        id: i + 1,
-        invoiceNumber: `INV-${o.id.split('-').pop()}`,
-        orderId: i + 100,
-        customerId: i + 200,
-        customerName: o.customer,
-        date: o.date,
-        dueDate: o.date,
-        amount: o.total,
-        status: (o.paymentStatus.toUpperCase() === 'PAID' ? 'PAID' : 'UNPAID') as Invoice['status']
-      }));
-      setInvoices(mapped);
     } finally {
       setLoading(false);
     }
@@ -68,9 +43,9 @@ export const Invoices: React.FC = () => {
     return matchSearch && matchFilter;
   });
 
-  const subtotal = MOCK_INVOICE_ITEMS.reduce((a, i) => a + i.amount, 0);
-  const tax = Math.round(subtotal * 0.18);
-  const total = subtotal + tax;
+  const subtotal = 0;
+  const tax = 0;
+  const total = 0;
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
@@ -204,14 +179,7 @@ export const Invoices: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--color-border)]">
-                    {MOCK_INVOICE_ITEMS.map((item, i) => (
-                      <tr key={i}>
-                        <td className="px-3 py-2.5 text-sm text-[var(--color-text-primary)]">{item.name}</td>
-                        <td className="px-3 py-2.5 text-sm text-[var(--color-text-secondary)] text-right">{item.qty} {item.unit}</td>
-                        <td className="px-3 py-2.5 text-sm text-[var(--color-text-secondary)] text-right">₹{item.rate}</td>
-                        <td className="px-3 py-2.5 text-sm font-medium text-[var(--color-text-primary)] text-right">₹{item.amount.toLocaleString()}</td>
-                      </tr>
-                    ))}
+                    {/* Items would be fetched from API in real scenario */}
                   </tbody>
                 </table>
               </div>

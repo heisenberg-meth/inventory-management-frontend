@@ -1,19 +1,38 @@
-import React, { useState } from 'react';
-import { AlertTriangle, Search, RefreshCw, ShoppingBag, TrendingDown, Package } from 'lucide-react';
-import { LOW_STOCK_ITEMS } from '../data/mockData';
+import React, { useState, useEffect } from 'react';
+import { ShoppingBag, AlertTriangle, TrendingDown, Package, Search, RefreshCw } from 'lucide-react';
+import { getLowStockProducts, type Product } from '../data/apiService';
 
 export const LowStockAlerts: React.FC = () => {
+  const [items, setItems] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
 
-  const filtered = LOW_STOCK_ITEMS.filter(item => {
-    const matchSearch = !search || item.name.toLowerCase().includes(search.toLowerCase()) || item.category.toLowerCase().includes(search.toLowerCase());
-    const matchFilter = filter === 'All' || (filter === 'Critical' && item.severity === 'critical') || (filter === 'Warning' && item.severity === 'warning');
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const data = await getLowStockProducts();
+      setItems(data);
+    } catch (err) {
+      console.error('Failed to fetch low stock products:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filtered = items.filter((item: Product) => {
+    const matchSearch = !search || item.name.toLowerCase().includes(search.toLowerCase()) || (item.category || '').toLowerCase().includes(search.toLowerCase());
+    const isCritical = item.stock <= (item.threshold || 0) * 0.5;
+    const matchFilter = filter === 'All' || (filter === 'Critical' && isCritical) || (filter === 'Warning' && !isCritical);
     return matchSearch && matchFilter;
   });
 
-  const criticalCount = LOW_STOCK_ITEMS.filter(i => i.severity === 'critical').length;
-  const warningCount = LOW_STOCK_ITEMS.filter(i => i.severity === 'warning').length;
+  const criticalCount = items.filter((item: Product) => item.stock <= (item.threshold || 0) * 0.5).length;
+  const warningCount = items.length - criticalCount;
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
@@ -58,7 +77,7 @@ export const LowStockAlerts: React.FC = () => {
             </div>
             <div>
               <div className="text-xs text-[var(--color-text-secondary)]">Total Items</div>
-              <div className="text-2xl font-bold text-[var(--color-text-primary)]">{LOW_STOCK_ITEMS.length}</div>
+              <div className="text-2xl font-bold text-[var(--color-text-primary)]">{items.length}</div>
             </div>
           </div>
         </div>
@@ -93,11 +112,14 @@ export const LowStockAlerts: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--color-border)]">
-              {filtered.length === 0 ? (
+              {loading ? (
+                <tr><td colSpan={7} className="px-4 py-12 text-center text-[var(--color-text-secondary)]">
+                  <div className="flex justify-center"><div className="w-6 h-6 border-2 border-[var(--color-mint)] border-t-transparent rounded-full animate-spin"></div></div>
+                </td></tr>
+              ) : filtered.length === 0 ? (
                 <tr><td colSpan={7} className="px-4 py-12 text-center text-[var(--color-text-secondary)]">No alerts found</td></tr>
-              ) : filtered.map(item => {
-                const pct = Math.round((item.stock / item.max) * 100);
-                const isCritical = item.severity === 'critical';
+              ) : filtered.map((item: Product) => {
+                const isCritical = item.stock <= (item.threshold || 0) * 0.5;
                 const barColor = isCritical ? 'var(--color-danger)' : 'var(--color-warning)';
                 return (
                   <tr key={item.id} className={`hover:bg-[var(--color-surface-secondary)] transition-colors ${isCritical ? 'border-l-4 border-l-[var(--color-danger)]' : 'border-l-4 border-l-[var(--color-warning)]'}`}>
@@ -108,7 +130,7 @@ export const LowStockAlerts: React.FC = () => {
                         </div>
                         <div>
                           <div className="font-medium text-sm text-[var(--color-text-primary)]">{item.name}</div>
-                          <div className="text-xs text-[var(--color-text-muted)]">{item.sku}</div>
+                          <div className="text-xs text-[var(--color-text-muted)]">{item.batch}</div>
                         </div>
                       </div>
                     </td>
@@ -117,12 +139,12 @@ export const LowStockAlerts: React.FC = () => {
                       <div className="space-y-1">
                         <div className="text-sm font-bold" style={{ color: barColor }}>{item.stock} {item.unit}s</div>
                         <div className="w-20 h-1.5 bg-[var(--color-surface-secondary)] rounded-full overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${Math.max(pct, 2)}%`, backgroundColor: barColor }} />
+                          <div className="h-full rounded-full" style={{ width: `${Math.min((item.stock / (item.max || 1000)) * 100, 100)}%`, backgroundColor: barColor }} />
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)]">{item.reorderLevel} {item.unit}s</td>
-                    <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)] max-w-[130px] truncate">{item.supplier}</td>
+                    <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)]">{item.threshold} {item.unit}s</td>
+                    <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)] max-w-[130px] truncate">Multiple</td>
                     <td className="px-4 py-3">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${isCritical ? 'bg-[var(--color-danger)]/20 text-[var(--color-danger)]' : 'bg-[var(--color-warning)]/20 text-[var(--color-warning)]'}`}>
                         {isCritical ? 'Critical' : 'Warning'}

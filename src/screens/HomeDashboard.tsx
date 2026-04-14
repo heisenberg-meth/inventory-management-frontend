@@ -7,32 +7,25 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { getDashboardStats, type DashboardKPIs } from '../data/apiService';
 
+// These will be replaced by API data or kept as placeholders if backend doesn't provide them yet
 const weeklyData = [
-  { day: "Mon", sales: 12400, id: "mon" },
-  { day: "Tue", sales: 18200, id: "tue" },
-  { day: "Wed", sales: 15800, id: "wed" },
-  { day: "Thu", sales: 21300, id: "thu" },
-  { day: "Fri", sales: 19500, id: "fri" },
-  { day: "Sat", sales: 24100, id: "sat" },
-  { day: "Sun", sales: 16700, id: "sun" },
+  { day: "Mon", sales: 0 },
+  { day: "Tue", sales: 0 },
+  { day: "Wed", sales: 0 },
+  { day: "Thu", sales: 0 },
+  { day: "Fri", sales: 0 },
+  { day: "Sat", sales: 0 },
+  { day: "Sun", sales: 0 },
 ];
 
 const stockLevels = [
-  { category: 'Medicines', level: 85, color: 'var(--color-mint)', id: 'medicines' },
-  { category: 'Medical Supplies', level: 62, color: 'var(--color-mint)', id: 'medical-supplies' },
-  { category: 'Personal Care', level: 38, color: 'var(--color-warning)', id: 'personal-care' },
-  { category: 'Equipment', level: 15, color: 'var(--color-danger)', id: 'equipment' },
+  { category: 'Medicines', level: 0, color: 'var(--color-mint)', id: 'medicines' },
+  { category: 'Medical Supplies', level: 0, color: 'var(--color-mint)', id: 'medical-supplies' },
+  { category: 'Personal Care', level: 0, color: 'var(--color-warning)', id: 'personal-care' },
+  { category: 'Equipment', level: 0, color: 'var(--color-danger)', id: 'equipment' },
 ];
 
-
-
-const recentActivity = [
-  { action: 'New product added', detail: 'Paracetamol 500mg', time: '5 mins ago', color: 'var(--color-mint)' },
-  { action: 'Stock adjusted', detail: 'Reduced inventory for Item #451', time: '12 mins ago', color: 'var(--color-info)' },
-  { action: 'Low stock alert', detail: 'Aspirin below threshold', time: '25 mins ago', color: 'var(--color-warning)' },
-  { action: 'Order completed', detail: 'ORD-1284 marked as delivered', time: '1 hour ago', color: 'var(--color-mint)' },
-  { action: 'New customer', detail: 'Metro Hospital registered', time: '2 hours ago', color: 'var(--color-info)' },
-];
+const recentActivity: { id: number; action: string; time: string; user: string; color: string; detail: string }[] = [];
 
 export const HomeDashboard: React.FC = () => {
   const navigate = useNavigate();

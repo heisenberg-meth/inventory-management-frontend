@@ -1,17 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Plus, Upload, Search, ArrowUpDown, Download, Edit, Eye, Trash2, X, Calendar, Package, AlertTriangle, Check } from 'lucide-react';
-import { getProducts, type Product } from '../data/apiService';
+import { getProducts, getCategories, type Product, type Category } from '../data/apiService';
 
-const INITIAL_PRODUCTS: Product[] = [
-  { 
-    id: 1, name: 'Paracetamol 500mg', batch: 'BTH-2024-001', batch_number: 'BTH-2024-001', 
-    category: 'Pain Relief', price: '₹45', sale_price: 45, purchase_price: 40, 
-    stock: 450, max: 1000, expiry: '2025-12-15', expiry_date: '2025-12-15', 
-    status: 'Active', unit: 'Strip', threshold: 100, reorder_level: 100 
-  },
-];
-
-const CATEGORIES = ['Pain Relief', 'Antibiotics', 'Antihistamine', 'Diabetes', 'Cholesterol', 'Gastric', 'Supplements', 'Cardiac', 'Vitamins', 'Other'];
 const UNITS = ['Piece', 'Box', 'Strip', 'Bottle', 'Vial', 'Sachet'];
 
 interface FormData {
@@ -44,6 +34,7 @@ const computeStatus = (stock: number, max: number, expiry: string): string => {
 
 export const ProductManagement: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -66,17 +57,20 @@ export const ProductManagement: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchInitialData();
   }, []);
 
-  const fetchProducts = async () => {
+  const fetchInitialData = async () => {
     setLoading(true);
     try {
-      const data = await getProducts();
-      setProducts(data);
+      const [productsData, categoriesData] = await Promise.all([
+        getProducts(),
+        getCategories()
+      ]);
+      setProducts(productsData);
+      setCategories(categoriesData);
     } catch (err) {
-      console.error('Failed to fetch products:', err);
-      setProducts(INITIAL_PRODUCTS);
+      console.error('Failed to fetch initial data:', err);
     } finally {
       setLoading(false);
     }
@@ -262,7 +256,7 @@ export const ProductManagement: React.FC = () => {
               className="px-3 sm:px-4 py-2 bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-mint)]"
             >
               <option>All Categories</option>
-              {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+              {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
             </select>
             <select
               value={statusFilter}
@@ -482,7 +476,7 @@ export const ProductManagement: React.FC = () => {
                     onChange={e => setFormData(f => ({ ...f, category: e.target.value }))}
                     className={inputClass}
                   >
-                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                   </select>
                 </div>
                 <div>

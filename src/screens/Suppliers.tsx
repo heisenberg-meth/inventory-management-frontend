@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit, Trash2, Search, X, Check, Users2, Phone, Mail } from 'lucide-react';
-import { SUPPLIERS as INITIAL_SUPPLIERS } from '../data/mockData';
 import { getSuppliers, type Supplier as SupplierType } from '../data/apiService';
-
-
 
 const IC = "w-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-mint)]";
 
@@ -19,22 +16,22 @@ export const Suppliers: React.FC = () => {
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
-  useEffect(() => {
-    fetchSuppliers();
-  }, []);
-
-  const fetchSuppliers = async () => {
+  const fetchSuppliers = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getSuppliers();
       setSuppliers(data);
     } catch (err) {
       console.error('Failed to fetch suppliers:', err);
-      setSuppliers(INITIAL_SUPPLIERS as SupplierType[]);
+      showToast('Connection to server failed');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchSuppliers();
+  }, [fetchSuppliers]);
 
   const openAdd = () => { setEditing(null); setForm({ name: '', contact: '', email: '', phone: '', address: '', category: 'Medicines', status: 'Active' }); setShowModal(true); };
   const openEdit = (s: SupplierType) => { setEditing(s); setForm({ name: s.name, contact: s.contact, email: s.email, phone: s.phone, address: s.address, category: s.category, status: s.status }); setShowModal(true); };

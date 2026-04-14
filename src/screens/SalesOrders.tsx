@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Eye, Search, X, Check, ShoppingCart, FileText } from 'lucide-react';
-import { SALES_ORDERS as INITIAL_ORDERS, CUSTOMERS } from '../data/mockData';
-import { getSalesOrders } from '../data/apiService';
+import { getSalesOrders, getCustomers, type Customer } from '../data/apiService';
 
-type Order = typeof INITIAL_ORDERS[number];
+interface Order {
+  id: string;
+  customer: string;
+  date: string;
+  items: number;
+  total: number;
+  status: string;
+  paymentStatus: string;
+}
 
 const statusColor = (s: string) => {
   switch (s) {
@@ -35,38 +42,48 @@ const IC = "w-full bg-[var(--color-surface-secondary)] border border-[var(--colo
 
 export const SalesOrders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showCreate, setShowCreate] = useState(false);
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
   const [toast, setToast] = useState('');
-  const [form, setForm] = useState({ customer: CUSTOMERS[0].name, notes: '' });
+  const [form, setForm] = useState({ customerId: '', notes: '' });
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
   useEffect(() => {
-    fetchOrders();
+    fetchInitialData();
   }, []);
 
-  const fetchOrders = async () => {
+  const fetchInitialData = async () => {
     setLoading(true);
     try {
-      const data = await getSalesOrders();
-      setOrders(data as Order[]);
+      const [orderData, customerData] = await Promise.all([
+        getSalesOrders(),
+        getCustomers()
+      ]);
+      setOrders(orderData as Order[]);
+      setCustomers(customerData);
+      if (customerData.length > 0) {
+        setForm(f => ({ ...f, customerId: String(customerData[0].id) }));
+      }
     } catch (err) {
-      console.error('Failed to fetch sales orders:', err);
-      setOrders(INITIAL_ORDERS);
+      console.error('Failed to fetch initial data:', err);
     } finally {
       setLoading(false);
     }
   };
 
+
+
   const handleCreate = () => {
-    if (!form.customer) return;
+    const selectedCustomer = customers.find(c => String(c.id) === form.customerId);
+    if (!selectedCustomer) return;
     const newOrder: Order = {
       id: `SO-2024-00${orders.length + 1}`,
-      customer: form.customer,
+      customer: selectedCustomer.name,
       date: new Date().toISOString().split('T')[0],
       items: 0,
       total: 0,
@@ -181,8 +198,8 @@ export const SalesOrders: React.FC = () => {
             </div>
             <div className="p-6 space-y-4">
               <div><label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Customer <span className="text-[var(--color-danger)]">*</span></label>
-                <select value={form.customer} onChange={e => setForm(f => ({ ...f, customer: e.target.value }))} className={IC}>
-                  {CUSTOMERS.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                <select value={form.customerId} onChange={e => setForm(f => ({ ...f, customerId: e.target.value }))} className={IC}>
+                  {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select></div>
               <div><label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Notes</label>
                 <textarea placeholder="Order notes..." value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={3} className={IC + ' resize-none'} /></div>
