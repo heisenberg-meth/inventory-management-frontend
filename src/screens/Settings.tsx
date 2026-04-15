@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, Building, Bell, CreditCard, Save, Check, Globe, Mail, Smartphone, User, Phone, MapPin, Lock, Edit3, Camera } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const IC = "w-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-mint)]";
 
@@ -40,29 +41,53 @@ const FieldLabel = ({ children }: { children: React.ReactNode }) => (
 const FieldValue = ({ icon: Icon, value, extra }: { icon?: React.ElementType; value: string; extra?: React.ReactNode }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--color-text-primary)', fontWeight: 500 }}>
     {Icon && <Icon size={14} color="var(--color-text-secondary)" />}
-    <span>{value}</span>
+    <span className="truncate">{value}</span>
     {extra}
   </div>
 );
 
 export const Settings: React.FC = () => {
+  const { user, tenant } = useAuth();
   const [activeTab, setActiveTab] = useState('General');
   const [toast, setToast] = useState('');
 
   // Profile state
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [profile, setProfile] = useState({ name: 'Admin User', phone: '+1 (555) 123-4567', location: 'New York, USA' });
+  const [profile, setProfile] = useState({ 
+    name: user?.name || '', 
+    phone: user?.phone || '', 
+    location: tenant?.address || '' 
+  });
   const [draft, setDraft] = useState({ ...profile });
+
+  // Update profile when user/tenant context changes
+  useEffect(() => {
+    if (user || tenant) {
+      const newProfile = {
+        name: user?.name || '',
+        phone: user?.phone || '',
+        location: tenant?.address || ''
+      };
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setProfile(newProfile);
+      setDraft(newProfile);
+    }
+  }, [user, tenant]);
 
   // Maintenance mode
   const [maintenance, setMaintenance] = useState(false);
 
   const [general, setGeneral] = useState({
-    companyName: 'Pharmacy Inc', email: 'admin@pharmacy.in', phone: '+91 22 1234 5678',
-    timezone: 'IST (UTC+5:30)', currency: 'INR (₹)', language: 'English',
-    address: '123, Main Street, Mumbai, MH 400001'
+    companyName: tenant?.name || 'No Business', 
+    email: user?.email || '', 
+    phone: user?.phone || '',
+    timezone: 'IST (UTC+5:30)', 
+    currency: 'INR (₹)', 
+    language: 'English',
+    address: tenant?.address || ''
   });
+
   const [notifs, setNotifs] = useState({
     lowStock: true, expiryAlert: true, newOrder: true, orderDelivered: false,
     weeklyReport: true, monthlyReport: false, emailDigest: true, smsAlerts: false
@@ -88,6 +113,11 @@ export const Settings: React.FC = () => {
     { id: 'Notifications', icon: Bell },
     { id: 'Subscription', icon: CreditCard },
   ];
+
+  const getInitials = (name?: string) => {
+    if (!name) return '??';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  };
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
@@ -119,7 +149,7 @@ export const Settings: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 space-y-4">
+        <div className="flex-1 space-y-4 overflow-hidden">
 
           {/* ── GENERAL ── */}
           {activeTab === 'General' && (
@@ -162,7 +192,7 @@ export const Settings: React.FC = () => {
                 {/* Avatar */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 20 }}>
                   <div style={{ width: 68, height: 68, borderRadius: '50%', background: 'linear-gradient(135deg, #ec4899, #a78bfa, #1db97a)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 700, color: 'white', flexShrink: 0 }}>
-                    AU
+                    {getInitials(user?.name)}
                   </div>
                   <div>
                     <button style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: '1px solid rgba(29,185,122,0.25)', borderRadius: 8, padding: '5px 12px', fontSize: 13, fontWeight: 600, color: D.mint, cursor: 'pointer', marginBottom: 4 }}>
@@ -175,7 +205,7 @@ export const Settings: React.FC = () => {
                 <div style={{ borderTop: '1px solid rgba(29,185,122,0.10)', marginBottom: 20 }} />
 
                 {/* Fields Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px 32px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '18px 32px' }}>
 
                   {/* Full Name */}
                   <div>
@@ -191,7 +221,7 @@ export const Settings: React.FC = () => {
                     <FieldLabel>Email Address</FieldLabel>
                     <FieldValue
                       icon={Mail}
-                      value="sanjayrs1306@gmail.com"
+                      value={user?.email || ''}
                       extra={
                         <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-mint)', background: 'rgba(29,185,122,0.12)', padding: '2px 8px', borderRadius: 20 }}>
                           ✓ Verified
@@ -210,7 +240,7 @@ export const Settings: React.FC = () => {
                     <FieldLabel>Phone Number</FieldLabel>
                     {editing
                       ? <input type="tel" value={draft.phone} onChange={e => setDraft(p => ({ ...p, phone: e.target.value }))} className={IC} />
-                      : <FieldValue icon={Phone} value={profile.phone} />
+                      : <FieldValue icon={Phone} value={profile.phone || 'Not provided'} />
                     }
                   </div>
 
@@ -219,7 +249,7 @@ export const Settings: React.FC = () => {
                     <FieldLabel>Location</FieldLabel>
                     {editing
                       ? <input type="text" value={draft.location} onChange={e => setDraft(p => ({ ...p, location: e.target.value }))} className={IC} />
-                      : <FieldValue icon={MapPin} value={profile.location} />
+                      : <FieldValue icon={MapPin} value={profile.location || 'Not provided'} />
                     }
                   </div>
 
@@ -227,8 +257,7 @@ export const Settings: React.FC = () => {
                   <div>
                     <FieldLabel>Role</FieldLabel>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: 'white', background: '#ef4444', padding: '3px 10px', borderRadius: 20 }}>⊙ Admin</span>
-                      <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Full business control</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: 'white', background: '#ef4444', padding: '3px 10px', borderRadius: 20 }}>⊙ {user?.role}</span>
                     </div>
                     {editing && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--color-text-muted)', marginTop: 4 }}>
@@ -242,10 +271,10 @@ export const Settings: React.FC = () => {
                     <FieldLabel>Workspace</FieldLabel>
                     <FieldValue
                       icon={Building}
-                      value="ABC Pharmacy"
+                      value={tenant?.name || 'Loading...'}
                       extra={
                         <span style={{ fontSize: 11, fontWeight: 700, color: '#a78bfa', background: 'rgba(167,139,250,0.12)', padding: '2px 8px', borderRadius: 20 }}>
-                          Enterprise Plan
+                          {tenant?.plan} Plan
                         </span>
                       }
                     />
@@ -281,10 +310,12 @@ export const Settings: React.FC = () => {
             <div className="bg-[var(--color-card-bg)] border border-[var(--color-border)] rounded-xl p-6 space-y-4">
               <h3 className="font-semibold text-[var(--color-text-primary)] flex items-center gap-2"><Building className="w-4 h-4 text-[var(--color-mint)]" />Company Profile</h3>
               <div className="flex items-center gap-4 p-4 bg-[var(--color-surface-secondary)] rounded-xl">
-                <div className="w-16 h-16 rounded-xl bg-[var(--color-mint)] flex items-center justify-center text-white font-bold text-xl">PI</div>
+                <div className="w-16 h-16 rounded-xl bg-[var(--color-mint)] flex items-center justify-center text-white font-bold text-xl">
+                  {getInitials(tenant?.name)}
+                </div>
                 <div>
-                  <div className="font-semibold text-[var(--color-text-primary)]">{general.companyName}</div>
-                  <div className="text-sm text-[var(--color-text-secondary)]">{general.email}</div>
+                  <div className="font-semibold text-[var(--color-text-primary)]">{tenant?.name}</div>
+                  <div className="text-sm text-[var(--color-text-secondary)]">{user?.email}</div>
                   <button className="text-xs text-[var(--color-mint)] hover:underline mt-1">Change Logo</button>
                 </div>
               </div>
@@ -372,25 +403,25 @@ export const Settings: React.FC = () => {
               <div className="bg-[var(--color-mint)]/10 border border-[var(--color-mint)]/30 rounded-xl p-4 flex items-center gap-3">
                 <CreditCard className="w-5 h-5 text-[var(--color-mint)]" />
                 <div>
-                  <div className="text-sm font-semibold text-[var(--color-mint)]">Current Plan: Professional</div>
-                  <div className="text-xs text-[var(--color-text-secondary)]">Renews on April 21, 2024 · ₹2,999/month</div>
+                  <div className="text-sm font-semibold text-[var(--color-mint)]">Current Plan: {tenant?.plan}</div>
+                  <div className="text-xs text-[var(--color-text-secondary)]">Manage your business subscription and limits</div>
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {PLANS.map(plan => (
-                  <div key={plan.name} className={`bg-[var(--color-card-bg)] border rounded-xl p-5 transition-all ${plan.current ? 'border-[var(--color-mint)] ring-2 ring-[var(--color-mint)]/30' : 'border-[var(--color-border)]'}`}>
-                    {plan.current && (
+                  <div key={plan.name} className={`bg-[var(--color-card-bg)] border rounded-xl p-5 transition-all ${plan.name === tenant?.plan ? 'border-[var(--color-mint)] ring-2 ring-[var(--color-mint)]/30' : 'border-[var(--color-border)]'}`}>
+                    {plan.name === tenant?.plan && (
                       <div className="text-xs font-semibold text-[var(--color-mint)] bg-[var(--color-mint)]/20 px-2 py-0.5 rounded-full inline-block mb-3">Current Plan</div>
                     )}
                     <div className="font-bold text-lg text-[var(--color-text-primary)]">{plan.name}</div>
-                    <div className="text-2xl font-bold mt-1 mb-4" style={{ color: plan.current ? 'var(--color-mint)' : 'var(--color-text-primary)' }}>{plan.price}</div>
+                    <div className="text-2xl font-bold mt-1 mb-4" style={{ color: plan.name === tenant?.plan ? 'var(--color-mint)' : 'var(--color-text-primary)' }}>{plan.price}</div>
                     <ul className="space-y-2 text-sm text-[var(--color-text-secondary)] mb-5">
                       {plan.features.map(f => (
                         <li key={f} className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--color-mint)]" />{f}</li>
                       ))}
                     </ul>
-                    <button className={`w-full py-2 rounded-lg font-medium text-sm transition-colors ${plan.current ? 'bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] cursor-default' : 'bg-[var(--color-mint)] text-white hover:bg-[var(--color-mint-hover)]'}`}>
-                      {plan.current ? 'Current Plan' : plan.name === 'Enterprise' ? 'Contact Sales' : 'Upgrade'}
+                    <button className={`w-full py-2 rounded-lg font-medium text-sm transition-colors ${plan.name === tenant?.plan ? 'bg-[var(--color-surface-secondary)] text-[var(--color-text-secondary)] cursor-default' : 'bg-[var(--color-mint)] text-white hover:bg-[var(--color-mint-hover)]'}`}>
+                      {plan.name === tenant?.plan ? 'Current Plan' : plan.name === 'Enterprise' ? 'Contact Sales' : 'Upgrade'}
                     </button>
                   </div>
                 ))}

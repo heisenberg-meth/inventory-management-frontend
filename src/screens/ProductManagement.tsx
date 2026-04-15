@@ -1,38 +1,47 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Plus, Upload, Search, ArrowUpDown, Download, Edit, Eye, Trash2, X, Calendar, Package, AlertTriangle, Check } from 'lucide-react';
-import { getProducts, getCategories, type Product, type Category } from '../data/apiService';
+import { getProducts, getCategories, createProduct, updateProduct, deleteProduct, type Product, type Category } from '../data/apiService';
+import { useAuth } from '../context/AuthContext';
 
 const UNITS = ['Piece', 'Box', 'Strip', 'Bottle', 'Vial', 'Sachet'];
 
 interface FormData {
   name: string;
+  sku: string;
   category: string;
-  price: string;
+  categoryId: string;
+  purchasePrice: string;
+  salePrice: string;
   unit: string;
   stock: number;
-  max: number;
-  threshold: number;
-  batch: string;
-  expiry: string;
+  reorderLevel: number;
+  batchNumber: string;
+  expiryDate: string;
 }
 
 const emptyForm: FormData = {
-  name: '', category: 'Pain Relief', price: '', unit: 'Strip',
-  stock: 0, max: 1000, threshold: 100, batch: '', expiry: ''
+  name: '', sku: '', category: 'Pain Relief', categoryId: '1', purchasePrice: '', salePrice: '', unit: 'Strip',
+  stock: 0, reorderLevel: 10, batchNumber: '', expiryDate: ''
 };
 
-const computeStatus = (stock: number, max: number, expiry: string): string => {
+const computeStatus = (stock: number, threshold: number, expiry: string): string => {
   if (stock === 0) return 'Out of Stock';
-  const today = new Date();
-  const expDate = new Date(expiry);
-  const days = Math.ceil((expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  if (days > 0 && days <= 30) return 'Expiring';
-  const pct = (stock / max) * 100;
-  if (pct < 20) return 'Low Stock';
+  
+  // Expiry check
+  if (expiry) {
+    const today = new Date();
+    const expDate = new Date(expiry);
+    const days = Math.ceil((expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    if (days > 0 && days <= 30) return 'Expiring';
+    if (days <= 0) return 'Expired';
+  }
+
+  if (stock <= threshold) return 'Low Stock';
   return 'Active';
 };
 
 export const ProductManagement: React.FC = () => {
+  const { tenant } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +73,7 @@ export const ProductManagement: React.FC = () => {
     setLoading(true);
     try {
       const [productsData, categoriesData] = await Promise.all([
-        getProducts(),
+        getProducts(0, 1000), // Get a large batch for local sorting/filtering in this view
         getCategories()
       ]);
       setProducts(productsData);
@@ -78,7 +87,10 @@ export const ProductManagement: React.FC = () => {
 
   const openAdd = () => {
     setEditingProduct(null);
-    setFormData(emptyForm);
+    setFormData({
+      ...emptyForm,
+      categoryId: categories.length > 0 ? categories[0].id.toString() : '1'
+    });
     setFormErrors({});
     setShowModal(true);
   };
@@ -86,15 +98,17 @@ export const ProductManagement: React.FC = () => {
   const openEdit = (p: Product) => {
     setEditingProduct(p);
     setFormData({
-      name: p.name, 
-      category: p.category || 'Pain Relief', 
-      price: (p.sale_price || 0).toString(),
-      unit: p.unit, 
-      stock: p.stock, 
-      max: p.max || 1000, 
-      threshold: p.threshold || p.reorder_level || 100,
-      batch: p.batch || p.batch_number || '', 
-      expiry: p.expiry || p.expiry_date || ''
+      name: p.name,
+      sku: p.sku || '',
+      category: p.category || '',
+      categoryId: p.categoryId?.toString() || (categories.length > 0 ? categories[0].id.toString() : '1'),
+      purchasePrice: (p.purchase_price || 0).toString(),
+      salePrice: (p.sale_price || 0).toString(),
+      unit: p.unit,
+      stock: p.stock,
+      reorderLevel: p.reorder_level || p.threshold || 10,
+      batchNumber: p.batch || p.batch_number || '',
+      expiryDate: p.expiry || p.expiry_date || ''
     });
     setFormErrors({});
     setShowModal(true);
@@ -103,46 +117,63 @@ export const ProductManagement: React.FC = () => {
   const validateForm = (): boolean => {
     const errors: Partial<FormData> = {};
     if (!formData.name.trim()) errors.name = 'Product name is required';
-    if (!formData.price || isNaN(Number(formData.price)) || Number(formData.price) <= 0) errors.price = 'Valid price required';
-    if (!formData.batch.trim()) errors.batch = 'Batch number is required';
-    if (!formData.expiry) errors.expiry = 'Expiry date is required';
+    if (!formData.salePrice || isNaN(Number(formData.salePrice)) || Number(formData.salePrice) <= 0) errors.salePrice = 'Valid sale price required';
+    if (!formData.batchNumber.trim()) errors.batchNumber = 'Batch number is required';
+    if (!formData.expiryDate) errors.expiryDate = 'Expiry date is required';
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateForm()) return;
-    const priceNum = Number(formData.price);
-    const status = computeStatus(formData.stock, formData.max, formData.expiry);
+    
+    const payload: any = {
+      name: formData.name,
+      sku: formData.sku,
+      categoryId: Number(formData.categoryId),
+      unit: formData.unit,
+      purchasePrice: Number(formData.purchasePrice),
+      salePrice: Number(formData.salePrice),
+      reorderLevel: formData.reorderLevel,
+    };
 
-    if (editingProduct) {
-      setProducts(prev => prev.map(p => p.id === editingProduct.id ? {
-        ...p, name: formData.name, category: formData.category,
-        price: `₹${priceNum}`, sale_price: priceNum, stock: formData.stock, max: formData.max,
-        threshold: formData.threshold, batch: formData.batch, batch_number: formData.batch,
-        expiry: formData.expiry, expiry_date: formData.expiry,
-        unit: formData.unit, status
-      } : p));
-      showSuccess('Product updated successfully!');
-    } else {
-      const newId = Math.max(0, ...products.map(p => p.id)) + 1;
-      setProducts(prev => [...prev, {
-        id: newId, name: formData.name, category: formData.category,
-        price: `₹${priceNum}`, sale_price: priceNum, purchase_price: priceNum * 0.8, stock: formData.stock, max: formData.max,
-        threshold: formData.threshold, reorder_level: formData.threshold, batch: formData.batch, batch_number: formData.batch,
-        expiry: formData.expiry, expiry_date: formData.expiry,
-        unit: formData.unit, status
-      }]);
-      showSuccess('Product added successfully!');
+    if (tenant?.type === 'PHARMACY') {
+      payload.pharmacyDetails = {
+        batchNumber: formData.batchNumber,
+        expiryDate: formData.expiryDate,
+        manufacturer: 'Default Manufacturer',
+        hsnCode: '0000',
+        schedule: 'H'
+      };
     }
-    setShowModal(false);
+
+    try {
+      if (editingProduct) {
+        await updateProduct(editingProduct.id, payload);
+        showSuccess('Product updated successfully!');
+      } else {
+        await createProduct(payload);
+        showSuccess('Product added successfully!');
+      }
+      setShowModal(false);
+      fetchInitialData(); // Refresh list from server
+    } catch (err: any) {
+      console.error('Failed to save product:', err);
+      alert(err.message || 'Failed to save product');
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteTarget) return;
-    setProducts(prev => prev.filter(p => p.id !== deleteTarget.id));
-    setDeleteTarget(null);
-    showSuccess('Product deleted.');
+    try {
+      await deleteProduct(deleteTarget.id);
+      setDeleteTarget(null);
+      showSuccess('Product deleted.');
+      fetchInitialData();
+    } catch (err: any) {
+      console.error('Failed to delete product:', err);
+      alert(err.message || 'Failed to delete product');
+    }
   };
 
   const handleSort = (field: keyof Product) => {
@@ -151,7 +182,10 @@ export const ProductManagement: React.FC = () => {
   };
 
   const filtered = useMemo(() => {
-    let result = products.filter(p => {
+    let result = products.map(p => ({
+      ...p,
+      status: computeStatus(p.stock, p.reorder_level || p.threshold || 10, p.expiry || p.expiry_date || '')
+    })).filter(p => {
       const q = searchQuery.toLowerCase();
       const matchSearch = !q || p.name.toLowerCase().includes(q) || (p.batch || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q);
       const matchCat = categoryFilter === 'All Categories' || p.category === categoryFilter;
@@ -171,10 +205,10 @@ export const ProductManagement: React.FC = () => {
   const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
 
   const stats = [
-    { label: 'Total Products', value: products.length.toLocaleString() },
-    { label: 'Active', value: products.filter(p => p.status === 'Active').length.toLocaleString() },
-    { label: 'Low Stock', value: products.filter(p => p.status === 'Low Stock').length.toLocaleString() },
-    { label: 'Expiring Soon', value: products.filter(p => p.status === 'Expiring').length.toLocaleString() },
+    { label: 'Total Products', value: filtered.length.toLocaleString() },
+    { label: 'Active', value: filtered.filter(p => p.status === 'Active').length.toLocaleString() },
+    { label: 'Low Stock', value: filtered.filter(p => p.status === 'Low Stock').length.toLocaleString() },
+    { label: 'Expiring Soon', value: filtered.filter(p => p.status === 'Expiring').length.toLocaleString() },
   ];
 
   const getStatusColor = (status: string) => {
@@ -183,6 +217,7 @@ export const ProductManagement: React.FC = () => {
       case 'Low Stock': return { bg: 'var(--color-warning)', text: 'var(--color-warning)' };
       case 'Out of Stock': return { bg: 'var(--color-danger)', text: 'var(--color-danger)' };
       case 'Expiring': return { bg: 'var(--color-danger)', text: 'var(--color-danger)' };
+      case 'Expired': return { bg: 'var(--color-danger)', text: 'var(--color-danger)' };
       default: return { bg: 'var(--color-mint)', text: 'var(--color-mint)' };
     }
   };
@@ -268,6 +303,7 @@ export const ProductManagement: React.FC = () => {
               <option>Low Stock</option>
               <option>Out of Stock</option>
               <option>Expiring</option>
+              <option>Expired</option>
             </select>
             <button 
               onClick={() => handleSort('name')}
@@ -293,7 +329,7 @@ export const ProductManagement: React.FC = () => {
                   { label: 'Product', field: 'name' },
                   { label: 'Batch No.', field: 'batch' },
                   { label: 'Category', field: 'category' },
-                  { label: 'Price', field: 'priceNum' },
+                  { label: 'Price', field: 'salePrice' },
                   { label: 'Stock', field: 'stock' },
                   { label: 'Expiry Date', field: 'expiry' },
                   { label: 'Status', field: 'status' },
@@ -327,7 +363,8 @@ export const ProductManagement: React.FC = () => {
                 </tr>
               ) : paginated.map((product) => {
                 const statusColor = getStatusColor(product.status || 'Active');
-                const stockPercent = (product.max || 1000) > 0 ? (product.stock / (product.max || 1000)) * 100 : 0;
+                const threshold = product.reorder_level || product.threshold || 10;
+                const stockPercent = (product.stock / (threshold * 4)) * 100; // Relative to 4x threshold for visualization
                 return (
                   <tr key={product.id} className="hover:bg-[var(--color-surface-secondary)] transition-colors">
                     <td className="px-3 sm:px-4 py-3">
@@ -355,7 +392,7 @@ export const ProductManagement: React.FC = () => {
                             className="h-full rounded-full transition-all"
                             style={{ 
                               width: `${Math.min(stockPercent, 100)}%`, 
-                              backgroundColor: stockPercent > 50 ? 'var(--color-mint)' : stockPercent > 20 ? 'var(--color-warning)' : 'var(--color-danger)'
+                              backgroundColor: product.stock > threshold ? 'var(--color-mint)' : 'var(--color-danger)'
                             }}
                           />
                         </div>
@@ -472,25 +509,37 @@ export const ProductManagement: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Category</label>
                   <select 
-                    value={formData.category}
-                    onChange={e => setFormData(f => ({ ...f, category: e.target.value }))}
+                    value={formData.categoryId}
+                    onChange={e => setFormData(f => ({ ...f, categoryId: e.target.value }))}
                     className={inputClass}
                   >
-                    {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                    Price (₹) <span className="text-[var(--color-danger)]">*</span>
+                    Sale Price (₹) <span className="text-[var(--color-danger)]">*</span>
                   </label>
                   <input
                     type="number"
                     placeholder="0.00"
-                    value={formData.price}
-                    onChange={e => setFormData(f => ({ ...f, price: e.target.value }))}
-                    className={inputClass + (formErrors.price ? ' border-[var(--color-danger)]' : '')}
+                    value={formData.salePrice}
+                    onChange={e => setFormData(f => ({ ...f, salePrice: e.target.value }))}
+                    className={inputClass + (formErrors.salePrice ? ' border-[var(--color-danger)]' : '')}
                   />
-                  {formErrors.price && <p className="text-xs text-[var(--color-danger)] mt-1">{formErrors.price}</p>}
+                  {formErrors.salePrice && <p className="text-xs text-[var(--color-danger)] mt-1">{formErrors.salePrice}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                    Purchase Price (₹)
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="0.00"
+                    value={formData.purchasePrice}
+                    onChange={e => setFormData(f => ({ ...f, purchasePrice: e.target.value }))}
+                    className={inputClass}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Unit</label>
@@ -503,34 +552,12 @@ export const ProductManagement: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Initial Stock</label>
-                  <input
-                    type="number"
-                    placeholder="0"
-                    value={formData.stock}
-                    onChange={e => setFormData(f => ({ ...f, stock: Number(e.target.value) }))}
-                    className={inputClass}
-                    min="0"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Max Stock</label>
-                  <input
-                    type="number"
-                    placeholder="1000"
-                    value={formData.max}
-                    onChange={e => setFormData(f => ({ ...f, max: Number(e.target.value) }))}
-                    className={inputClass}
-                    min="1"
-                  />
-                </div>
-                <div>
                   <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Low Stock Threshold</label>
                   <input
                     type="number"
-                    placeholder="100"
-                    value={formData.threshold}
-                    onChange={e => setFormData(f => ({ ...f, threshold: Number(e.target.value) }))}
+                    placeholder="10"
+                    value={formData.reorderLevel}
+                    onChange={e => setFormData(f => ({ ...f, reorderLevel: Number(e.target.value) }))}
                     className={inputClass}
                     min="0"
                   />
@@ -538,39 +565,41 @@ export const ProductManagement: React.FC = () => {
               </div>
 
               {/* Pharmacy Fields */}
-              <div className="bg-[var(--color-mint-glow)] border border-[var(--color-mint)]/30 rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-[var(--color-mint)] mb-4 flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  Pharmacy Domain Fields
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                      Batch Number <span className="text-[var(--color-danger)]">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="BTH-2024-XXX"
-                      value={formData.batch}
-                      onChange={e => setFormData(f => ({ ...f, batch: e.target.value }))}
-                      className={inputClass + (formErrors.batch ? ' border-[var(--color-danger)]' : '')}
-                    />
-                    {formErrors.batch && <p className="text-xs text-[var(--color-danger)] mt-1">{formErrors.batch}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                      Expiry Date <span className="text-[var(--color-danger)]">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={formData.expiry}
-                      onChange={e => setFormData(f => ({ ...f, expiry: e.target.value }))}
-                      className={inputClass + (formErrors.expiry ? ' border-[var(--color-danger)]' : '')}
-                    />
-                    {formErrors.expiry && <p className="text-xs text-[var(--color-danger)] mt-1">{formErrors.expiry}</p>}
+              {tenant?.type === 'PHARMACY' && (
+                <div className="bg-[var(--color-mint-glow)] border border-[var(--color-mint)]/30 rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-[var(--color-mint)] mb-4 flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Pharmacy Domain Fields
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                        Batch Number <span className="text-[var(--color-danger)]">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="BTH-2024-XXX"
+                        value={formData.batchNumber}
+                        onChange={e => setFormData(f => ({ ...f, batchNumber: e.target.value }))}
+                        className={inputClass + (formErrors.batchNumber ? ' border-[var(--color-danger)]' : '')}
+                      />
+                      {formErrors.batchNumber && <p className="text-xs text-[var(--color-danger)] mt-1">{formErrors.batchNumber}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                        Expiry Date <span className="text-[var(--color-danger)]">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.expiryDate}
+                        onChange={e => setFormData(f => ({ ...f, expiryDate: e.target.value }))}
+                        className={inputClass + (formErrors.expiryDate ? ' border-[var(--color-danger)]' : '')}
+                      />
+                      {formErrors.expiryDate && <p className="text-xs text-[var(--color-danger)] mt-1">{formErrors.expiryDate}</p>}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="p-4 sm:p-6 border-t border-[var(--color-border)] flex flex-col sm:flex-row justify-end gap-3">
@@ -617,32 +646,17 @@ export const ProductManagement: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { label: 'Category', value: viewingProduct.category },
-                  { label: 'Price', value: viewingProduct.price },
+                  { label: 'Sale Price', value: viewingProduct.price },
                   { label: 'Batch No.', value: viewingProduct.batch },
                   { label: 'Expiry Date', value: viewingProduct.expiry },
                   { label: 'Current Stock', value: `${viewingProduct.stock.toLocaleString()} ${viewingProduct.unit}s` },
-                  { label: 'Max Stock', value: `${(viewingProduct.max || 1000).toLocaleString()} ${viewingProduct.unit}s` },
+                  { label: 'Reorder Level', value: `${(viewingProduct.reorder_level || viewingProduct.threshold || 10).toLocaleString()} ${viewingProduct.unit}s` },
                 ].map(item => (
                   <div key={item.label} className="bg-[var(--color-surface-secondary)] rounded-lg p-3">
                     <div className="text-xs text-[var(--color-text-muted)] mb-1">{item.label}</div>
                     <div className="text-sm font-medium text-[var(--color-text-primary)]">{item.value || 'N/A'}</div>
                   </div>
                 ))}
-              </div>
-              <div className="mt-2">
-                <div className="flex justify-between mb-2">
-                  <span className="text-sm text-[var(--color-text-secondary)]">Stock Level</span>
-                  <span className="text-sm font-medium text-[var(--color-text-primary)]">{Math.round((viewingProduct.stock / (viewingProduct.max || 1000)) * 100)}%</span>
-                </div>
-                <div className="w-full h-3 bg-[var(--color-surface-secondary)] rounded-full overflow-hidden">
-                  <div 
-                    className="h-full rounded-full transition-all"
-                    style={{ 
-                      width: `${(viewingProduct.stock / (viewingProduct.max || 1000)) * 100}%`,
-                      backgroundColor: viewingProduct.stock / (viewingProduct.max || 1000) > 0.5 ? 'var(--color-mint)' : viewingProduct.stock / (viewingProduct.max || 1000) > 0.2 ? 'var(--color-warning)' : 'var(--color-danger)'
-                    }}
-                  />
-                </div>
               </div>
             </div>
             <div className="p-6 border-t border-[var(--color-border)] flex gap-3 justify-end">

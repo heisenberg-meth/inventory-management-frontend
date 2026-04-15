@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Suspense } from 'react';
 import { PageLoader } from './PageLoader';
+import { useAuth } from '../context/AuthContext';
 
 interface NavItem {
   icon?: React.ElementType; // Optional icon for sub-items
@@ -26,6 +27,7 @@ interface NavSection {
 export const Layout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, tenant, logout } = useAuth();
   
   const [isDark, setIsDark] = useState<boolean>(() => {
     const saved = localStorage.getItem('ims-theme');
@@ -37,6 +39,16 @@ export const Layout: React.FC = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const getInitials = (name?: string) => {
+    if (!name) return '??';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  };
 
   // Close profile dropdown on outside click
   useEffect(() => {
@@ -293,18 +305,18 @@ export const Layout: React.FC = () => {
         <div className="p-4 border-t border-[var(--color-border)]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[var(--color-mint)] flex items-center justify-center text-white font-semibold flex-shrink-0">
-              JD
+              {getInitials(user?.name)}
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-medium text-[var(--color-text-primary)] truncate">
-                John Doe
+                {user?.name || 'Loading...'}
               </div>
               <div className="text-xs text-[var(--color-text-secondary)] truncate">
-                Tenant Admin
+                {user?.role || 'User'}
               </div>
             </div>
             <button
-              onClick={() => navigate("/login")}
+              onClick={handleLogout}
               className="p-1.5 rounded-lg hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors"
               title="Logout"
             >
@@ -345,10 +357,10 @@ export const Layout: React.FC = () => {
             {/* Tenant Switcher */}
             <div className="hidden sm:flex items-center gap-2 bg-[var(--color-surface-secondary)] px-3 py-1.5 rounded-full border border-[var(--color-border)]">
               <span className="text-xs sm:text-sm text-[var(--color-text-primary)]">
-                Pharmacy Inc
+                {tenant?.name || 'No Business'}
               </span>
               <span className="px-2 py-0.5 bg-[var(--color-danger)] text-white text-xs rounded-full">
-                production
+                {tenant?.plan || 'production'}
               </span>
             </div>
 
@@ -467,7 +479,7 @@ export const Layout: React.FC = () => {
                     flexShrink: 0,
                   }}
                 >
-                  AU
+                  {getInitials(user?.name)}
                 </div>
                 <span
                   style={{
@@ -478,7 +490,7 @@ export const Layout: React.FC = () => {
                   }}
                   className="sm:inline"
                 >
-                  Admin User
+                  {user?.name || 'Loading...'}
                 </span>
                 <ChevronDown
                   size={13}
@@ -540,7 +552,7 @@ export const Layout: React.FC = () => {
                           fontSize: 16,
                         }}
                       >
-                        AU
+                        {getInitials(user?.name)}
                       </div>
                       <div>
                         <div
@@ -550,7 +562,7 @@ export const Layout: React.FC = () => {
                             color: "var(--color-text-primary)",
                           }}
                         >
-                          Admin User
+                          {user?.name}
                         </div>
                         <div
                           style={{
@@ -570,7 +582,7 @@ export const Layout: React.FC = () => {
                               borderRadius: 20,
                             }}
                           >
-                            ⊙ Admin
+                            ⊙ {user?.role}
                           </span>
                         </div>
                         <div
@@ -580,7 +592,7 @@ export const Layout: React.FC = () => {
                             marginTop: 3,
                           }}
                         >
-                          admin@abcpharma.com
+                          {user?.email}
                         </div>
                         <div
                           style={{
@@ -589,7 +601,7 @@ export const Layout: React.FC = () => {
                             marginTop: 2,
                           }}
                         >
-                          ABC Pharmacy
+                          {tenant?.name}
                         </div>
                       </div>
                     </div>
@@ -767,10 +779,7 @@ export const Layout: React.FC = () => {
 
                     {/* Sign Out */}
                     <button
-                      onClick={() => {
-                        setProfileOpen(false);
-                        navigate("/login");
-                      }}
+                      onClick={handleLogout}
                       style={{
                         width: "100%",
                         height: 40,

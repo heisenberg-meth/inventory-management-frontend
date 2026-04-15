@@ -5,6 +5,7 @@ import {
   Shield, ShieldCheck, Fingerprint, Info, Star, Zap
 } from 'lucide-react';
 import { login as loginApi } from '../data/apiService';
+import { useAuth } from '../context/AuthContext';
 
 // Import images for Vite
 import WarehouseImg from '../assets/warehouse_platform_bg.png';
@@ -13,6 +14,7 @@ import ViyanLogo from "../../public/viyan-logo.png"
 
 export const LoginScreen: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [searchParams] = useSearchParams();
   const initialRole = searchParams.get('role') || 'tenant-admin';
 
@@ -51,11 +53,10 @@ export const LoginScreen: React.FC = () => {
 
     try {
       const response = await loginApi({ email, password, companyCode: orgId });
-      const token = (response as any).accessToken || (response as any).token;
+      const token = response.accessToken;
       
-      if (token) {
-        localStorage.setItem('ims-token', token);
-        localStorage.setItem('ims-user', JSON.stringify(response.user));
+      if (token && response.user) {
+        login(token, response.user, response.tenant);
         
         if (isPlatformAdmin || response.user?.role === "PLATFORM_ADMIN") {
           navigate("/admin");

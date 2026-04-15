@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Printer, Download, X, Eye } from 'lucide-react';
 import { getInvoices, type Invoice } from '../data/apiService';
+import { useAuth } from '../context/AuthContext';
 
 
 const statusColor = (s: string) => {
@@ -15,6 +16,7 @@ const statusColor = (s: string) => {
 };
 
 export const Invoices: React.FC = () => {
+  const { user, tenant } = useAuth();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null);
@@ -143,13 +145,15 @@ export const Invoices: React.FC = () => {
               <div className="flex justify-between items-start">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-lg bg-[var(--color-mint)] flex items-center justify-center text-white font-bold text-sm">PI</div>
-                    <span className="font-bold text-lg text-[var(--color-text-primary)]">Pharmacy Inc</span>
+                    <div className="w-8 h-8 rounded-lg bg-[var(--color-mint)] flex items-center justify-center text-white font-bold text-sm">
+                      {tenant?.name?.substring(0, 2).toUpperCase() || 'PI'}
+                    </div>
+                    <span className="font-bold text-lg text-[var(--color-text-primary)]">{tenant?.name || 'Pharmacy Inc'}</span>
                   </div>
                   <div className="text-xs text-[var(--color-text-secondary)] space-y-0.5">
-                    <div>123, Main Street, Mumbai, MH 400001</div>
-                    <div>admin@pharmacy.in | +91 22 1234 5678</div>
-                    <div>GSTIN: 27AABCP1234A1Z5</div>
+                    <div>{tenant?.address || '123, Main Street, Mumbai, MH 400001'}</div>
+                    <div>{user?.email || 'admin@pharmacy.in'} | {user?.phone || '+91 22 1234 5678'}</div>
+                    <div>GSTIN: {tenant?.gstin || '27AABCP1234A1Z5'}</div>
                   </div>
                 </div>
                 <div className="text-right">

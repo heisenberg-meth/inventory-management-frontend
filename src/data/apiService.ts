@@ -9,19 +9,19 @@ export interface Product {
   name: string;
   batch_number: string;
   category_id?: number;
-  category?: string; // We'll map this if possible
+  category?: string;
   sale_price: number;
   purchase_price: number;
   stock: number;
   expiry_date: string;
   unit: string;
   reorder_level: number;
-  status?: string; // Calculated on frontend
-  price?: string; // Frontend expects "₹XXX"
-  batch?: string; // Frontend shortcut
-  expiry?: string; // Frontend shortcut
-  threshold?: number; // Frontend shortcut
-  max?: number; // Not in backend, we'll default to 1000
+  status?: string;
+  price?: string;
+  batch?: string;
+  expiry?: string;
+  threshold?: number;
+  max?: number;
   storage_location?: string;
   zone?: string;
   rack?: string;
@@ -36,7 +36,20 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  phone?: string;
   role: string;
+  scope?: string;
+}
+
+export interface Tenant {
+  id: number;
+  name: string;
+  type: string;
+  address?: string;
+  gstin?: string;
+  plan: string;
+  companyCode: string;
+  workspaceSlug: string;
 }
 
 export interface ApiResponse<T> {
@@ -45,6 +58,7 @@ export interface ApiResponse<T> {
   accessToken?: string;
   refreshToken?: string;
   user?: User;
+  tenant?: Tenant;
 }
 
 export interface PagedResponse<T> {
@@ -140,27 +154,18 @@ export interface DashboardKPIs {
   stockValuation: number;
 }
 
-export interface Tenant {
-  id: number;
-  name: string;
-  type: string;
-  plan: "Free" | "Pro" | "Enterprise";
-  status: "Active" | "Suspended";
-  users: number;
-  lastActive: string;
-  revenue: string;
-}
-
 export interface StockItem {
   productId: number;
   quantity: number;
 }
+
 export interface PlatformStats {
   totalTenants: number;
   activeTenants: number;
   totalSubscriptions: number;
   systemHealth: string;
 }
+
 export interface AuditLog {
   id: number;
   user: string;
@@ -185,10 +190,7 @@ async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Pr
 
   const headers = new Headers(rest.headers);
   if (token) {
-    console.log(`[API] Attaching Token: ${token.substring(0, 10)}...`);
     headers.set('Authorization', `Bearer ${token}`);
-  } else {
-    console.warn('[API] No token found in localStorage (ims-token)');
   }
 
   if (data && !(data instanceof FormData)) {
@@ -221,6 +223,7 @@ export const api = {
 // Auth
 export const login = (credentials: Record<string, string>) => api.post<ApiResponse<null>>('/auth/login', credentials);
 export const signup = (userData: Record<string, unknown>) => api.post<ApiResponse<null>>('/auth/signup', userData);
+export const getProfile = () => api.get<ApiResponse<null>>('/auth/me');
 
 // Tenant Products
 export const getProducts = async (page = 0, size = 10): Promise<Product[]> => {
@@ -238,9 +241,14 @@ export const getProducts = async (page = 0, size = 10): Promise<Product[]> => {
     price: `₹${p.salePrice || p.sale_price || 0}`,
     threshold: p.reorderLevel || p.reorder_level || 10,
     max: 1000,
-    status: (p.stock || 0) === 0 ? 'Out of Stock' : ((p.stock || 0) <= (p.reorderLevel || p.reorder_level || 50) ? 'Low Stock' : 'Active')
+    status: (p.stock || 0) === 0 ? 'Out of Stock' : ((p.stock || 0) <= (p.reorderLevel || p.reorder_level || 10) ? 'Low Stock' : 'Active')
   }));
 };
+
+export const createProduct = (data: any) => api.post<Product>('/tenant/products', data);
+export const updateProduct = (id: number | string, data: any) => api.put<Product>(`/tenant/products/${id}`, data);
+export const deleteProduct = (id: number | string) => api.delete(`/tenant/products/${id}`);
+
 export const getLowStockProducts = async (): Promise<Product[]> => {
   const products = await getProducts(0, 500); 
   return products.filter(p => p.status === 'Low Stock' || p.status === 'Out of Stock');
@@ -250,11 +258,11 @@ export const getCategories = async (): Promise<Category[]> => {
   const categories = Array.isArray(data) ? data : data?.content;
   return categories || [];
 };
-export const getBrands = () => Promise.resolve([]); // Not implemented in backend yet
+export const getBrands = () => Promise.resolve([]);
 
 // Tenant Suppliers & Customers
-export const getSuppliers = () => api.get<PagedResponse<Supplier> | Supplier[]>('/tenant/suppliers').then(res => Array.isArray(res) ? res : res.content || []);
-export const getCustomers = () => api.get<PagedResponse<Customer> | Customer[]>('/tenant/customers').then(res => Array.isArray(res) ? res : res.content || []);
+export const getSuppliers = () => api.get<PagedResponse<Supplier> | Supplier[]>('/tenant/suppliers').then(res => Array.isArray(res) ? res : (res as PagedResponse<Supplier>).content || []);
+export const getCustomers = () => api.get<PagedResponse<Customer> | Customer[]>('/tenant/customers').then(res => Array.isArray(res) ? res : (res as PagedResponse<Customer>).content || []);
 
 // Tenant Orders & Invoices
 export const getSalesOrders = () => api.get<PagedResponse<SalesOrder>>('/tenant/orders?type=sale').then(res => res.content || []);
@@ -272,17 +280,14 @@ export const getStockByLocation = (locId: string | number) => api.get<Record<str
 
 // Platform
 export const getPlatformStats = async (): Promise<PlatformStats> => {
-  const data = await api.get<PlatformStatsResponse>('/platform/stats');
+  const data = await api.get<Record<string, number>>('/platform/stats');
   return {
     totalTenants: data.total_tenants || 0,
-    activeTenants: data.total_tenants || 0, // Mocking active as total for now
+    activeTenants: data.total_tenants || 0,
     totalSubscriptions: 0,
     systemHealth: "Excellent",
   };
 };
 
-interface PlatformStatsResponse {
-  total_tenants: number;
-}
 export const getTenants = () => api.get<Tenant[]>('/platform/tenants');
 export const getAuditLogs = () => api.get<AuditLog[]>('/platform/audit/logs');
