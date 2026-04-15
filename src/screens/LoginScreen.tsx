@@ -50,18 +50,20 @@ export const LoginScreen: React.FC = () => {
     setError(false);
 
     try {
-      const response = await loginApi({ email, password, orgId });
-      if (response && response.token) {
-        localStorage.setItem('ims-token', response.token);
+      const response = await loginApi({ email, password, companyCode: orgId });
+      const token = (response as any).accessToken || (response as any).token;
+      
+      if (token) {
+        localStorage.setItem('ims-token', token);
         localStorage.setItem('ims-user', JSON.stringify(response.user));
         
-        if (isPlatformAdmin || response.user?.role === 'PLATFORM_ADMIN') {
-          navigate('/admin');
+        if (isPlatformAdmin || response.user?.role === "PLATFORM_ADMIN") {
+          navigate("/admin");
         } else {
-          navigate('/app');
+          navigate("/app");
         }
       } else {
-        throw new Error('No token received');
+        throw new Error('No token received from backend');
       }
     } catch (err: unknown) {
       console.error('Login failed:', err);

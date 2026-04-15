@@ -42,7 +42,8 @@ export interface User {
 export interface ApiResponse<T> {
   data: T;
   message?: string;
-  token?: string;
+  accessToken?: string;
+  refreshToken?: string;
   user?: User;
 }
 
@@ -184,8 +185,12 @@ async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Pr
 
   const headers = new Headers(rest.headers);
   if (token) {
+    console.log(`[API] Attaching Token: ${token.substring(0, 10)}...`);
     headers.set('Authorization', `Bearer ${token}`);
+  } else {
+    console.warn('[API] No token found in localStorage (ims-token)');
   }
+
   if (data && !(data instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
   }
