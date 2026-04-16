@@ -147,14 +147,16 @@ export const Layout: React.FC = () => {
     if (path === '/app') return location.pathname === '/app';
     return location.pathname.startsWith(path);
   };
-  useEffect(() => {
+  const currentSectionTitle = (() => {
     const currentSection = navSections.find(section => 
       section.items.some(item => isActive(item.path))
     );
-    if (currentSection && currentSection.title !== expandedSection) {
-      setExpandedSection(currentSection.title);
-    }
-  }, [location.pathname]);
+    return currentSection?.title ?? null;
+  })();
+
+  if (currentSectionTitle && currentSectionTitle !== expandedSection) {
+    setExpandedSection(currentSectionTitle);
+  }
 
   const toggleSection = (title: string) => {
     setExpandedSection(expandedSection === title ? null : title);

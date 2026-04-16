@@ -235,7 +235,7 @@ async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Pr
     let err = "API failed";
     try {
       err = await response.text();
-    } catch (e) {
+    } catch {
       // ignore
     }
     console.error("API ERROR:", err);
@@ -251,7 +251,7 @@ async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Pr
   let parsedData;
   try {
     parsedData = JSON.parse(text);
-  } catch (error) {
+  } catch {
     console.error("Failed to parse JSON. Response text:", text.substring(0, 200));
     throw new Error(`Invalid JSON from backend: ${text.substring(0, 50)}...`);
   }
