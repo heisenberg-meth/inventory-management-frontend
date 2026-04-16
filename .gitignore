@@ -26,3 +26,4 @@ dist-ssr
 .affinity/*
 .antigravity/
 .antigravity/*
+api.py
