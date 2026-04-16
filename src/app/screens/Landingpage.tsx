@@ -84,10 +84,37 @@ const darkTheme: Theme = {
   sectionAlt: "#0d2b1f",
 };
 
+// ─── Static Landing-Page Data ────────────────────────────────────────────────
+const DASHBOARD_BARS = [65, 80, 55, 90, 72, 88, 60, 95, 78, 85, 70, 92];
+const DASHBOARD_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+const DASHBOARD_STAT_CARDS = [
+  { label: "Products", value: "2,847", color: "#34D399" },
+  { label: "Orders",   value: "384",   color: "#60a5fa" },
+  { label: "Revenue",  value: "$48.2K",color: "#a78bfa" },
+  { label: "Stock Alert", value: "12", color: "#fb923c" },
+];
+const RECENT_ORDER_LABELS = ["INV-001", "INV-002", "INV-003"];
+const RECENT_ORDER_STATUSES = ["Paid", "Pending", "Shipped"];
+const LOW_STOCK_LABELS = ["Laptop Pro", "iPhone Case", "USB Hub"];
+const LOW_STOCK_COUNTS = [3, 7, 2];
+
+const TRUSTED_BRANDS = ["RetailMax", "PharmaCare", "FreshMart", "LogiHub", "StockPro", "WarehouseX"];
+
+const SOCIAL_PROOF_AVATARS = [
+  "https://images.unsplash.com/photo-1762522921456-cdfe882d36c3?w=40",
+  "https://images.unsplash.com/photo-1769071166862-8cc3a6f2ac5c?w=40",
+  "https://images.unsplash.com/photo-1768796373360-95d80c5830fb?w=40",
+];
+
+const SUMMARY_STATS = [
+  { value: "2,500+", label: "Businesses Onboarded" },
+  { value: "99.8%",  label: "Fulfillment Accuracy" },
+  { value: "94%",    label: "Stock Error Reduction" },
+  { value: "4.9/5",  label: "Average Rating" },
+];
+
 // ─── Dashboard Mockup Component ───────────────────────────────────────────────
 function DashboardMockup({ t }: { t: Theme }) {
-  const bars = [65, 80, 55, 90, 72, 88, 60, 95, 78, 85, 70, 92];
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
   return (
     <div
       className="rounded-2xl overflow-hidden shadow-2xl border"
@@ -144,12 +171,7 @@ function DashboardMockup({ t }: { t: Theme }) {
         <div className="flex-1 p-4 overflow-hidden">
           {/* Stats row */}
           <div className="grid grid-cols-4 gap-2 mb-4">
-            {[
-              { label: "Products", value: "2,847", color: "#34D399" },
-              { label: "Orders", value: "384", color: "#60a5fa" },
-              { label: "Revenue", value: "$48.2K", color: "#a78bfa" },
-              { label: "Stock Alert", value: "12", color: "#fb923c" },
-            ].map((stat, i) => (
+            {DASHBOARD_STAT_CARDS.map((stat, i) => (
               <div
                 key={i}
                 className="rounded-xl p-2 border"
@@ -180,7 +202,7 @@ function DashboardMockup({ t }: { t: Theme }) {
               Sales Overview
             </div>
             <div className="flex items-end gap-1 h-20">
-              {bars.map((h, i) => (
+              {DASHBOARD_BARS.map((h, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-1">
                   <div
                     className="w-full rounded-sm"
@@ -198,7 +220,7 @@ function DashboardMockup({ t }: { t: Theme }) {
               ))}
             </div>
             <div className="flex justify-between mt-1">
-              {months.map((m, i) => (
+              {DASHBOARD_MONTHS.map((m, i) => (
                 <span key={i} className="text-xs" style={{ color: t.textMuted }}>
                   {m}
                 </span>
@@ -215,11 +237,11 @@ function DashboardMockup({ t }: { t: Theme }) {
               <div className="text-xs font-medium mb-2" style={{ color: t.textSecondary }}>
                 Recent Orders
               </div>
-              {["INV-001", "INV-002", "INV-003"].map((inv, i) => (
+              {RECENT_ORDER_LABELS.map((inv, i) => (
                 <div key={i} className="flex justify-between items-center py-1 border-b last:border-0" style={{ borderColor: t.border }}>
                   <span className="text-xs" style={{ color: t.textMuted }}>{inv}</span>
                   <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ background: "rgba(52,211,153,0.15)", color: "#34D399" }}>
-                    {["Paid", "Pending", "Shipped"][i]}
+                    {RECENT_ORDER_STATUSES[i]}
                   </span>
                 </div>
               ))}
@@ -231,11 +253,11 @@ function DashboardMockup({ t }: { t: Theme }) {
               <div className="text-xs font-medium mb-2" style={{ color: t.textSecondary }}>
                 Low Stock
               </div>
-              {["Laptop Pro", "iPhone Case", "USB Hub"].map((item, i) => (
+              {LOW_STOCK_LABELS.map((item, i) => (
                 <div key={i} className="flex justify-between items-center py-1 border-b last:border-0" style={{ borderColor: t.border }}>
                   <span className="text-xs" style={{ color: t.textMuted }}>{item}</span>
                   <span className="text-xs font-medium" style={{ color: "#fb923c" }}>
-                    {[3, 7, 2][i]} left
+                    {LOW_STOCK_COUNTS[i]} left
                   </span>
                 </div>
               ))}
@@ -425,6 +447,93 @@ function MegaDropdownPanel({ activeDropdown: _ad, cancelClose: _cc, scheduleClos
   return null;
 }
 
+// ─── Page-Level Content Constants ────────────────────────────────────────────
+const FEATURES = [
+  { icon: Package,      title: "Product Management",        desc: "Organize products with SKUs, barcodes, categories, and rich variants in one unified catalog." },
+  { icon: Activity,     title: "Real-time Inventory",       desc: "Track stock movements in real time across all warehouses with live alerts and dashboards." },
+  { icon: ShoppingCart, title: "Purchase & Sales Orders",   desc: "Streamline procurement and fulfillment with end-to-end order lifecycle management." },
+  { icon: BarChart3,    title: "Smart Reports & Analytics", desc: "Generate in-depth reports on sales trends, stock velocity, and profitability insights." },
+  { icon: Building2,    title: "Multi-Warehouse Support",   desc: "Manage inventory across multiple locations with inter-warehouse transfers and mapping." },
+  { icon: Shield,       title: "Role-Based Access Control", desc: "Control who sees what with granular permission sets, audit logs, and team management." },
+];
+
+const STEPS = [
+  { icon: UserPlus,    step: "01", title: "Create Your Account",        desc: "Sign up in seconds, set up your organization profile, and invite your team members." },
+  { icon: Package,     step: "02", title: "Add Products & Inventory",   desc: "Import your product catalog via CSV or add products manually with full metadata." },
+  { icon: TrendingUp,  step: "03", title: "Track Sales & Stock",        desc: "Process orders, update stock automatically, and get real-time visibility across all channels." },
+  { icon: FileText,    step: "04", title: "Generate Reports & Insights",desc: "Export detailed reports, schedule automated summaries, and make data-driven decisions." },
+];
+
+const INDUSTRIES = [
+  { title: "Retail",      img: "https://images.unsplash.com/photo-1769259179770-c0de5dccf60a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400", features: ["Barcode Scanning",      "POS Integration",        "Season Analytics"],       icon: ScanBarcode,   color: "#34D399" },
+  { title: "Pharmacy",    img: "https://images.unsplash.com/photo-1642055514517-7b52288890ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400", features: ["Expiry Date Tracking", "Batch Management",       "Regulatory Reports"],     icon: AlertTriangle, color: "#60a5fa" },
+  { title: "Supermarket", img: "https://images.unsplash.com/photo-1606824722920-4c652a70f348?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400", features: ["Real-time Stock Sync",  "Multi-category Support", "Demand Forecasting"],     icon: Boxes,         color: "#a78bfa" },
+  { title: "Warehouse",   img: "https://images.unsplash.com/photo-1726776230751-183496c51f00?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400", features: ["Location Tracking",     "Bin Management",         "Shipment Coordination"],  icon: MapPin,        color: "#fb923c" },
+];
+
+const SHOWCASE_TABS = ["Dashboard", "Product Management", "Inventory Overview", "Reports & Analytics"];
+
+const PLANS = [
+  {
+    name: "Starter",
+    price: "$29",
+    period: "/month",
+    desc: "Perfect for small businesses just getting started.",
+    features: ["Up to 500 products", "1 Warehouse", "Basic reports", "Email support", "3 team members", "CSV import/export"],
+    cta: "Get Started",
+    highlight: false,
+  },
+  {
+    name: "Business",
+    price: "$79",
+    period: "/month",
+    desc: "Everything you need to scale your inventory operations.",
+    features: ["Unlimited products", "5 Warehouses", "Advanced analytics", "Priority support", "20 team members", "API access", "Role-based access", "Barcode scanning"],
+    cta: "Start Free Trial",
+    highlight: true,
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    period: "",
+    desc: "Tailored solutions for large organizations at scale.",
+    features: ["Unlimited everything", "Custom integrations", "Dedicated account manager", "SLA guarantee", "Custom onboarding", "Advanced security", "White-label option", "SSO / SAML"],
+    cta: "Contact Sales",
+    highlight: false,
+  },
+];
+
+const TESTIMONIALS = [
+  {
+    name: "Sarah Mitchell",
+    role: "Operations Director, RetailMax",
+    img: "https://images.unsplash.com/photo-1762522921456-cdfe882d36c3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=100",
+    quote: "IMS transformed how we manage our 12 retail locations. Stock discrepancies dropped by 94% within the first month. Absolutely game-changing.",
+    rating: 5,
+  },
+  {
+    name: "James Okonkwo",
+    role: "CEO, PharmaCare Solutions",
+    img: "https://images.unsplash.com/photo-1769071166862-8cc3a6f2ac5c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=100",
+    quote: "The expiry tracking feature alone saved us thousands in compliance fines. The dashboard is clean, intuitive, and our team adopted it in days.",
+    rating: 5,
+  },
+  {
+    name: "Elena Rodriguez",
+    role: "Supply Chain Manager, FreshMart",
+    img: "https://images.unsplash.com/photo-1768796373360-95d80c5830fb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=100",
+    quote: "Managing 8 warehouses used to be a nightmare. Now I have real-time visibility into every bin location. Our fulfillment accuracy is now 99.8%.",
+    rating: 5,
+  },
+];
+
+const FOOTER_LINKS: Record<string, string[]> = {
+  Product:   ["Features", "Pricing", "Changelog", "Roadmap", "Integrations"],
+  Company:   ["About Us", "Careers", "Blog", "Press Kit", "Contact"],
+  Resources: ["Documentation", "API Reference", "Community", "Status", "Support"],
+  Legal:     ["Privacy Policy", "Terms of Service", "Cookie Policy", "GDPR", "Security"],
+};
+
 // ─── Main Landing Page ────────────────────────────────────────────────────────
 export function LandingPage() {
   const navigate = useNavigate();
@@ -459,92 +568,6 @@ export function LandingPage() {
   const scrollTo = (id: string) => {
     setMobileMenuOpen(false);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const features = [
-    { icon: Package, title: "Product Management", desc: "Organize products with SKUs, barcodes, categories, and rich variants in one unified catalog." },
-    { icon: Activity, title: "Real-time Inventory", desc: "Track stock movements in real time across all warehouses with live alerts and dashboards." },
-    { icon: ShoppingCart, title: "Purchase & Sales Orders", desc: "Streamline procurement and fulfillment with end-to-end order lifecycle management." },
-    { icon: BarChart3, title: "Smart Reports & Analytics", desc: "Generate in-depth reports on sales trends, stock velocity, and profitability insights." },
-    { icon: Building2, title: "Multi-Warehouse Support", desc: "Manage inventory across multiple locations with inter-warehouse transfers and mapping." },
-    { icon: Shield, title: "Role-Based Access Control", desc: "Control who sees what with granular permission sets, audit logs, and team management." },
-  ];
-
-  const steps = [
-    { icon: UserPlus, step: "01", title: "Create Your Account", desc: "Sign up in seconds, set up your organization profile, and invite your team members." },
-    { icon: Package, step: "02", title: "Add Products & Inventory", desc: "Import your product catalog via CSV or add products manually with full metadata." },
-    { icon: TrendingUp, step: "03", title: "Track Sales & Stock", desc: "Process orders, update stock automatically, and get real-time visibility across all channels." },
-    { icon: FileText, step: "04", title: "Generate Reports & Insights", desc: "Export detailed reports, schedule automated summaries, and make data-driven decisions." },
-  ];
-
-  const industries = [
-    { title: "Retail", img: "https://images.unsplash.com/photo-1769259179770-c0de5dccf60a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400", features: ["Barcode Scanning", "POS Integration", "Season Analytics"], icon: ScanBarcode, color: "#34D399" },
-    { title: "Pharmacy", img: "https://images.unsplash.com/photo-1642055514517-7b52288890ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400", features: ["Expiry Date Tracking", "Batch Management", "Regulatory Reports"], icon: AlertTriangle, color: "#60a5fa" },
-    { title: "Supermarket", img: "https://images.unsplash.com/photo-1606824722920-4c652a70f348?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400", features: ["Real-time Stock Sync", "Multi-category Support", "Demand Forecasting"], icon: Boxes, color: "#a78bfa" },
-    { title: "Warehouse", img: "https://images.unsplash.com/photo-1726776230751-183496c51f00?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400", features: ["Location Tracking", "Bin Management", "Shipment Coordination"], icon: MapPin, color: "#fb923c" },
-  ];
-
-  const showcaseTabs = ["Dashboard", "Product Management", "Inventory Overview", "Reports & Analytics"];
-
-  const plans = [
-    {
-      name: "Starter",
-      price: "$29",
-      period: "/month",
-      desc: "Perfect for small businesses just getting started.",
-      features: ["Up to 500 products", "1 Warehouse", "Basic reports", "Email support", "3 team members", "CSV import/export"],
-      cta: "Get Started",
-      highlight: false,
-    },
-    {
-      name: "Business",
-      price: "$79",
-      period: "/month",
-      desc: "Everything you need to scale your inventory operations.",
-      features: ["Unlimited products", "5 Warehouses", "Advanced analytics", "Priority support", "20 team members", "API access", "Role-based access", "Barcode scanning"],
-      cta: "Start Free Trial",
-      highlight: true,
-    },
-    {
-      name: "Enterprise",
-      price: "Custom",
-      period: "",
-      desc: "Tailored solutions for large organizations at scale.",
-      features: ["Unlimited everything", "Custom integrations", "Dedicated account manager", "SLA guarantee", "Custom onboarding", "Advanced security", "White-label option", "SSO / SAML"],
-      cta: "Contact Sales",
-      highlight: false,
-    },
-  ];
-
-  const testimonials = [
-    {
-      name: "Sarah Mitchell",
-      role: "Operations Director, RetailMax",
-      img: "https://images.unsplash.com/photo-1762522921456-cdfe882d36c3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=100",
-      quote: "IMS transformed how we manage our 12 retail locations. Stock discrepancies dropped by 94% within the first month. Absolutely game-changing.",
-      rating: 5,
-    },
-    {
-      name: "James Okonkwo",
-      role: "CEO, PharmaCare Solutions",
-      img: "https://images.unsplash.com/photo-1769071166862-8cc3a6f2ac5c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=100",
-      quote: "The expiry tracking feature alone saved us thousands in compliance fines. The dashboard is clean, intuitive, and our team adopted it in days.",
-      rating: 5,
-    },
-    {
-      name: "Elena Rodriguez",
-      role: "Supply Chain Manager, FreshMart",
-      img: "https://images.unsplash.com/photo-1768796373360-95d80c5830fb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=100",
-      quote: "Managing 8 warehouses used to be a nightmare. Now I have real-time visibility into every bin location. Our fulfillment accuracy is now 99.8%.",
-      rating: 5,
-    },
-  ];
-
-  const footerLinks = {
-    Product: ["Features", "Pricing", "Changelog", "Roadmap", "Integrations"],
-    Company: ["About Us", "Careers", "Blog", "Press Kit", "Contact"],
-    Resources: ["Documentation", "API Reference", "Community", "Status", "Support"],
-    Legal: ["Privacy Policy", "Terms of Service", "Cookie Policy", "GDPR", "Security"],
   };
 
   return (
@@ -708,7 +731,7 @@ export function LandingPage() {
               {/* Social proof */}
               <div className="flex items-center gap-4 justify-center lg:justify-start">
                 <div className="flex -space-x-2">
-                  {["https://images.unsplash.com/photo-1762522921456-cdfe882d36c3?w=40", "https://images.unsplash.com/photo-1769071166862-8cc3a6f2ac5c?w=40", "https://images.unsplash.com/photo-1768796373360-95d80c5830fb?w=40"].map((src, i) => (
+                  {SOCIAL_PROOF_AVATARS.map((src, i) => (
                     <img key={i} src={src} alt="user" className="w-8 h-8 rounded-full border-2 object-cover" style={{ borderColor: t.bg }} />
                   ))}
                 </div>
@@ -759,7 +782,7 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-center text-sm mb-6" style={{ color: t.textMuted }}>TRUSTED BY LEADING BRANDS ACROSS INDUSTRIES</p>
           <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-16">
-            {["RetailMax", "PharmaCare", "FreshMart", "LogiHub", "StockPro", "WarehouseX"].map((brand) => (
+            {TRUSTED_BRANDS.map((brand) => (
               <div key={brand} className="font-bold text-lg tracking-tight" style={{ color: t.textMuted, opacity: 0.6 }}>
                 {brand}
               </div>
@@ -785,7 +808,7 @@ export function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((f, i) => (
+            {FEATURES.map((f, i) => (
               <div
                 key={i}
                 className="group p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-1"
@@ -841,7 +864,7 @@ export function LandingPage() {
             <div className="absolute top-10 left-0 right-0 h-0.5 hidden lg:block" style={{ background: `linear-gradient(to right, transparent, rgba(52,211,153,0.4), transparent)` }} />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-              {steps.map((step, i) => (
+              {STEPS.map((step, i) => (
                 <div key={i} className="relative flex flex-col items-center text-center">
                   <div
                     className="relative w-20 h-20 rounded-2xl flex items-center justify-center mb-5 z-10"
@@ -881,7 +904,7 @@ export function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {industries.map((ind, i) => (
+            {INDUSTRIES.map((ind, i) => (
               <div
                 key={i}
                 className="group rounded-2xl overflow-hidden border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
@@ -935,7 +958,7 @@ export function LandingPage() {
 
           {/* Tab bar */}
           <div className="flex flex-wrap justify-center gap-2 mb-10">
-            {showcaseTabs.map((tab, i) => (
+            {SHOWCASE_TABS.map((tab, i) => (
               <button
                 key={i}
                 onClick={() => setActiveShowcase(i)}
@@ -954,7 +977,7 @@ export function LandingPage() {
 
           {/* Showcase grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {showcaseTabs.map((tab, i) => (
+            {SHOWCASE_TABS.map((tab, i) => (
               <div
                 key={i}
                 className="cursor-pointer transition-all duration-300"
@@ -984,7 +1007,7 @@ export function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
-            {plans.map((plan, i) => (
+            {PLANS.map((plan, i) => (
               <div
                 key={i}
                 className="relative rounded-2xl border flex flex-col transition-all duration-300"
@@ -1058,7 +1081,7 @@ export function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((t_, i) => (
+            {TESTIMONIALS.map((t_, i) => (
               <div
                 key={i}
                 className="p-6 rounded-2xl border flex flex-col"
@@ -1087,12 +1110,7 @@ export function LandingPage() {
 
           {/* Stats row */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
-            {[
-              { value: "2,500+", label: "Businesses Onboarded" },
-              { value: "99.8%", label: "Fulfillment Accuracy" },
-              { value: "94%", label: "Stock Error Reduction" },
-              { value: "4.9/5", label: "Average Rating" },
-            ].map((stat, i) => (
+            {SUMMARY_STATS.map((stat, i) => (
               <div key={i} className="text-center">
                 <div className="mb-1" style={{ fontSize: "2rem", fontWeight: 800, color: "#34D399" }}>{stat.value}</div>
                 <div className="text-sm" style={{ color: t.textSecondary }}>{stat.label}</div>
@@ -1179,7 +1197,7 @@ export function LandingPage() {
             </div>
 
             {/* Link columns */}
-            {Object.entries(footerLinks).map(([section, links]) => (
+            {Object.entries(FOOTER_LINKS).map(([section, links]) => (
               <div key={section}>
                 <h4 className="text-sm font-semibold mb-4" style={{ color: "white" }}>{section}</h4>
                 <ul className="space-y-3">
