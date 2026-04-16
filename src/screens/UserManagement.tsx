@@ -1,14 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Plus, X, Mail, Shield, Edit, Trash2, Check, AlertTriangle, Search, UserCheck, UserX } from 'lucide-react';
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  status: "Active" | "Inactive";
-  lastLogin: string;
-}
+import { getUsers, createUser, updateUser, deleteUser, type User } from '../data/apiService';
 
 interface Role {
   name: string;
@@ -16,14 +8,6 @@ interface Role {
   permissions: string;
   color: string;
 }
-
-const initialUsers: User[] = [
-  { id: 1, name: 'John Doe', email: 'john@pharmacy.com', role: 'Tenant Admin', status: 'Active', lastLogin: '2024-03-21 10:30 AM' },
-  { id: 2, name: 'Jane Smith', email: 'jane@pharmacy.com', role: 'Manager', status: 'Active', lastLogin: '2024-03-21 09:15 AM' },
-  { id: 3, name: 'Mike Johnson', email: 'mike@pharmacy.com', role: 'Staff', status: 'Active', lastLogin: '2024-03-20 05:45 PM' },
-  { id: 4, name: 'Sarah Williams', email: 'sarah@pharmacy.com', role: 'Staff', status: 'Active', lastLogin: '2024-03-21 08:20 AM' },
-  { id: 5, name: 'David Brown', email: 'david@pharmacy.com', role: 'Manager', status: 'Inactive', lastLogin: '2024-03-15 02:10 PM' },
-];
 
 const roles: Role[] = [
   { name: 'Root', description: 'Full system access across all tenants', permissions: 'All', color: 'var(--color-danger)' },
@@ -37,7 +21,8 @@ const roles: Role[] = [
 const INPUT_CLS = "w-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-mint)]";
 
 export const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
@@ -53,6 +38,22 @@ export const UserManagement: React.FC = () => {
   // Edit form
   const [editForm, setEditForm] = useState({ name: '', email: '', role: '', status: '' as 'Active' | 'Inactive' });
 
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getUsers();
+      setUsers(data || []);
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
   const showSuccess = (msg: string) => {
     setSuccessMsg(msg);
     setTimeout(() => setSuccessMsg(''), 3000);
@@ -61,7 +62,7 @@ export const UserManagement: React.FC = () => {
   const filteredUsers = useMemo(() => {
     const q = searchQuery.toLowerCase();
     return users.filter(u =>
-      !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || u.role.toLowerCase().includes(q)
+      !q || u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.role?.toLowerCase().includes(q)
     );
   }, [users, searchQuery]);
 
@@ -76,55 +77,78 @@ export const UserManagement: React.FC = () => {
     }
   };
 
-  const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase();
+  const getInitials = (name: string) => name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : '?';
 
-  const handleInvite = () => {
+  const handleInvite = async () => {
     if (!inviteEmail || !inviteName) return;
-    const newUser: User = {
-      id: Math.max(...users.map(u => u.id)) + 1,
-      name: inviteName,
-      email: inviteEmail,
-      role: inviteRole,
-      status: 'Active',
-      lastLogin: 'Never',
-    };
-    setUsers(prev => [...prev, newUser]);
-    setShowInviteModal(false);
-    setInviteEmail('');
-    setInviteName('');
-    setInviteRole('Staff');
-    showSuccess(`Invitation sent to ${inviteEmail}`);
+    try {
+      await createUser({
+        name: inviteName,
+        email: inviteEmail,
+        role: inviteRole,
+        status: 'Active'
+      });
+      setShowInviteModal(false);
+      setInviteEmail('');
+      setInviteName('');
+      setInviteRole('Staff');
+      showSuccess(`Invitation sent to ${inviteEmail}`);
+      fetchUsers();
+    } catch (err) {
+      console.error('Failed to invite user:', err);
+      alert('Failed to invite user');
+    }
   };
 
   const openEdit = (user: User) => {
     setEditUser(user);
-    setEditForm({ name: user.name, email: user.email, role: user.role, status: user.status });
+    setEditForm({ name: user.name || '', email: user.email || '', role: user.role || '', status: (user.scope as any) === 'INACTIVE' ? 'Inactive' : 'Active' });
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editUser) return;
-    setUsers(prev => prev.map(u => u.id === editUser.id ? { ...u, ...editForm } : u));
-    setEditUser(null);
-    showSuccess('User updated successfully!');
+    try {
+      await updateUser(editUser.id, {
+        ...editForm,
+        scope: editForm.status === 'Inactive' ? 'INACTIVE' : 'ACTIVE'
+      });
+      setEditUser(null);
+      showSuccess('User updated successfully!');
+      fetchUsers();
+    } catch (err) {
+      console.error('Failed to update user:', err);
+      alert('Failed to update user');
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteTarget) return;
-    setUsers(prev => prev.filter(u => u.id !== deleteTarget.id));
-    setDeleteTarget(null);
-    showSuccess('User removed.');
+    try {
+      await deleteUser(deleteTarget.id);
+      setDeleteTarget(null);
+      showSuccess('User removed.');
+      fetchUsers();
+    } catch (err) {
+      console.error('Failed to delete user:', err);
+      alert('Failed to delete user');
+    }
   };
 
-  const toggleStatus = (userId: number) => {
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: u.status === 'Active' ? 'Inactive' : 'Active' } : u));
-    const user = users.find(u => u.id === userId);
-    if (user) showSuccess(`${user.name} ${user.status === 'Active' ? 'deactivated' : 'activated'}`);
+  const toggleStatus = async (user: User) => {
+    try {
+      const newStatus = (user.scope as any) === 'INACTIVE' ? 'ACTIVE' : 'INACTIVE';
+      await updateUser(user.id, { scope: newStatus });
+      showSuccess(`${user.name} ${newStatus === 'ACTIVE' ? 'activated' : 'deactivated'}`);
+      fetchUsers();
+    } catch (err) {
+      console.error('Failed to toggle user status:', err);
+    }
   };
 
   const stats = [
     { label: 'Total Users', value: users.length },
-    { label: 'Active', value: users.filter(u => u.status === 'Active').length },
-    { label: 'Inactive', value: users.filter(u => u.status === 'Inactive').length },
+    { label: 'Active', value: users.filter(u => (u.scope as any) !== 'INACTIVE').length },
+    { label: 'Inactive', value: users.filter(u => (u.scope as any) === 'INACTIVE').length },
     { label: 'Roles', value: roles.length },
   ];
 
@@ -193,10 +217,13 @@ export const UserManagement: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--color-border)]">
-                {filteredUsers.length === 0 ? (
+                {loading ? (
+                  <tr><td colSpan={5} className="px-4 py-8 text-center"><div className="w-8 h-8 border-3 border-[var(--color-mint)] border-t-transparent rounded-full animate-spin mx-auto"></div></td></tr>
+                ) : filteredUsers.length === 0 ? (
                   <tr><td colSpan={5} className="px-4 py-8 text-center text-[var(--color-text-secondary)] text-sm">No users found</td></tr>
                 ) : filteredUsers.map((user) => {
                   const roleColor = getRoleColor(user.role);
+                  const isActive = (user.scope as any) !== 'INACTIVE';
                   return (
                     <tr key={user.id} className="hover:bg-[var(--color-surface-secondary)] transition-colors">
                       <td className="px-3 sm:px-4 py-3">
@@ -222,16 +249,16 @@ export const UserManagement: React.FC = () => {
                         <span 
                           className="px-2 sm:px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap cursor-pointer hover:opacity-80 transition-opacity"
                           style={{ 
-                            backgroundColor: user.status === 'Active' ? 'rgba(29,185,122,0.15)' : 'rgba(100,116,139,0.15)',
-                            color: user.status === 'Active' ? 'var(--color-mint)' : 'var(--color-text-muted)'
+                            backgroundColor: isActive ? 'rgba(29,185,122,0.15)' : 'rgba(100,116,139,0.15)',
+                            color: isActive ? 'var(--color-mint)' : 'var(--color-text-muted)'
                           }}
-                          onClick={() => toggleStatus(user.id)}
-                          title={`Click to ${user.status === 'Active' ? 'deactivate' : 'activate'}`}
+                          onClick={() => toggleStatus(user)}
+                          title={`Click to ${isActive ? 'deactivate' : 'activate'}`}
                         >
-                          {user.status}
+                          {isActive ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-[var(--color-text-secondary)] whitespace-nowrap hidden md:table-cell">{user.lastLogin}</td>
+                      <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-[var(--color-text-secondary)] whitespace-nowrap hidden md:table-cell">{'N/A'}</td>
                       <td className="px-3 sm:px-4 py-3">
                         <div className="flex gap-1 sm:gap-2">
                           <button 
@@ -242,11 +269,11 @@ export const UserManagement: React.FC = () => {
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => toggleStatus(user.id)}
+                            onClick={() => toggleStatus(user)}
                             className="p-1.5 rounded hover:bg-[var(--color-warning)]/20 text-[var(--color-text-secondary)] hover:text-[var(--color-warning)] transition-colors"
-                            title={user.status === 'Active' ? 'Deactivate' : 'Activate'}
+                            title={isActive ? 'Deactivate' : 'Activate'}
                           >
-                            {user.status === 'Active' ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
+                            {isActive ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
                           </button>
                           <button 
                             onClick={() => setDeleteTarget(user)}

@@ -17,22 +17,6 @@ import {
 import { getPlatformStats, type PlatformStats } from '../../data/apiService';
 
 
-// PLACEHOLDERS for charts as they might not have real backend implementation yet
-const signupData: { month: string; signups: number }[] = [];
-const revenueData: { month: string; revenue: number }[] = [];
-const planData = [
-  { name: 'Free', value: 0, color: 'var(--pa-text-light-gray)' },
-  { name: 'Pro', value: 0, color: 'var(--pa-teal)' },
-  { name: 'Enterprise', value: 0, color: '#f59e0b' },
-];
-const healthMetrics = [
-  { label: 'API Response Time', value: '--', progress: 0, status: 'Normal', statusColor: 'mint', icon: Activity },
-  { label: 'Database Load', value: '--', progress: 0, status: 'Normal', statusColor: 'mint', icon: Database },
-  { label: 'Storage Used', value: '--', progress: 0, status: 'Normal', statusColor: 'amber', icon: HardDrive },
-  { label: 'Active Sessions', value: '--', progress: 0, status: 'Normal', statusColor: 'mint', icon: Cpu },
-];
-const recentTenants: { name: string; type: string; plan: string; status: string; joined: string }[] = [];
-
 export const GlobalDashboard: React.FC = () => {
   const [stats, setStats] = React.useState<PlatformStats | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -52,6 +36,10 @@ export const GlobalDashboard: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const signupData = stats?.signupTrend || [];
+  const planData = stats?.planDistribution || [];
+  const supportTicketsCount = stats?.supportTickets?.length || 0;
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -97,7 +85,7 @@ export const GlobalDashboard: React.FC = () => {
             </div>
           </div>
           <div>
-            <div className="text-[28px] font-[700] text-[var(--pa-text-near-black)]">₹0</div>
+            <div className="text-[28px] font-[700] text-[var(--pa-text-near-black)]">₹{loading ? '...' : stats?.totalSubscriptions ? '0' : '0'}</div>
             <div className="text-[12px] font-medium text-[var(--pa-text-muted)] uppercase tracking-wider">Monthly Revenue (MRR)</div>
           </div>
         </div>
@@ -110,7 +98,9 @@ export const GlobalDashboard: React.FC = () => {
             </div>
           </div>
           <div>
-            <div className="text-[28px] font-[700] text-[var(--pa-amber)]">0</div>
+            <div className="text-[28px] font-[700] text-[var(--pa-amber)]">
+              {loading ? '...' : supportTicketsCount}
+            </div>
             <div className="text-[12px] font-medium text-[var(--pa-text-muted)] uppercase tracking-wider">Open Support Tickets</div>
           </div>
         </div>
@@ -228,25 +218,14 @@ export const GlobalDashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--pa-border)]">
-                {recentTenants.map((tenant, idx) => (
-                  <tr key={idx} className="hover:bg-[var(--pa-row-hover)] transition-colors cursor-pointer group">
-                    <td className="px-6 py-4">
-                      <div className="text-[14px] font-[700] text-[var(--pa-text-near-black)] group-hover:text-[var(--pa-teal)] transition-colors">{tenant.name}</div>
-                    </td>
-                    <td className="px-6 py-4 text-[14px] text-[var(--pa-text-muted)]">{tenant.type}</td>
-                    <td className="px-6 py-4">
-                      <span className={`text-[13px] font-[600] ${tenant.plan === 'Enterprise' ? 'text-[var(--pa-teal)]' : tenant.plan === 'Pro' ? 'text-[var(--pa-mint)]' : 'text-[var(--pa-text-muted)]'}`}>
-                        {tenant.plan}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-0.5 rounded-[4px] text-[11px] font-[700] uppercase tracking-wider ${tenant.status === 'Active' ? 'bg-[var(--pa-badge-active-bg)] text-[var(--pa-badge-active-text)]' : 'bg-[var(--pa-badge-trial-bg)] text-[var(--pa-badge-trial-text)]'}`}>
-                        {tenant.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-[13px] text-[var(--pa-text-muted)] font-medium">{tenant.joined}</td>
-                  </tr>
-                ))}
+                {loading ? (
+                  <tr><td colSpan={5} className="px-6 py-8 text-center"><div className="w-6 h-6 border-2 border-[var(--pa-teal)] border-t-transparent rounded-full animate-spin mx-auto"></div></td></tr>
+                ) : !stats || stats.totalTenants === 0 ? (
+                  <tr><td colSpan={5} className="px-6 py-8 text-center text-[var(--pa-text-muted)]">No tenants found</td></tr>
+                ) : (
+                  // Map recent tenants here if they were in the stats. For now, since they aren't, show empty.
+                  <tr><td colSpan={5} className="px-6 py-8 text-center text-[var(--pa-text-muted)]">No recent data available</td></tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -277,7 +256,7 @@ export const GlobalDashboard: React.FC = () => {
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                   <div className="text-[20px] font-[700] text-[var(--pa-text-near-black)]">142</div>
+                   <div className="text-[20px] font-[700] text-[var(--pa-text-near-black)]">{stats?.totalTenants || 0}</div>
                    <div className="text-[9px] font-[700] text-[var(--pa-text-light-gray)] uppercase">Total</div>
                 </div>
               </div>
@@ -290,7 +269,9 @@ export const GlobalDashboard: React.FC = () => {
                       <span className="text-[13px] font-[600] text-[var(--pa-text-muted)]">{item.name}</span>
                     </div>
                     <div className="text-right">
-                       <span className="text-[13px] font-[700] text-[var(--pa-text-near-black)]">{Math.round((item.value/142)*100)}%</span>
+                       <span className="text-[13px] font-[700] text-[var(--pa-text-near-black)]">
+                         {stats?.totalTenants ? Math.round((item.value / stats.totalTenants) * 100) : 0}%
+                       </span>
                        <div className="text-[10px] text-[var(--pa-text-light-gray)] font-medium uppercase">{item.value} units</div>
                     </div>
                   </div>

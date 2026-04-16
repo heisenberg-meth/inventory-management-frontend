@@ -142,7 +142,7 @@ export const Analytics: React.FC = () => {
     {
       icon: DollarSign,
       label: 'Total Revenue',
-      value: stats ? `₹${stats.totalRevenue.toLocaleString()}` : '...',
+      value: stats ? `₹${stats.totalRevenue?.toLocaleString()}` : '...',
       change: '↑ 18.4% vs last period',
       accent: true,
       id: 'metric-revenue',
@@ -150,7 +150,7 @@ export const Analytics: React.FC = () => {
     {
       icon: ShoppingCart,
       label: 'Total Orders',
-      value: stats ? stats.totalOrders.toLocaleString() : '...',
+      value: stats ? stats.totalOrders?.toLocaleString() : '...',
       change: '↑ 12.1% vs last period',
       accent: false,
       id: 'metric-orders',
@@ -158,7 +158,7 @@ export const Analytics: React.FC = () => {
     {
       icon: Package,
       label: 'Low Stock',
-      value: stats ? stats.lowStockCount.toLocaleString() : '...',
+      value: stats ? stats.lowStockCount?.toLocaleString() : '...',
       change: '↓ 8.3% vs last period',
       accent: false,
       id: 'metric-products',
@@ -166,7 +166,7 @@ export const Analytics: React.FC = () => {
     {
       icon: Users,
       label: 'Out of Stock',
-      value: stats ? stats.outOfStockCount.toLocaleString() : '...',
+      value: stats ? stats.outOfStockCount?.toLocaleString() : '...',
       change: '↑ 5.2% vs last period',
       accent: false,
       id: 'metric-customers',

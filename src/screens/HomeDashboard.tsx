@@ -64,7 +64,7 @@ export const HomeDashboard: React.FC = () => {
     { 
       icon: DollarSign, 
       label: "Today's Revenue", 
-      value: stats ? `₹${(stats.totalRevenue || 0).toLocaleString()}` : '...', 
+      value: stats ? `₹${stats.totalRevenue?.toLocaleString()}` : '...', 
       change: stats ? null : null, 
       trend: 'up',
       iconBg: 'bg-[var(--color-mint)]',

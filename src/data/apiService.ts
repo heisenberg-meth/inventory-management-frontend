@@ -150,7 +150,9 @@ export interface SalesOrder {
 export interface DashboardKPIs {
   totalProducts: number;
   lowStockCount: number;
+  outOfStockCount: number;
   totalRevenue: number;
+  stockValuation: number;
   totalOrders: number;
   weeklySales: { day: string; sales: number }[];
   stockLevels: { category: string; level: number }[];
@@ -212,8 +214,6 @@ async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Pr
   const token = localStorage.getItem('ims-token');
 
   const headers = new Headers(rest.headers);
-  // Bypass ngrok interstitial warning page
-  headers.set('ngrok-skip-browser-warning', 'true');
   
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
@@ -278,17 +278,20 @@ export const getProducts = async (page = 0, size = 10): Promise<Product[]> => {
   
   if (!products) return [];
 
-  return (products as Product[]).map((p) => ({
-    ...p,
-    id: p.id,
-    name: p.name,
-    batch: p.batchNumber || p.batch_number,
-    expiry: p.expiryDate || p.expiry_date,
-    price: p.salePrice || p.sale_price ? `₹${(p.salePrice || p.sale_price).toLocaleString()}` : undefined,
-    threshold: p.reorderLevel || p.reorder_level,
-    max: 1000,
-    status: p.status
-  }));
+  return (products as Product[]).map((p) => {
+    const sPrice = p.salePrice ?? p.sale_price;
+    return {
+      ...p,
+      id: p.id,
+      name: p.name || 'Unnamed Product',
+      batch: p.batchNumber ?? p.batch_number ?? '',
+      expiry: p.expiryDate ?? p.expiry_date ?? '',
+      price: sPrice != null ? `₹${Number(sPrice).toLocaleString()}` : '₹0',
+      threshold: p.reorderLevel ?? p.reorder_level ?? 10,
+      max: 1000,
+      status: p.status || 'Active'
+    };
+  });
 };
 
 export const createProduct = (data: unknown) => api.post<Product>('/tenant/products', data);
@@ -306,9 +309,22 @@ export const getCategories = async (): Promise<Category[]> => {
 };
 export const getBrands = () => Promise.resolve([]);
 
+// Tenant Users
+export const getUsers = () => api.get<User[]>('/tenant/users');
+export const createUser = (data: unknown) => api.post<User>('/tenant/users', data);
+export const updateUser = (id: string | number, data: unknown) => api.put<User>(`/tenant/users/${id}`, data);
+export const deleteUser = (id: string | number) => api.delete(`/tenant/users/${id}`);
+
 // Tenant Suppliers & Customers
 export const getSuppliers = () => api.get<PagedResponse<Supplier> | Supplier[]>('/tenant/suppliers').then(res => Array.isArray(res) ? res : (res as PagedResponse<Supplier>).content || []);
+export const createSupplier = (data: unknown) => api.post<Supplier>('/tenant/suppliers', data);
+export const updateSupplier = (id: string | number, data: unknown) => api.put<Supplier>(`/tenant/suppliers/${id}`, data);
+export const deleteSupplier = (id: string | number) => api.delete(`/tenant/suppliers/${id}`);
+
 export const getCustomers = () => api.get<PagedResponse<Customer> | Customer[]>('/tenant/customers').then(res => Array.isArray(res) ? res : (res as PagedResponse<Customer>).content || []);
+export const createCustomer = (data: unknown) => api.post<Customer>('/tenant/customers', data);
+export const updateCustomer = (id: string | number, data: unknown) => api.put<Customer>(`/tenant/customers/${id}`, data);
+export const deleteCustomer = (id: string | number) => api.delete(`/tenant/customers/${id}`);
 
 // Tenant Orders & Invoices
 export const getSalesOrders = () => api.get<PagedResponse<SalesOrder>>('/tenant/orders?type=sale').then(res => res.content || []);
@@ -317,7 +333,22 @@ export const getInvoices = () => api.get<Invoice[]>('/tenant/invoices');
 export const getPayments = () => api.get<Payment[]>('/tenant/payments');
 
 // Tenant Reports & Dashboard
-export const getDashboardStats = () => api.get<DashboardKPIs>('/tenant/reports/dashboard');
+export const getDashboardStats = async (): Promise<DashboardKPIs> => {
+  const data = await api.get<DashboardKPIs>('/tenant/reports/dashboard');
+  return {
+    ...data,
+    totalRevenue: data?.totalRevenue || 0,
+    stockValuation: data?.stockValuation || 0,
+    totalProducts: data?.totalProducts || 0,
+    lowStockCount: data?.lowStockCount || 0,
+    outOfStockCount: data?.outOfStockCount || 0,
+    totalOrders: data?.totalOrders || 0,
+    weeklySales: data?.weeklySales || [],
+    stockLevels: data?.stockLevels || [],
+    recentSales: data?.recentSales || [],
+    recentActivity: data?.recentActivity || []
+  };
+};
 export const getStockReport = () => api.get<Record<string, unknown>>('/tenant/reports/stock');
 
 // Tenant Stock

@@ -39,16 +39,35 @@ export const Customers: React.FC = () => {
   const openAdd = () => { setEditing(null); setForm({ name: '', contact: '', email: '', phone: '', type: 'Hospital', status: 'Active' }); setShowModal(true); };
   const openEdit = (c: CustomerType) => { setEditing(c); setForm({ name: c.name, contact: c.contact, email: c.email, phone: c.phone, type: c.type, status: c.status }); setShowModal(true); };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name.trim()) return;
-    if (editing) {
-      setCustomers(prev => prev.map(c => c.id === editing.id ? { ...c, ...form } : c));
-      showToast('Customer updated!');
-    } else {
-      setCustomers(prev => [...prev, { id: Date.now(), outstanding: 0, totalOrders: 0, ...form }]);
-      showToast('Customer added!');
+    try {
+      if (editing) {
+        await updateCustomer(editing.id, form);
+        showToast('Customer updated!');
+      } else {
+        await createCustomer(form);
+        showToast('Customer added!');
+      }
+      setShowModal(false);
+      fetchCustomers();
+    } catch (err) {
+      console.error('Failed to save customer:', err);
+      alert('Failed to save customer');
     }
-    setShowModal(false);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteCustomer(deleteTarget.id);
+      setDeleteTarget(null);
+      showToast('Customer deleted.');
+      fetchCustomers();
+    } catch (err) {
+      console.error('Failed to delete customer:', err);
+      alert('Failed to delete customer');
+    }
   };
 
   const filtered = customers.filter(c =>
@@ -138,9 +157,9 @@ export const Customers: React.FC = () => {
                       <div className="flex items-center gap-1 text-xs text-[var(--color-text-secondary)]"><Phone className="w-3 h-3" />{c.phone}</div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-[var(--color-text-primary)]">{c.totalOrders}</td>
-                  <td className="px-4 py-3 text-sm font-medium" style={{ color: c.outstanding > 0 ? 'var(--color-warning)' : 'var(--color-mint)' }}>
-                    ₹{c.outstanding.toLocaleString()}
+                  <td className="px-4 py-3 text-sm font-medium text-[var(--color-text-primary)]">{c.totalOrders ?? 0}</td>
+                  <td className="px-4 py-3 text-sm font-medium" style={{ color: (c.outstanding ?? 0) > 0 ? 'var(--color-warning)' : 'var(--color-mint)' }}>
+                    ₹{(c.outstanding ?? 0).toLocaleString()}
                   </td>
                   <td className="px-4 py-3">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${c.status === 'Active' ? 'bg-[var(--color-mint)]/20 text-[var(--color-mint)]' : 'bg-[var(--color-danger)]/20 text-[var(--color-danger)]'}`}>
@@ -219,8 +238,8 @@ export const Customers: React.FC = () => {
                   { label: 'Email', value: viewing.email },
                   { label: 'Phone', value: viewing.phone },
                   { label: 'Status', value: viewing.status },
-                  { label: 'Total Orders', value: String(viewing.totalOrders) },
-                  { label: 'Outstanding', value: `₹${viewing.outstanding.toLocaleString()}` },
+                  { label: 'Total Orders', value: String(viewing.totalOrders ?? 0) },
+                  { label: 'Outstanding', value: `₹${(viewing.outstanding ?? 0).toLocaleString()}` },
                 ].map(item => (
                   <div key={item.label} className="bg-[var(--color-surface-secondary)] rounded-lg p-3">
                     <div className="text-xs text-[var(--color-text-muted)] mb-1">{item.label}</div>
@@ -244,7 +263,7 @@ export const Customers: React.FC = () => {
             <p className="text-sm text-[var(--color-text-secondary)] mb-6">Delete <strong>{deleteTarget.name}</strong>? This cannot be undone.</p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteTarget(null)} className="flex-1 px-4 py-2 bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-[var(--color-text-primary)] rounded-lg text-sm hover:bg-[var(--color-card-bg)] transition-colors">Cancel</button>
-              <button onClick={() => { setCustomers(prev => prev.filter(c => c.id !== deleteTarget.id)); setDeleteTarget(null); showToast('Customer deleted.'); }} className="flex-1 px-4 py-2 bg-[var(--color-danger)] text-white rounded-lg font-medium text-sm hover:opacity-90 transition-opacity">Delete</button>
+              <button onClick={handleDelete} className="flex-1 px-4 py-2 bg-[var(--color-danger)] text-white rounded-lg font-medium text-sm hover:opacity-90 transition-opacity">Delete</button>
             </div>
           </div>
         </div>

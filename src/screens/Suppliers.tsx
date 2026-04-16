@@ -36,16 +36,35 @@ export const Suppliers: React.FC = () => {
   const openAdd = () => { setEditing(null); setForm({ name: '', contact: '', email: '', phone: '', address: '', category: 'Medicines', status: 'Active' }); setShowModal(true); };
   const openEdit = (s: SupplierType) => { setEditing(s); setForm({ name: s.name, contact: s.contact, email: s.email, phone: s.phone, address: s.address, category: s.category, status: s.status }); setShowModal(true); };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name.trim()) return;
-    if (editing) {
-      setSuppliers(prev => prev.map(s => s.id === editing.id ? { ...s, ...form } : s));
-      showToast('Supplier updated!');
-    } else {
-      setSuppliers(prev => [...prev, { id: Date.now(), outstanding: 0, totalOrders: 0, ...form }]);
-      showToast('Supplier added!');
+    try {
+      if (editing) {
+        await updateSupplier(editing.id, form);
+        showToast('Supplier updated!');
+      } else {
+        await createSupplier(form);
+        showToast('Supplier added!');
+      }
+      setShowModal(false);
+      fetchSuppliers();
+    } catch (err) {
+      console.error('Failed to save supplier:', err);
+      alert('Failed to save supplier');
     }
-    setShowModal(false);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteSupplier(deleteTarget.id);
+      setDeleteTarget(null);
+      showToast('Supplier deleted.');
+      fetchSuppliers();
+    } catch (err) {
+      console.error('Failed to delete supplier:', err);
+      alert('Failed to delete supplier');
+    }
   };
 
   const filtered = suppliers.filter(s =>
@@ -127,7 +146,7 @@ export const Suppliers: React.FC = () => {
             <div className="mt-4 pt-4 border-t border-[var(--color-border)] grid grid-cols-3 gap-2 text-center">
               <div><div className="text-xs text-[var(--color-text-muted)]">Category</div><div className="text-xs font-semibold text-[var(--color-text-primary)]">{supplier.category}</div></div>
               <div><div className="text-xs text-[var(--color-text-muted)]">Total Orders</div><div className="text-xs font-semibold text-[var(--color-text-primary)]">{supplier.totalOrders}</div></div>
-              <div><div className="text-xs text-[var(--color-text-muted)]">Outstanding</div><div className="text-xs font-semibold" style={{ color: supplier.outstanding > 0 ? 'var(--color-warning)' : 'var(--color-mint)' }}>₹{supplier.outstanding.toLocaleString()}</div></div>
+              <div><div className="text-xs text-[var(--color-text-muted)]">Outstanding</div><div className="text-xs font-semibold" style={{ color: (supplier.outstanding ?? 0) > 0 ? 'var(--color-warning)' : 'var(--color-mint)' }}>₹{(supplier.outstanding ?? 0).toLocaleString()}</div></div>
             </div>
           </div>
         ))}
@@ -179,7 +198,7 @@ export const Suppliers: React.FC = () => {
             <p className="text-sm text-[var(--color-text-secondary)] mb-6">Delete <strong>{deleteTarget.name}</strong>? This cannot be undone.</p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteTarget(null)} className="flex-1 px-4 py-2 bg-[var(--color-surface-secondary)] border border-[var(--color-border)] text-[var(--color-text-primary)] rounded-lg text-sm hover:bg-[var(--color-card-bg)] transition-colors">Cancel</button>
-              <button onClick={() => { setSuppliers(prev => prev.filter(s => s.id !== deleteTarget.id)); setDeleteTarget(null); showToast('Supplier deleted.'); }} className="flex-1 px-4 py-2 bg-[var(--color-danger)] text-white rounded-lg font-medium text-sm hover:opacity-90 transition-opacity">Delete</button>
+              <button onClick={handleDelete} className="flex-1 px-4 py-2 bg-[var(--color-danger)] text-white rounded-lg font-medium text-sm hover:opacity-90 transition-opacity">Delete</button>
             </div>
           </div>
         </div>
