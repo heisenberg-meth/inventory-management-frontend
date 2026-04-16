@@ -1,144 +1,22 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Plus, Search, Edit, Trash2, Eye, X, Check, AlertTriangle,
   PackagePlus, Download, ArrowUpDown, Layers,
   Package, MinusCircle, Info
 } from 'lucide-react';
+import {
+  getCompositeItems, createCompositeItem, updateCompositeItem, deleteCompositeItem,
+  getProducts,
+  type CompositeComponent, type CompositeItemData,
+} from '../data/apiService';
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
-interface ComponentItem {
-  productId: number;
-  productName: string;
-  sku: string;
-  quantity: number;
-  unit: string;
-  unitCost: number;
-}
+// ─── Types (aliases for imported API types) ────────────────────────────────────
+type ComponentItem = CompositeComponent;
+type CompositeItem = CompositeItemData;
 
-interface CompositeItem {
-  id: number;
-  name: string;
-  sku: string;
-  category: string;
-  description: string;
-  sellingPrice: number;
-  components: ComponentItem[];
-  status: 'Active' | 'Inactive' | 'Draft';
-  createdAt: string;
-}
-
-// ─── Available base products for selection ─────────────────────────────────────
-const AVAILABLE_PRODUCTS = [
-  { id: 1,  name: 'Paracetamol 500mg',      sku: 'BTH-2024-001', unit: 'Strip',  cost: 40  },
-  { id: 2,  name: 'Amoxicillin 250mg',      sku: 'BTH-2024-002', unit: 'Strip',  cost: 110 },
-  { id: 3,  name: 'Ibuprofen 400mg',        sku: 'BTH-2024-003', unit: 'Strip',  cost: 58  },
-  { id: 4,  name: 'Cetirizine 10mg',        sku: 'BTH-2024-004', unit: 'Piece',  cost: 30  },
-  { id: 5,  name: 'Metformin 500mg',        sku: 'BTH-2024-005', unit: 'Strip',  cost: 78  },
-  { id: 6,  name: 'Atorvastatin 20mg',      sku: 'BTH-2024-006', unit: 'Strip',  cost: 130 },
-  { id: 7,  name: 'Omeprazole 20mg',        sku: 'BTH-2024-007', unit: 'Strip',  cost: 88  },
-  { id: 8,  name: 'Vitamin D3 60K',         sku: 'BTH-2024-008', unit: 'Box',    cost: 48  },
-  { id: 9,  name: 'Bandage Roll 5cm',       sku: 'BTH-2024-009', unit: 'Piece',  cost: 25  },
-  { id: 10, name: 'Antiseptic Cream 25g',   sku: 'BTH-2024-010', unit: 'Piece',  cost: 55  },
-  { id: 11, name: 'Cotton Wool 100g',       sku: 'BTH-2024-011', unit: 'Box',    cost: 35  },
-  { id: 12, name: 'Aspirin 75mg',           sku: 'BTH-2024-012', unit: 'Strip',  cost: 22  },
-  { id: 13, name: 'Losartan 50mg',          sku: 'BTH-2024-013', unit: 'Strip',  cost: 95  },
-  { id: 14, name: 'Glucometer Strips',      sku: 'BTH-2024-014', unit: 'Box',    cost: 320 },
-  { id: 15, name: 'Disposable Gloves (50)', sku: 'BTH-2024-015', unit: 'Box',    cost: 120 },
-];
+type PickerProduct = { id: number; name: string; sku: string; unit: string; cost: number };
 
 const CATEGORIES = ['First Aid', 'Chronic Care', 'Diabetes Care', 'Cardiac Care', 'General Wellness', 'Pain Management', 'Other'];
-
-// ─── Seed Data ─────────────────────────────────────────────────────────────────
-const INITIAL_COMPOSITES: CompositeItem[] = [
-  {
-    id: 1,
-    name: 'Basic First Aid Kit',
-    sku: 'COMP-001',
-    category: 'First Aid',
-    description: 'Essential first aid supplies for minor injuries and emergencies. Ideal for offices and homes.',
-    sellingPrice: 350,
-    status: 'Active',
-    createdAt: '2024-03-01',
-    components: [
-      { productId: 9,  productName: 'Bandage Roll 5cm',     sku: 'BTH-2024-009', quantity: 3, unit: 'Piece', unitCost: 25  },
-      { productId: 10, productName: 'Antiseptic Cream 25g', sku: 'BTH-2024-010', quantity: 1, unit: 'Piece', unitCost: 55  },
-      { productId: 11, productName: 'Cotton Wool 100g',     sku: 'BTH-2024-011', quantity: 1, unit: 'Box',   unitCost: 35  },
-      { productId: 1,  productName: 'Paracetamol 500mg',    sku: 'BTH-2024-001', quantity: 1, unit: 'Strip', unitCost: 40  },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Diabetes Care Bundle',
-    sku: 'COMP-002',
-    category: 'Diabetes Care',
-    description: 'Comprehensive diabetes management kit including medication and monitoring supplies.',
-    sellingPrice: 850,
-    status: 'Active',
-    createdAt: '2024-03-05',
-    components: [
-      { productId: 5,  productName: 'Metformin 500mg',      sku: 'BTH-2024-005', quantity: 2, unit: 'Strip', unitCost: 78  },
-      { productId: 14, productName: 'Glucometer Strips',    sku: 'BTH-2024-014', quantity: 1, unit: 'Box',   unitCost: 320 },
-      { productId: 15, productName: 'Disposable Gloves (50)',sku: 'BTH-2024-015', quantity: 1, unit: 'Box',  unitCost: 120 },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Pain Relief Pack',
-    sku: 'COMP-003',
-    category: 'Pain Management',
-    description: 'Combined pain relief medication pack for acute and mild chronic pain.',
-    sellingPrice: 220,
-    status: 'Active',
-    createdAt: '2024-03-10',
-    components: [
-      { productId: 1, productName: 'Paracetamol 500mg', sku: 'BTH-2024-001', quantity: 2, unit: 'Strip', unitCost: 40 },
-      { productId: 3, productName: 'Ibuprofen 400mg',   sku: 'BTH-2024-003', quantity: 1, unit: 'Strip', unitCost: 58 },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Cardiac Wellness Kit',
-    sku: 'COMP-004',
-    category: 'Cardiac Care',
-    description: 'Essential medications for cardiac patients to manage cholesterol, blood pressure, and clotting.',
-    sellingPrice: 680,
-    status: 'Active',
-    createdAt: '2024-03-12',
-    components: [
-      { productId: 6,  productName: 'Atorvastatin 20mg', sku: 'BTH-2024-006', quantity: 1, unit: 'Strip', unitCost: 130 },
-      { productId: 13, productName: 'Losartan 50mg',     sku: 'BTH-2024-013', quantity: 1, unit: 'Strip', unitCost: 95  },
-      { productId: 12, productName: 'Aspirin 75mg',      sku: 'BTH-2024-012', quantity: 2, unit: 'Strip', unitCost: 22  },
-    ],
-  },
-  {
-    id: 5,
-    name: 'Allergy & Immunity Combo',
-    sku: 'COMP-005',
-    category: 'General Wellness',
-    description: 'Supplements and antihistamines for seasonal allergy management and immune support.',
-    sellingPrice: 195,
-    status: 'Draft',
-    createdAt: '2024-03-15',
-    components: [
-      { productId: 4, productName: 'Cetirizine 10mg',  sku: 'BTH-2024-004', quantity: 2, unit: 'Piece', unitCost: 30 },
-      { productId: 8, productName: 'Vitamin D3 60K',   sku: 'BTH-2024-008', quantity: 1, unit: 'Box',   unitCost: 48 },
-    ],
-  },
-  {
-    id: 6,
-    name: 'Gastric Relief Bundle',
-    sku: 'COMP-006',
-    category: 'General Wellness',
-    description: 'Combination therapy for acid reflux and gastric discomfort.',
-    sellingPrice: 310,
-    status: 'Inactive',
-    createdAt: '2024-02-28',
-    components: [
-      { productId: 7, productName: 'Omeprazole 20mg',   sku: 'BTH-2024-007', quantity: 2, unit: 'Strip', unitCost: 88 },
-      { productId: 1, productName: 'Paracetamol 500mg', sku: 'BTH-2024-001', quantity: 1, unit: 'Strip', unitCost: 40 },
-    ],
-  },
-];
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 const calcCOGS = (components: ComponentItem[]) =>
@@ -166,13 +44,17 @@ const emptyForm = (): FormState => ({
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 export const CompositeItems: React.FC = () => {
-  const [items, setItems]             = useState<CompositeItem[]>(INITIAL_COMPOSITES);
-  const [search, setSearch]           = useState('');
-  const [catFilter, setCatFilter]     = useState('All Categories');
+  const [items, setItems]               = useState<CompositeItem[]>([]);
+  const [availableProducts, setAvailableProducts] = useState<PickerProduct[]>([]);
+  const [loading, setLoading]           = useState(true);
+  const [search, setSearch]             = useState('');
+  const [catFilter, setCatFilter]       = useState('All Categories');
   const [statusFilter, setStatusFilter] = useState('All Status');
-  const [sortField, setSortField]     = useState<'name' | 'sku' | 'sellingPrice' | 'status'>('name');
-  const [sortDir, setSortDir]         = useState<'asc' | 'desc'>('asc');
-  const [toast, setToast]             = useState('');
+  const [sortField, setSortField]       = useState<'name' | 'sku' | 'sellingPrice' | 'status'>('name');
+  const [sortDir, setSortDir]           = useState<'asc' | 'desc'>('asc');
+  const [toast, setToast]               = useState('');
+  const [toastType, setToastType]        = useState<'success' | 'error'>('success');
+  const [saving, setSaving]              = useState(false);
 
   // Modals
   const [showForm, setShowForm]           = useState(false);
@@ -186,7 +68,38 @@ export const CompositeItems: React.FC = () => {
   const [components, setComponents]   = useState<ComponentItem[]>([]);
   const [compSearch, setCompSearch]   = useState('');
 
-  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const [composites, products] = await Promise.all([
+          getCompositeItems(),
+          getProducts(0, 500),
+        ]);
+        setItems(composites);
+        setAvailableProducts(
+          products.map(p => ({
+            id: p.id,
+            name: p.name,
+            sku: p.sku ?? p.batchNumber ?? '',
+            unit: p.unit ?? 'Piece',
+            cost: p.salePrice ?? p.sale_price ?? 0,
+          }))
+        );
+      } catch (err) {
+        console.error('Failed to load composite items:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToast(msg);
+    setToastType(type);
+    setTimeout(() => setToast(''), 3500);
+  };
 
   // ── Sort & Filter ───────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
@@ -240,38 +153,73 @@ export const CompositeItems: React.FC = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSave = () => {
-    if (!validateForm()) return;
+  const handleSave = async () => {
+    if (!validateForm() || saving) return;
+    const payload = { ...form, sellingPrice: Number(form.sellingPrice), components };
+    setSaving(true);
     if (editing) {
-      setItems(prev => prev.map(it => it.id === editing.id
-        ? { ...it, ...form, sellingPrice: Number(form.sellingPrice), components }
+      // Optimistic update
+      const prev = items;
+      setItems(old => old.map(it => it.id === editing.id
+        ? { ...it, ...payload } as CompositeItem
         : it
       ));
-      showToast('Composite item updated!');
+      setShowForm(false);
+      try {
+        const updated = await updateCompositeItem(editing.id, payload);
+        setItems(old => old.map(it => it.id === editing.id ? updated : it));
+        showToast('Composite item updated!');
+      } catch (err) {
+        console.error('Update failed:', err);
+        setItems(prev);
+        setShowForm(true);
+        showToast('Update failed. Please try again.', 'error');
+      }
     } else {
-      const newId = Math.max(0, ...items.map(i => i.id)) + 1;
-      setItems(prev => [...prev, {
-        id: newId,
-        ...form,
-        sellingPrice: Number(form.sellingPrice),
-        components,
+      // Optimistic: add a temp item with negative id so it appears immediately
+      const tempId = -(Date.now());
+      const tempItem: CompositeItem = {
+        id: tempId, ...payload,
         createdAt: new Date().toISOString().split('T')[0],
-      }]);
-      showToast('Composite item created!');
+      };
+      setItems(old => [...old, tempItem]);
+      setShowForm(false);
+      try {
+        const created = await createCompositeItem({
+          ...payload,
+          createdAt: new Date().toISOString().split('T')[0],
+        });
+        setItems(old => old.map(it => it.id === tempId ? created : it));
+        showToast('Composite item created!');
+      } catch (err) {
+        console.error('Create failed:', err);
+        setItems(old => old.filter(it => it.id !== tempId));
+        setShowForm(true);
+        showToast('Create failed. Please try again.', 'error');
+      }
     }
-    setShowForm(false);
+    setSaving(false);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteTarget) return;
-    setItems(prev => prev.filter(i => i.id !== deleteTarget.id));
+    const prev = items;
+    // Optimistic remove
+    setItems(old => old.filter(i => i.id !== deleteTarget.id));
     setDeleteTarget(null);
-    showToast('Composite item deleted.');
+    try {
+      await deleteCompositeItem(deleteTarget.id);
+      showToast('Composite item deleted.');
+    } catch (err) {
+      console.error('Delete failed:', err);
+      setItems(prev);
+      showToast('Delete failed. Please try again.', 'error');
+    }
   };
 
   // ── Component management ────────────────────────────────────────────────────
-  const addComponent = (prod: typeof AVAILABLE_PRODUCTS[number]) => {
-    if (components.find(c => c.productId === prod.id)) return; // already added
+  const addComponent = (prod: PickerProduct) => {
+    if (components.find(c => c.productId === prod.id)) return;
     setComponents(prev => [...prev, {
       productId: prod.id, productName: prod.name, sku: prod.sku,
       quantity: 1, unit: prod.unit, unitCost: prod.cost,
@@ -286,9 +234,9 @@ export const CompositeItems: React.FC = () => {
     setComponents(prev => prev.filter(c => c.productId !== productId));
   };
 
-  const filteredProducts = AVAILABLE_PRODUCTS.filter(p =>
-    !compSearch || p.name.toLowerCase().includes(compSearch.toLowerCase()) || p.sku.toLowerCase().includes(compSearch.toLowerCase())
-  ).filter(p => !components.find(c => c.productId === p.id));
+  const filteredProducts = availableProducts
+    .filter(p => !compSearch || p.name.toLowerCase().includes(compSearch.toLowerCase()) || p.sku.toLowerCase().includes(compSearch.toLowerCase()))
+    .filter(p => !components.find(c => c.productId === p.id));
 
   const cogs = calcCOGS(components);
   const margin = form.sellingPrice && Number(form.sellingPrice) > 0
@@ -307,8 +255,14 @@ export const CompositeItems: React.FC = () => {
     <div className="p-4 sm:p-6 space-y-5">
       {/* Toast */}
       {toast && (
-        <div className="fixed top-20 right-4 z-50 flex items-center gap-2 bg-[var(--color-mint)] text-white px-4 py-3 rounded-lg shadow-xl animate-fade-in">
-          <Check className="w-4 h-4" />{toast}
+        <div className={`fixed top-20 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-xl animate-fade-in text-white ${
+          toastType === 'error' ? 'bg-[var(--color-danger)]' : 'bg-[var(--color-mint)]'
+        }`}>
+          {toastType === 'error'
+            ? <AlertTriangle className="w-4 h-4" />
+            : <Check className="w-4 h-4" />
+          }
+          {toast}
         </div>
       )}
 
@@ -422,7 +376,9 @@ export const CompositeItems: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--color-border)]">
-              {filtered.length === 0 ? (
+              {loading ? (
+                <tr><td colSpan={10} className="px-4 py-16 text-center text-sm text-[var(--color-text-muted)]">Loading composite items...</td></tr>
+              ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={10} className="px-4 py-16 text-center">
                     <Layers className="w-12 h-12 text-[var(--color-text-muted)] mx-auto mb-3" />
@@ -789,8 +745,10 @@ export const CompositeItems: React.FC = () => {
               </button>
               <button
                 onClick={handleSave}
-                className="px-5 py-2 bg-[var(--color-mint)] text-white rounded-lg hover:bg-[var(--color-mint-hover)] transition-colors font-medium text-sm"
+                disabled={saving}
+                className="px-5 py-2 bg-[var(--color-mint)] text-white rounded-lg hover:bg-[var(--color-mint-hover)] transition-colors font-medium text-sm disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
               >
+                {saving && <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />}
                 {editing ? 'Save Changes' : 'Create Composite Item'}
               </button>
             </div>

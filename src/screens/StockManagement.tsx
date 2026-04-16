@@ -14,27 +14,11 @@ interface StockMovement {
   user: string;
 }
 
-const initialMovements: StockMovement[] = [
-  { id: 1, date: '2024-03-21', product: 'Paracetamol 500mg', type: 'IN', quantity: 200, before: 450, after: 650, reference: 'PO-1245', user: 'John Doe' },
-  { id: 2, date: '2024-03-21', product: 'Amoxicillin 250mg', type: 'OUT', quantity: 50, before: 139, after: 89, reference: 'SO-2134', user: 'Jane Smith' },
-  { id: 3, date: '2024-03-20', product: 'Ibuprofen 400mg', type: 'ADJUSTMENT', quantity: -20, before: 20, after: 0, reference: 'ADJ-445', user: 'Admin' },
-  { id: 4, date: '2024-03-20', product: 'Cetirizine 10mg', type: 'IN', quantity: 150, before: 470, after: 620, reference: 'PO-1243', user: 'John Doe' },
-  { id: 5, date: '2024-03-19', product: 'Metformin 500mg', type: 'OUT', quantity: 80, before: 390, after: 310, reference: 'SO-2130', user: 'Jane Smith' },
-  { id: 6, date: '2024-03-19', product: 'Vitamin D3 60K', type: 'TRANSFER', quantity: 100, before: 880, after: 780, reference: 'TRF-089', user: 'John Doe' },
-];
+const initialMovements: StockMovement[] = [];
 
-const stockData = [
-  { name: 'In Stock', value: 856, color: 'var(--color-mint)', id: 'in-stock' },
-  { name: 'Low Stock', value: 89, color: 'var(--color-warning)', id: 'low-stock' },
-  { name: 'Out of Stock', value: 23, color: 'var(--color-danger)', id: 'out-of-stock' },
-];
+const stockData: { name: string; value: number; color: string; id: string }[] = [];
 
-const lowStockItems = [
-  { name: 'Amoxicillin 250mg', stock: 89, max: 500 },
-  { name: 'Atorvastatin 20mg', stock: 42, max: 400 },
-  { name: 'Aspirin 75mg', stock: 55, max: 600 },
-  { name: 'Losartan 50mg', stock: 67, max: 500 },
-];
+const lowStockItems: { name: string; stock: number; max: number }[] = [];
 
 const PRODUCTS = ['Paracetamol 500mg', 'Amoxicillin 250mg', 'Ibuprofen 400mg', 'Cetirizine 10mg', 'Metformin 500mg', 'Atorvastatin 20mg', 'Vitamin D3 60K'];
 const TABS = ['All Movements', 'Stock In', 'Stock Out', 'Adjustments', 'Transfers'];

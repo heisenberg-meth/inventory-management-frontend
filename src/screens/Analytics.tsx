@@ -7,65 +7,33 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer
 } from 'recharts';
-import { getDashboardStats, type DashboardKPIs } from '../data/apiService';
+import {
+  getDashboardStats, type DashboardKPIs,
+  getRevenueTrend, getTopProducts, getCategoryStats, getOrderStatusStats, getQuickStats,
+  type RevenueTrendPoint, type TopProduct, type CategoryStat, type OrderStatusStat, type QuickStat,
+} from '../data/apiService';
 
-// ─── Data ──────────────────────────────────────────────────────────────────
+// ─── UI config (not data) ───────────────────────────────────────────────────
+const CATEGORY_COLORS = ['#1db97a', '#38bdf8', '#f59e0b', '#a78bfa', '#6b7280'];
 
-const revenueTrendData = [
-  { month: 'Jan', revenue: 78000 },
-  { month: 'Feb', revenue: 95000 },
-  { month: 'Mar', revenue: 88000 },
-  { month: 'Apr', revenue: 110000 },
-  { month: 'May', revenue: 130000 },
-  { month: 'Jun', revenue: 118000 },
-  { month: 'Jul', revenue: 152000 },
-  { month: 'Aug', revenue: 173000 },
-];
-
-const topProducts = [
-  { name: 'Paracetamol 500mg',  value: 48200, max: 48200 },
-  { name: 'Vitamin D3 1000IU',  value: 38900, max: 48200 },
-  { name: 'Amoxicillin 250mg',  value: 31400, max: 48200 },
-  { name: 'Cetirizine 10mg',    value: 24100, max: 48200 },
-  { name: 'Metformin 500mg',    value: 19800, max: 48200 },
-  { name: 'Insulin Glargine',   value: 14200, max: 48200 },
-];
-
-const categoryData = [
-  { name: 'Analgesics',    pct: 35, color: '#1db97a' },
-  { name: 'Antibiotics',   pct: 25, color: '#38bdf8' },
-  { name: 'Antidiabetics', pct: 20, color: '#f59e0b' },
-  { name: 'Vitamins',      pct: 12, color: '#a78bfa' },
-  { name: 'Others',        pct:  8, color: '#6b7280' },
-];
-
-const orderStatuses = [
-  { label: 'Completed', color: '#1db97a', badge: 'bg-[#1db97a]/20 text-[#1db97a]', count: 260, pct: 91 },
-  { label: 'Pending',   color: '#f59e0b', badge: 'bg-[#f59e0b]/20 text-[#f59e0b]', count:  18, pct: 6  },
-  { label: 'Overdue',   color: '#ef4444', badge: 'bg-[#ef4444]/20 text-[#ef4444]', count:   6, pct: 2  },
-  { label: 'Draft',     color: '#6b7280', badge: 'bg-gray-500/20 text-gray-400',   count:   0, pct: 0  },
-];
-
-const quickStats = [
-  { label: 'Avg Order Value',     value: '₹1,706',  highlight: false },
-  { label: 'Best Selling Day',    value: 'Saturday', highlight: false },
-  { label: 'Return Rate',         value: '2.1%',     highlight: true  },
-  { label: 'Stock Turnover',      value: '4.2x',     highlight: true  },
-  { label: 'Gross Margin',        value: '34.8%',    highlight: true  },
-  { label: 'Customer Lifetime',   value: '₹12,400',  highlight: false },
-];
+const STATUS_BADGE: Record<string, { color: string; badge: string }> = {
+  Completed: { color: '#1db97a', badge: 'bg-[#1db97a]/20 text-[#1db97a]' },
+  Pending:   { color: '#f59e0b', badge: 'bg-[#f59e0b]/20 text-[#f59e0b]' },
+  Overdue:   { color: '#ef4444', badge: 'bg-[#ef4444]/20 text-[#ef4444]' },
+  Draft:     { color: '#6b7280', badge: 'bg-gray-500/20 text-gray-400'   },
+};
 
 const DATE_PILLS = ['7 Days', '30 Days', '3 Months', '6 Months', '1 Year', 'Custom'];
 
 // ─── Donut chart (pure SVG) ─────────────────────────────────────────────
-const DonutChart: React.FC = () => {
+const DonutChart: React.FC<{ categories: (CategoryStat & { color: string })[] }> = ({ categories }) => {
   const r = 46;
   const cx = 60;
   const cy = 60;
   const circumference = 2 * Math.PI * r;
 
-  const segments = categoryData.map((d, i) => {
-    const start = categoryData.slice(0, i).reduce((sum, item) => sum + item.pct, 0);
+  const segments = categories.map((d, i) => {
+    const start = categories.slice(0, i).reduce((sum, item) => sum + item.pct, 0);
     return { ...d, start };
   });
 
@@ -120,19 +88,34 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
 export const Analytics: React.FC = () => {
   const [activePill, setActivePill] = useState('30 Days');
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<DashboardKPIs | null>(null);
+  const [stats, setStats]               = useState<DashboardKPIs | null>(null);
+  const [revenueTrend, setRevenueTrend] = useState<RevenueTrendPoint[]>([]);
+  const [topProducts, setTopProducts]   = useState<TopProduct[]>([]);
+  const [categories, setCategories]     = useState<(CategoryStat & { color: string })[]>([]);
+  const [orderStatuses, setOrderStatuses] = useState<OrderStatusStat[]>([]);
+  const [quickStats, setQuickStats]     = useState<QuickStat[]>([]);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
+  useEffect(() => { fetchAll(); }, []);
 
-  const fetchStats = async () => {
+  const fetchAll = async () => {
     setLoading(true);
     try {
-      const data = await getDashboardStats();
-      setStats(data);
+      const [kpis, trend, products, cats, orders, quick] = await Promise.all([
+        getDashboardStats(),
+        getRevenueTrend(),
+        getTopProducts(),
+        getCategoryStats(),
+        getOrderStatusStats(),
+        getQuickStats(),
+      ]);
+      setStats(kpis);
+      setRevenueTrend(trend);
+      setTopProducts(products);
+      setCategories(cats.map((c, i) => ({ ...c, color: CATEGORY_COLORS[i % CATEGORY_COLORS.length] })));
+      setOrderStatuses(orders);
+      setQuickStats(quick);
     } catch (err) {
-      console.error('Failed to fetch analytics stats:', err);
+      console.error('Failed to fetch analytics data:', err);
     } finally {
       setLoading(false);
     }
@@ -318,7 +301,7 @@ export const Analytics: React.FC = () => {
             </select>
           </div>
           <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={revenueTrendData} margin={{ top: 6, right: 6, bottom: 0, left: -10 }}>
+            <AreaChart data={revenueTrend} margin={{ top: 6, right: 6, bottom: 0, left: -10 }}>
               <defs>
                 <linearGradient id="mintGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#1db97a" stopOpacity={0.3} />
@@ -363,33 +346,37 @@ export const Analytics: React.FC = () => {
             Top Products by Revenue
           </h2>
           <div className="space-y-4">
-            {topProducts.map((p, i) => (
-              <div key={i}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[13px] text-[var(--color-text-primary)] truncate pr-2">
-                    {p.name}
-                  </span>
-                  <span
-                    className="text-[13px] font-semibold flex-shrink-0"
-                    style={{ color: 'var(--color-mint)' }}
-                  >
-                    ₹{p.value.toLocaleString('en-IN')}
-                  </span>
-                </div>
-                <div
-                  className="w-full rounded-full overflow-hidden"
-                  style={{ height: '8px', background: 'var(--color-surface-secondary)' }}
-                >
-                  <div
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{
-                      width: `${(p.value / p.max) * 100}%`,
-                      background: 'var(--color-mint)',
-                    }}
-                  />
-                </div>
+            {topProducts.length === 0 ? (
+              <div className="py-6 text-center text-sm text-[var(--color-text-muted)]">
+                {loading ? 'Loading…' : 'No data available'}
               </div>
-            ))}
+            ) : (() => {
+              const max = Math.max(...topProducts.map(p => p.value), 1);
+              return topProducts.map((p, i) => (
+                <div key={i}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[13px] text-[var(--color-text-primary)] truncate pr-2">
+                      {p.name}
+                    </span>
+                    <span
+                      className="text-[13px] font-semibold flex-shrink-0"
+                      style={{ color: 'var(--color-mint)' }}
+                    >
+                      ₹{p.value.toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                  <div
+                    className="w-full rounded-full overflow-hidden"
+                    style={{ height: '8px', background: 'var(--color-surface-secondary)' }}
+                  >
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{ width: `${(p.value / max) * 100}%`, background: 'var(--color-mint)' }}
+                    />
+                  </div>
+                </div>
+              ));
+            })()}
           </div>
         </div>
       </div>
@@ -406,10 +393,14 @@ export const Analytics: React.FC = () => {
             Sales by Category
           </h2>
           <div className="flex justify-center mb-4">
-            <DonutChart />
+            <DonutChart categories={categories} />
           </div>
           <div className="space-y-2">
-            {categoryData.map((c, i) => (
+            {categories.length === 0 ? (
+              <div className="py-4 text-center text-xs text-[var(--color-text-muted)]">
+                {loading ? 'Loading…' : 'No data'}
+              </div>
+            ) : categories.map((c, i) => (
               <div key={i} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span
@@ -435,32 +426,28 @@ export const Analytics: React.FC = () => {
             Order Status
           </h2>
           <div className="space-y-4">
-            {orderStatuses.map((s, i) => (
-              <div key={i}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span
-                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${s.badge}`}
-                  >
-                    {s.label}
-                  </span>
-                  <span
-                    className="text-lg font-bold text-[var(--color-text-primary)]"
-                    style={{ lineHeight: 1 }}
-                  >
-                    {s.count}
-                  </span>
-                </div>
-                <div
-                  className="w-full rounded-full overflow-hidden"
-                  style={{ height: '6px', background: 'var(--color-surface-secondary)' }}
-                >
-                  <div
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{ width: `${s.pct}%`, background: s.color }}
-                  />
-                </div>
+            {orderStatuses.length === 0 ? (
+              <div className="py-6 text-center text-sm text-[var(--color-text-muted)]">
+                {loading ? 'Loading…' : 'No data available'}
               </div>
-            ))}
+            ) : orderStatuses.map((s, i) => {
+              const style = STATUS_BADGE[s.label] ?? { color: '#6b7280', badge: 'bg-gray-500/20 text-gray-400' };
+              return (
+                <div key={i}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${style.badge}`}>
+                      {s.label}
+                    </span>
+                    <span className="text-lg font-bold text-[var(--color-text-primary)]" style={{ lineHeight: 1 }}>
+                      {s.count}
+                    </span>
+                  </div>
+                  <div className="w-full rounded-full overflow-hidden" style={{ height: '6px', background: 'var(--color-surface-secondary)' }}>
+                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${s.pct}%`, background: style.color }} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -473,11 +460,12 @@ export const Analytics: React.FC = () => {
             Quick Stats
           </h2>
           <div className="divide-y divide-[var(--color-border)]">
-            {quickStats.map((s, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between py-2.5"
-              >
+            {quickStats.length === 0 ? (
+              <div className="py-6 text-center text-sm text-[var(--color-text-muted)]">
+                {loading ? 'Loading…' : 'No data available'}
+              </div>
+            ) : quickStats.map((s, i) => (
+              <div key={i} className="flex items-center justify-between py-2.5">
                 <span className="text-xs text-[var(--color-text-secondary)]">{s.label}</span>
                 <span
                   className="text-xs font-semibold"

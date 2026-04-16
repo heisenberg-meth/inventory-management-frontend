@@ -364,3 +364,98 @@ export const getPlatformStats = async (): Promise<PlatformStats> => {
 export const getTenants = () => api.get<Tenant[]>('/platform/tenants');
 export const createTenant = (data: unknown) => api.post<Tenant>('/platform/tenants', data);
 export const getAuditLogs = () => api.get<AuditLog[]>('/platform/audit/logs');
+
+export interface BillItem {
+  id: string;
+  supplier: string;
+  po?: string;
+  billDate: string;
+  dueDate: string;
+  amount: number;
+  status: 'Draft' | 'Unpaid' | 'Partial' | 'Paid' | 'Overdue';
+}
+
+export const getBills = () => api.get<BillItem[]>('/tenant/bills');
+
+export interface CompositeComponent {
+  productId: number;
+  productName: string;
+  sku: string;
+  quantity: number;
+  unit: string;
+  unitCost: number;
+}
+
+export interface CompositeItemData {
+  id: number;
+  name: string;
+  sku: string;
+  category: string;
+  description: string;
+  sellingPrice: number;
+  components: CompositeComponent[];
+  status: 'Active' | 'Inactive' | 'Draft';
+  createdAt: string;
+}
+
+export const getCompositeItems  = () => api.get<CompositeItemData[]>('/tenant/composite-items');
+export const createCompositeItem = (data: unknown) => api.post<CompositeItemData>('/tenant/composite-items', data);
+export const updateCompositeItem = (id: number, data: unknown) => api.put<CompositeItemData>(`/tenant/composite-items/${id}`, data);
+export const deleteCompositeItem = (id: number) => api.delete(`/tenant/composite-items/${id}`);
+
+// AI Dashboard
+export interface AIRecommendation {
+  id: number | string;
+  tag: string;
+  title: string;
+  desc: string;
+  time: string;
+  urgency: 'critical' | 'warning' | 'medium' | 'info';
+}
+
+export interface AIDemandForecast {
+  product: string;
+  change: string;
+  status: 'Surge' | 'Growing' | 'Stable' | 'Decline';
+}
+
+export interface AIAnomaly {
+  title: string;
+  desc: string;
+  time: string;
+  status: 'Pending' | 'Resolved';
+  severity: 'danger' | 'warning' | 'info';
+}
+
+export interface AIHealthData {
+  score: number;
+  metrics: { label: string; pct: number }[];
+  realtimeCount: number;
+  predictiveCount: number;
+  errorCount: number;
+  pricingCount: number;
+  predictedRestocks: number;
+  demandSurgeItems: number;
+  accuracyScore: string;
+  anomaliesDetected: number;
+  autoResolved: number;
+  pendingReview: number;
+}
+
+export const getAIHealth          = () => api.get<AIHealthData>('/tenant/ai/health');
+export const getAIRecommendations = () => api.get<AIRecommendation[]>('/tenant/ai/recommendations');
+export const getAIDemandForecast  = () => api.get<AIDemandForecast[]>('/tenant/ai/demand-forecast');
+export const getAIAnomalies       = () => api.get<AIAnomaly[]>('/tenant/ai/anomalies');
+
+// ── Analytics ───────────────────────────────────────────────────────────────
+export interface RevenueTrendPoint { month: string; revenue: number }
+export interface TopProduct        { name: string; value: number }
+export interface CategoryStat      { name: string; pct: number }
+export interface OrderStatusStat   { label: string; count: number; pct: number }
+export interface QuickStat         { label: string; value: string; highlight: boolean }
+
+export const getRevenueTrend    = () => api.get<RevenueTrendPoint[]>('/tenant/analytics/revenue-trend');
+export const getTopProducts     = () => api.get<TopProduct[]>('/tenant/analytics/top-products');
+export const getCategoryStats   = () => api.get<CategoryStat[]>('/tenant/analytics/categories');
+export const getOrderStatusStats= () => api.get<OrderStatusStat[]>('/tenant/analytics/order-statuses');
+export const getQuickStats      = () => api.get<QuickStat[]>('/tenant/analytics/quick-stats');

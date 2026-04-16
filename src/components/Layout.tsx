@@ -9,6 +9,13 @@ import {
 import { Suspense } from 'react';
 import { PageLoader } from './PageLoader';
 import { useAuth } from '../context/AuthContext';
+import { getProducts, getSalesOrders } from '../data/apiService';
+
+interface AppNotification {
+  id: string;
+  text: string;
+  type: 'warning' | 'info' | 'danger';
+}
 
 interface NavItem {
   icon?: React.ElementType; // Optional icon for sub-items
@@ -38,7 +45,52 @@ export const Layout: React.FC = () => {
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      const notifs: AppNotification[] = [];
+      try {
+        const allProducts = await getProducts(0, 500);
+        const now = new Date();
+        const in30 = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+        // Products expiring within 30 days
+        const expiring = allProducts.filter(p => {
+          const exp = p.expiry || p.expiry_date || '';
+          if (!exp) return false;
+          const d = new Date(exp);
+          return d >= now && d <= in30;
+        });
+        if (expiring.length > 0) {
+          notifs.push({
+            id: 'expiry',
+            text: `${expiring.length} product${expiring.length > 1 ? 's' : ''} expiring within 30 days`,
+            type: 'warning',
+          });
+        }
+
+        // Low stock / out of stock items
+        const lowStock = allProducts.filter(
+          p => p.status === 'Low Stock' || p.status === 'Out of Stock'
+        );
+        lowStock.slice(0, 5).forEach(p => {
+          notifs.push({ id: `low-${p.id}`, text: `Low stock: ${p.name}`, type: 'danger' });
+        });
+
+        // Recent orders
+        const orders = await getSalesOrders();
+        orders.slice(0, 3).forEach(o => {
+          notifs.push({ id: `order-${o.id}`, text: `New order ${o.id} received`, type: 'info' });
+        });
+      } catch (err) {
+        console.error('Failed to fetch notifications:', err);
+      }
+      setNotifications(notifs);
+    };
+    fetchNotifications();
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -162,12 +214,6 @@ export const Layout: React.FC = () => {
   const toggleSection = (title: string) => {
     setExpandedSection(expandedSection === title ? null : title);
   };
-
-  const notifications = [
-    { id: 1, text: '7 products expiring within 30 days', time: '5m ago', type: 'warning' },
-    { id: 2, text: 'New order ORD-1285 received', time: '12m ago', type: 'info' },
-    { id: 3, text: 'Low stock: Amoxicillin 250mg', time: '25m ago', type: 'danger' },
-  ];
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[var(--color-primary-bg)]">
@@ -371,7 +417,11 @@ export const Layout: React.FC = () => {
                 className="relative p-2 rounded-lg hover:bg-[var(--color-surface-secondary)] transition-colors"
               >
                 <Bell className="w-5 h-5 text-[var(--color-text-secondary)]" />
-                <div className="absolute top-1 right-1 w-2 h-2 bg-[var(--color-danger)] rounded-full" />
+                {notifications.length > 0 && (
+                  <div className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-[var(--color-danger)] rounded-full flex items-center justify-center">
+                    <span className="text-white text-[9px] font-bold px-0.5">{notifications.length}</span>
+                  </div>
+                )}
               </button>
 
               {/* Notifications Dropdown */}
@@ -381,37 +431,39 @@ export const Layout: React.FC = () => {
                     <span className="font-semibold text-[var(--color-text-primary)]">
                       Notifications
                     </span>
-                    <span className="text-xs text-[var(--color-mint)] cursor-pointer hover:underline">
+                    <button
+                      onClick={() => setNotifications([])}
+                      className="text-xs text-[var(--color-mint)] hover:underline"
+                    >
                       Mark all read
-                    </span>
+                    </button>
                   </div>
-                  <div className="divide-y divide-[var(--color-border)]">
-                    {notifications.map((n) => (
-                      <div
-                        key={n.id}
-                        className="p-4 hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div
-                            className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                              n.type === "warning"
-                                ? "bg-[var(--color-warning)]"
-                                : n.type === "danger"
-                                  ? "bg-[var(--color-danger)]"
-                                  : "bg-[var(--color-info)]"
-                            }`}
-                          />
-                          <div>
-                            <p className="text-sm text-[var(--color-text-primary)]">
-                              {n.text}
-                            </p>
-                            <p className="text-xs text-[var(--color-text-muted)] mt-1">
-                              {n.time}
-                            </p>
+                  <div className="divide-y divide-[var(--color-border)] max-h-72 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-6 text-center text-sm text-[var(--color-text-muted)]">
+                        No new notifications
+                      </div>
+                    ) : (
+                      notifications.map((n) => (
+                        <div
+                          key={n.id}
+                          className="p-4 hover:bg-[var(--color-surface-secondary)] transition-colors cursor-pointer"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div
+                              className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
+                                n.type === 'warning'
+                                  ? 'bg-[var(--color-warning)]'
+                                  : n.type === 'danger'
+                                    ? 'bg-[var(--color-danger)]'
+                                    : 'bg-[var(--color-info)]'
+                              }`}
+                            />
+                            <p className="text-sm text-[var(--color-text-primary)]">{n.text}</p>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                   <div className="p-3 text-center">
                     <button

@@ -1,21 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Eye, Printer, X, Search, ChevronDown, Download, Edit2, ArrowRight } from 'lucide-react';
+import { getBills, type BillItem } from '../data/apiService';
 
-const MOCK_BILLS = [
-  { id: 'BILL-001', supplier: 'MedSupply Co.', po: 'PO-2024-003', poLink: true, billDate: 'Mar 20, 2026', dueDate: 'Mar 30, 2026', amount: '₹42,000', status: 'Unpaid', statusLabel: '⏳ Unpaid', statusClass: 'bg-[var(--color-warning)] text-white', actions: ['view', 'edit', 'pay'] },
-  { id: 'BILL-002', supplier: 'PharmaDist Ltd.', po: 'PO-2024-002', poLink: false, billDate: 'Mar 15, 2026', dueDate: 'Mar 25, 2026', amount: '₹18,500', status: 'Overdue', statusLabel: '⚠ Overdue', statusClass: 'bg-[var(--color-danger)] text-white', actions: ['view', 'pay_urgent'] },
-  { id: 'BILL-003', supplier: 'GlobalMed Suppliers', po: 'PO-2024-001', poLink: false, billDate: 'Mar 10, 2026', dueDate: 'Apr 10, 2026', amount: '₹85,000', status: 'Paid', statusLabel: '✓ Paid', statusClass: 'bg-[var(--color-mint)] text-white', actions: ['view', 'print'] },
-  { id: 'BILL-004', supplier: 'ABC Distributors', po: 'PO-2024-004', poLink: false, billDate: 'Mar 8, 2026', dueDate: 'Apr 8, 2026', amount: '₹32,400', status: 'Partial', statusLabel: '◑ Partial', statusClass: 'bg-[var(--color-warning)] text-white', actions: ['view', 'pay_balance'] },
-  { id: 'BILL-005', supplier: 'SunPharma Wholesale', po: 'PO-2024-005', poLink: false, billDate: 'Mar 5, 2026', dueDate: 'Apr 5, 2026', amount: '₹1,24,000', status: 'Paid', statusLabel: '✓ Paid', statusClass: 'bg-[var(--color-mint)] text-white', actions: ['view', 'print'] },
-  { id: 'BILL-006', supplier: 'MedSupply Co.', po: '—', poLink: false, billDate: 'Mar 1, 2026', dueDate: 'Mar 20, 2026', amount: '₹22,000', status: 'Overdue', statusLabel: '⚠ Overdue', statusClass: 'bg-[var(--color-danger)] text-white', actions: ['view', 'pay'] },
-  { id: 'BILL-007', supplier: 'HealthFirst Dist.', po: 'PO-2024-006', poLink: false, billDate: 'Feb 28, 2026', dueDate: 'Mar 28, 2026', amount: '₹58,600', status: 'Draft', statusLabel: '📝 Draft', statusClass: 'bg-[var(--color-surface-secondary)] text-[var(--color-text-muted)] border border-[var(--color-border)]', actions: ['view', 'edit', 'confirm'] },
-];
+const STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
+  Draft:   { label: '📝 Draft',   cls: 'bg-[var(--color-surface-secondary)] text-[var(--color-text-muted)] border border-[var(--color-border)]' },
+  Unpaid:  { label: '⏳ Unpaid',  cls: 'bg-[var(--color-warning)] text-white' },
+  Partial: { label: '◑ Partial',  cls: 'bg-[var(--color-warning)] text-white' },
+  Paid:    { label: '✓ Paid',     cls: 'bg-[var(--color-mint)] text-white' },
+  Overdue: { label: '⚠ Overdue', cls: 'bg-[var(--color-danger)] text-white' },
+};
+
+const ACTIONS_FOR_STATUS: Record<string, string[]> = {
+  Draft:   ['view', 'edit', 'confirm'],
+  Unpaid:  ['view', 'edit', 'pay'],
+  Overdue: ['view', 'pay_urgent'],
+  Paid:    ['view', 'print'],
+  Partial: ['view', 'pay_balance'],
+};
+
+const fmt = (n: number) => `₹${n.toLocaleString('en-IN')}`;
 
 export const Bills: React.FC = () => {
+  const [bills, setBills] = useState<BillItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('All Bills');
+  const [search, setSearch] = useState('');
   const [isNewBillModalOpen, setIsNewBillModalOpen] = useState(false);
 
-  const tabs = ["All Bills", "Draft", "Unpaid", "Partial", "Paid", "Overdue"];
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        setBills(await getBills());
+      } catch (err) {
+        console.error('Failed to fetch bills:', err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const filtered = bills.filter(b => {
+    const matchTab = activeTab === 'All Bills' || b.status === activeTab;
+    const q = search.toLowerCase();
+    const matchSearch = !q || b.supplier.toLowerCase().includes(q) || b.id.toLowerCase().includes(q);
+    return matchTab && matchSearch;
+  });
+
+  const total      = bills.length;
+  const paidAmt    = bills.filter(b => b.status === 'Paid').reduce((s, b) => s + b.amount, 0);
+  const unpaidAmt  = bills.filter(b => b.status === 'Unpaid' || b.status === 'Partial').reduce((s, b) => s + b.amount, 0);
+  const overdueAmt = bills.filter(b => b.status === 'Overdue').reduce((s, b) => s + b.amount, 0);
+
+  const tabs = ['All Bills', 'Draft', 'Unpaid', 'Partial', 'Paid', 'Overdue'];
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
@@ -45,10 +82,10 @@ export const Bills: React.FC = () => {
       {/* METRIC CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { icon: '💰', title: 'Total Bills', value: '₹4,82,500', trend: 'This month', color: 'text-[var(--color-text-muted)]' },
-          { icon: '✅', title: 'Paid', value: '₹2,40,000', trend: '12 bills settled', color: 'text-[var(--color-mint)]' },
-          { icon: '⏳', title: 'Unpaid', value: '₹1,82,500', trend: '8 bills pending', color: 'text-[var(--color-warning)]' },
-          { icon: '⚠', title: 'Overdue', value: '₹60,000', trend: '3 bills past due', color: 'text-[var(--color-danger)]' },
+          { icon: '💰', title: 'Total Bills',  value: total,                                                                         sub: 'This month',    color: 'text-[var(--color-text-muted)]'  },
+          { icon: '✅', title: 'Paid',          value: bills.filter(b => b.status === 'Paid').length,                                  sub: fmt(paidAmt),    color: 'text-[var(--color-mint)]'        },
+          { icon: '⏳', title: 'Unpaid',        value: bills.filter(b => b.status === 'Unpaid' || b.status === 'Partial').length,      sub: fmt(unpaidAmt),  color: 'text-[var(--color-warning)]'     },
+          { icon: '⚠',  title: 'Overdue',       value: bills.filter(b => b.status === 'Overdue').length,                              sub: fmt(overdueAmt), color: 'text-[var(--color-danger)]'      },
         ].map((metric, i) => (
           <div key={i} className="bg-[var(--color-card-bg)] border border-[var(--color-border)] rounded-xl p-5 flex flex-col gap-3">
             <div className="flex items-center gap-3">
@@ -56,7 +93,7 @@ export const Bills: React.FC = () => {
               <div className="text-sm font-medium text-[var(--color-text-secondary)]">{metric.title}</div>
             </div>
             <div className="text-2xl font-bold text-[var(--color-text-primary)]">{metric.value}</div>
-            <div className={`text-xs font-medium ${metric.color === 'text-[var(--color-text-muted)]' ? 'text-[var(--color-text-muted)] font-normal' : metric.color}`}>{metric.trend}</div>
+            <div className={`text-xs font-medium ${i === 0 ? 'text-[var(--color-text-muted)] font-normal' : metric.color}`}>{metric.sub}</div>
           </div>
         ))}
       </div>
@@ -82,12 +119,14 @@ export const Bills: React.FC = () => {
       <div className="bg-[var(--color-card-bg)] border border-[var(--color-border)] rounded-xl flex flex-col">
         {/* Table Header Area */}
         <div className="p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[var(--color-border)]">
-          <h2 className="text-base font-semibold text-[var(--color-text-primary)]">23 Bills</h2>
+          <h2 className="text-base font-semibold text-[var(--color-text-primary)]">{filtered.length} Bills</h2>
           <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] w-4 h-4" />
-            <input 
-              type="text" 
-              placeholder="Search supplier..." 
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search supplier..."
               className="w-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-lg pl-9 pr-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-mint)]/50 focus:border-[var(--color-mint)]"
             />
           </div>
@@ -106,83 +145,85 @@ export const Bills: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--color-border)]">
-              {MOCK_BILLS.map((bill, i) => (
-                <tr key={i} className="hover:bg-[var(--color-surface-secondary)] transition-colors group">
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <span className="text-sm font-medium text-[var(--color-mint)]">{bill.id}</span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <span className="text-sm text-[var(--color-text-primary)]">{bill.supplier}</span>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    {bill.po !== '—' ? (
-                      <span className={`text-sm ${bill.poLink ? 'text-[var(--color-mint)] hover:underline cursor-pointer' : 'text-[var(--color-text-secondary)]'}`}>
-                        {bill.po}
+              {loading ? (
+                <tr><td colSpan={8} className="px-4 py-12 text-center text-sm text-[var(--color-text-muted)]">Loading bills...</td></tr>
+              ) : filtered.length === 0 ? (
+                <tr><td colSpan={8} className="px-4 py-12 text-center text-sm text-[var(--color-text-muted)]">No bills found</td></tr>
+              ) : filtered.map((bill) => {
+                const { label: statusLabel, cls: statusClass } = STATUS_CONFIG[bill.status] ?? { label: bill.status, cls: '' };
+                const actions = ACTIONS_FOR_STATUS[bill.status] ?? ['view'];
+                return (
+                  <tr key={bill.id} className="hover:bg-[var(--color-surface-secondary)] transition-colors group">
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span className="text-sm font-medium text-[var(--color-mint)]">{bill.id}</span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <span className="text-sm text-[var(--color-text-primary)]">{bill.supplier}</span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      {bill.po ? (
+                        <span className="text-sm text-[var(--color-mint)] hover:underline cursor-pointer">{bill.po}</span>
+                      ) : (
+                        <span className="text-sm text-[var(--color-text-muted)]">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span className="text-sm text-[var(--color-text-secondary)]">{bill.billDate}</span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span className="text-sm text-[var(--color-text-secondary)]">{bill.dueDate}</span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span className="text-sm font-semibold text-[var(--color-text-primary)]">{fmt(bill.amount)}</span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-md ${statusClass}`}>
+                        {statusLabel}
                       </span>
-                    ) : (
-                      <span className="text-sm text-[var(--color-text-muted)]">—</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <span className="text-sm text-[var(--color-text-secondary)]">{bill.billDate}</span>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <span className="text-sm text-[var(--color-text-secondary)]">{bill.dueDate}</span>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <span className="text-sm font-semibold text-[var(--color-text-primary)]">{bill.amount}</span>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-md ${bill.statusClass}`}>
-                      {bill.statusLabel}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-right">
-                    <div className="flex items-center justify-start gap-2">
-                       <button className="p-1.5 rounded-md hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors" title="View">
-                         <Eye className="w-4 h-4" />
-                       </button>
-                       {bill.actions.includes('edit') && (
-                         <button className="p-1.5 rounded-md hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors" title="Edit">
-                           <Edit2 className="w-4 h-4" />
-                         </button>
-                       )}
-                       {bill.actions.includes('print') && (
-                         <button className="p-1.5 rounded-md hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors" title="Print">
-                           <Printer className="w-4 h-4" />
-                         </button>
-                       )}
-                       {bill.actions.includes('pay') && (
-                         <button className="text-sm font-medium text-[var(--color-mint)] hover:underline transition-colors whitespace-nowrap">
-                           Pay Now
-                         </button>
-                       )}
-                       {bill.actions.includes('pay_urgent') && (
-                         <button className="text-sm font-medium text-[var(--color-danger)] hover:underline transition-colors whitespace-nowrap">
-                           Pay Now
-                         </button>
-                       )}
-                       {bill.actions.includes('pay_balance') && (
-                         <button className="flex items-center gap-1 text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--color-mint)] transition-colors whitespace-nowrap">
-                           <Plus className="w-3 h-3" /> Pay Balance
-                         </button>
-                       )}
-                       {bill.actions.includes('confirm') && (
-                         <button className="flex items-center gap-1 text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--color-mint)] transition-colors whitespace-nowrap pl-1">
-                           <ArrowRight className="w-3.5 h-3.5" /> Confirm
-                         </button>
-                       )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex items-center justify-start gap-2">
+                        <button className="p-1.5 rounded-md hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors" title="View">
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        {actions.includes('edit') && (
+                          <button className="p-1.5 rounded-md hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors" title="Edit">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                        )}
+                        {actions.includes('print') && (
+                          <button className="p-1.5 rounded-md hover:bg-[var(--color-surface-secondary)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors" title="Print">
+                            <Printer className="w-4 h-4" />
+                          </button>
+                        )}
+                        {actions.includes('pay') && (
+                          <button className="text-sm font-medium text-[var(--color-mint)] hover:underline transition-colors whitespace-nowrap">Pay Now</button>
+                        )}
+                        {actions.includes('pay_urgent') && (
+                          <button className="text-sm font-medium text-[var(--color-danger)] hover:underline transition-colors whitespace-nowrap">Pay Now</button>
+                        )}
+                        {actions.includes('pay_balance') && (
+                          <button className="flex items-center gap-1 text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--color-mint)] transition-colors whitespace-nowrap">
+                            <Plus className="w-3 h-3" /> Pay Balance
+                          </button>
+                        )}
+                        {actions.includes('confirm') && (
+                          <button className="flex items-center gap-1 text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--color-mint)] transition-colors whitespace-nowrap pl-1">
+                            <ArrowRight className="w-3.5 h-3.5" /> Confirm
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
         
         {/* Pagination */}
         <div className="p-4 border-t border-[var(--color-border)] flex items-center justify-end">
-          <span className="text-sm text-[var(--color-text-muted)]">1-7 of 23</span>
+          <span className="text-sm text-[var(--color-text-muted)]">{filtered.length} of {total}</span>
         </div>
       </div>
 

@@ -18,78 +18,7 @@ interface Shipment {
 
 // ─── Static Data ──────────────────────────────────────────────────────────────
 
-const SHIPMENTS: Shipment[] = [
-  {
-    id: 'shp-1',
-    shipmentId: 'SHP-001',
-    orderId: 'SO-2024-003',
-    customer: 'Stark Industries',
-    courier: 'FedEx',
-    tracking: 'FX-784521-IN',
-    dispatchDate: 'Feb 05, 2026',
-    status: 'Shipped',
-  },
-  {
-    id: 'shp-2',
-    shipmentId: 'SHP-002',
-    orderId: 'SO-2024-002',
-    customer: 'Wayne Enterprises',
-    courier: 'DHL',
-    tracking: 'DH-442891',
-    dispatchDate: 'Feb 03, 2026',
-    status: 'Packed',
-  },
-  {
-    id: 'shp-3',
-    shipmentId: 'SHP-003',
-    orderId: 'SO-2024-001',
-    customer: 'Acme Corp',
-    courier: 'BlueDart',
-    tracking: 'BD-991234',
-    dispatchDate: 'Feb 01, 2026',
-    status: 'Delivered',
-  },
-  {
-    id: 'shp-4',
-    shipmentId: 'SHP-004',
-    orderId: 'SO-2024-005',
-    customer: 'Initech',
-    courier: 'DTDC',
-    tracking: '—',
-    dispatchDate: 'Pending',
-    status: 'Pending',
-  },
-  {
-    id: 'shp-5',
-    shipmentId: 'SHP-005',
-    orderId: 'SO-2024-004',
-    customer: 'Globex Corp',
-    courier: 'FedEx',
-    tracking: 'FX-882341',
-    dispatchDate: 'Feb 08, 2026',
-    status: 'In Transit',
-  },
-  {
-    id: 'shp-6',
-    shipmentId: 'SHP-006',
-    orderId: 'SO-2024-006',
-    customer: 'Umbrella Corp',
-    courier: 'DHL',
-    tracking: 'DH-119283',
-    dispatchDate: 'Feb 10, 2026',
-    status: 'Delivered',
-  },
-  {
-    id: 'shp-7',
-    shipmentId: 'SHP-007',
-    orderId: 'SO-2024-007',
-    customer: 'Cyberdyne Systems',
-    courier: 'BlueDart',
-    tracking: '—',
-    dispatchDate: 'Pending',
-    status: 'Pending',
-  },
-];
+const SHIPMENTS: Shipment[] = [];
 
 const FILTER_TABS = ['All', 'Pending', 'Packed', 'Shipped', 'In Transit', 'Delivered'];
 

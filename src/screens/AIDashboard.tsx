@@ -4,50 +4,11 @@ import {
   Zap, TrendingUp, BarChart3, ChevronRight,
   Info, RefreshCw,
 } from 'lucide-react';
-
-// ─── Ticker data ────────────────────────────────────────────────────────────────
-const TICKER_EVENTS = [
-  { id: 1,  text: 'Stock Update: Paracetamol 500mg', detail: 'SALE: 450 → 448' },
-  { id: 2,  text: 'Alert: Ibuprofen 400mg', detail: 'OUT OF STOCK' },
-  { id: 3,  text: 'New Order: ORD-2024-087', detail: 'City Hospital · ₹48,200' },
-  { id: 4,  text: 'AI Prediction: Amoxicillin', detail: 'Demand +40% next week' },
-  { id: 5,  text: 'Stock Update: Cetirizine 10mg', detail: 'RESTOCK: 620 → 680' },
-  { id: 6,  text: 'Price Optimisation Applied', detail: 'Metformin 500mg · ₹85 → ₹88' },
-  { id: 7,  text: 'Expiry Alert: Atorvastatin 20mg', detail: 'Batch BTH-2024-006 expires May 2024' },
-  { id: 8,  text: 'Transfer Completed', detail: 'Main Warehouse → Branch A Pune' },
-];
-
-// ─── AI Recommendations ─────────────────────────────────────────────────────────
-const RECOMMENDATIONS = [
-  {
-    id: 1, tag: 'Restock',
-    title: 'Restock Metformin 500mg',
-    desc: 'Stock critically low (12% remaining)',
-    time: 'Now',
-    urgency: 'critical',
-  },
-  {
-    id: 2, tag: 'Pricing',
-    title: 'Price Optimisation',
-    desc: 'Cetirizine 10mg underpriced vs market avg',
-    time: '2h ago',
-    urgency: 'medium',
-  },
-  {
-    id: 3, tag: 'Expiry',
-    title: 'Expiry Alert',
-    desc: 'Batch B2241 expires in 18 days',
-    time: '3h ago',
-    urgency: 'warning',
-  },
-  {
-    id: 4, tag: 'Demand',
-    title: 'Demand Spike Predicted',
-    desc: 'Amoxicillin demand up 40% next week',
-    time: '1d ago',
-    urgency: 'info',
-  },
-];
+import {
+  getAIHealth, getAIRecommendations, getAIDemandForecast, getAIAnomalies,
+  getDashboardStats,
+  type AIHealthData, type AIRecommendation, type AIDemandForecast, type AIAnomaly,
+} from '../data/apiService';
 
 // ─── Features ───────────────────────────────────────────────────────────────────
 const FEATURES: { text: string; color: string }[][] = [
@@ -67,13 +28,6 @@ const FEATURES: { text: string; color: string }[][] = [
     { text: 'Error detection',         color: 'var(--color-warning)' },
     { text: 'Dynamic pricing',         color: 'var(--color-mint)' },
   ],
-];
-
-// ─── Health metrics ─────────────────────────────────────────────────────────────
-const HEALTH_METRICS = [
-  { label: 'Stock Coverage',       pct: 82, color: 'var(--color-mint)'    },
-  { label: 'Order Fulfillment',    pct: 91, color: 'var(--color-mint)'    },
-  { label: 'Supplier Reliability', pct: 74, color: 'var(--color-warning)' },
 ];
 
 // ─── SVG Circular Progress ──────────────────────────────────────────────────────
@@ -138,37 +92,69 @@ export const AIDashboard: React.FC = () => {
   const [smartQuery, setSmartQuery] = useState('');
   const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Auto-rotate ticker
-  useEffect(() => {
-    tickerRef.current = setInterval(() => {
-      setTickerIdx(i => (i + 1) % TICKER_EVENTS.length);
-    }, 3200);
-    return () => { if (tickerRef.current) clearInterval(tickerRef.current); };
-  }, []);
+  // API-driven state
+  const [healthData, setHealthData]             = useState<AIHealthData | null>(null);
+  const [recommendations, setRecommendations]   = useState<AIRecommendation[]>([]);
+  const [demandForecast, setDemandForecast]     = useState<AIDemandForecast[]>([]);
+  const [anomalies, setAnomalies]               = useState<AIAnomaly[]>([]);
+  const [tickerEvents, setTickerEvents]         = useState<{ text: string; detail: string }[]>([]);
+  const [loading, setLoading]                   = useState(true);
 
-  const handleRefresh = () => {
+  const fetchAll = async () => {
     setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 1400);
+    setLoading(true);
+    try {
+      const [health, recs, forecast, anom, dashStats] = await Promise.all([
+        getAIHealth(),
+        getAIRecommendations(),
+        getAIDemandForecast(),
+        getAIAnomalies(),
+        getDashboardStats(),
+      ]);
+      setHealthData(health);
+      setRecommendations(recs);
+      setDemandForecast(forecast);
+      setAnomalies(anom);
+      setTickerEvents((dashStats.recentActivity ?? []).map(a => ({ text: a.action, detail: a.detail })));
+    } catch (err) {
+      console.error('Failed to fetch AI dashboard data:', err);
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
   };
 
-  const ticker = TICKER_EVENTS[tickerIdx];
+  useEffect(() => { fetchAll(); }, []);
+
+  // Auto-rotate ticker
+  useEffect(() => {
+    if (tickerEvents.length === 0) return;
+    tickerRef.current = setInterval(() => {
+      setTickerIdx(i => (i + 1) % tickerEvents.length);
+    }, 3200);
+    return () => { if (tickerRef.current) clearInterval(tickerRef.current); };
+  }, [tickerEvents.length]);
+
+  const handleRefresh = () => { fetchAll(); };
+
+  const ticker = tickerEvents[tickerIdx] ?? null;
 
   const METRIC_CARDS = [
     {
       id: 'realtime', icon: Activity, iconColor: 'var(--color-mint)',
-      number: '19', title: 'Real-Time Updates', subtitle: 'Live inventory tracking',
+      number: loading ? '…' : String(healthData?.realtimeCount ?? '—'), title: 'Real-Time Updates', subtitle: 'Live inventory tracking',
     },
     {
       id: 'predictive', icon: Brain, iconColor: 'var(--color-info)',
-      number: '6', title: 'Predictive Analytics', subtitle: 'Demand forecasting',
+      number: loading ? '…' : String(healthData?.predictiveCount ?? '—'), title: 'Predictive Analytics', subtitle: 'Demand forecasting',
     },
     {
       id: 'errors', icon: AlertTriangle, iconColor: 'var(--color-warning)',
-      number: '3', title: 'Error Detection', subtitle: 'Anomaly identification',
+      number: loading ? '…' : String(healthData?.errorCount ?? '—'), title: 'Error Detection', subtitle: 'Anomaly identification',
     },
     {
       id: 'pricing', icon: DollarSign, iconColor: 'var(--color-mint)',
-      number: '12', title: 'Dynamic Pricing', subtitle: 'AI pricing optimisation',
+      number: loading ? '…' : String(healthData?.pricingCount ?? '—'), title: 'Dynamic Pricing', subtitle: 'AI pricing optimisation',
     },
   ];
 
@@ -375,39 +361,42 @@ export const AIDashboard: React.FC = () => {
                   <div className="flex flex-col sm:flex-row items-center gap-6">
                     {/* SVG Ring */}
                     <div className="flex-shrink-0">
-                      <CircularProgress pct={78} />
+                      <CircularProgress pct={healthData?.score ?? 0} />
                     </div>
 
                     {/* Bar metrics */}
                     <div className="flex-1 w-full space-y-4">
-                      {HEALTH_METRICS.map((m, i) => (
-                        <div key={i}>
-                          <div className="flex justify-between items-center mb-1.5">
-                            <span className="text-[13px] text-[var(--color-text-secondary)]">
-                              {m.label}
-                            </span>
-                            <span
-                              className="text-[13px] font-semibold tabular-nums"
-                              style={{ color: m.color }}
-                            >
-                              {m.pct}%
-                            </span>
-                          </div>
-                          <div
-                            className="w-full h-2 rounded-full overflow-hidden"
-                            style={{ background: "var(--color-card-bg)" }}
-                          >
+                      {(healthData?.metrics ?? []).map((m, i) => {
+                        const mColor = m.pct >= 80 ? 'var(--color-mint)' : m.pct >= 60 ? 'var(--color-warning)' : 'var(--color-danger)';
+                        return (
+                          <div key={i}>
+                            <div className="flex justify-between items-center mb-1.5">
+                              <span className="text-[13px] text-[var(--color-text-secondary)]">
+                                {m.label}
+                              </span>
+                              <span
+                                className="text-[13px] font-semibold tabular-nums"
+                                style={{ color: mColor }}
+                              >
+                                {m.pct}%
+                              </span>
+                            </div>
                             <div
-                              className="h-full rounded-full transition-all duration-700"
-                              style={{
-                                width: `${m.pct}%`,
-                                background: m.color,
-                                boxShadow: `0 0 8px ${m.color}60`,
-                              }}
-                            />
+                              className="w-full h-2 rounded-full overflow-hidden"
+                              style={{ background: "var(--color-card-bg)" }}
+                            >
+                              <div
+                                className="h-full rounded-full transition-all duration-700"
+                                style={{
+                                  width: `${m.pct}%`,
+                                  background: mColor,
+                                  boxShadow: `0 0 8px ${mColor}60`,
+                                }}
+                              />
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
 
                       {/* Mini legend */}
                       <div className="pt-2 flex gap-4">
@@ -458,7 +447,11 @@ export const AIDashboard: React.FC = () => {
                   </div>
 
                   <div className="space-y-3">
-                    {RECOMMENDATIONS.map((rec) => (
+                    {recommendations.length === 0 ? (
+                      <div className="text-center py-6 text-sm text-[var(--color-text-muted)]">
+                        {loading ? 'Loading recommendations…' : 'No recommendations at this time'}
+                      </div>
+                    ) : recommendations.map((rec) => (
                       <div
                         key={rec.id}
                         className="flex items-start gap-2.5 p-3 rounded-lg cursor-pointer group transition-colors"
@@ -518,19 +511,19 @@ export const AIDashboard: React.FC = () => {
                   {[
                     {
                       label: "Predicted Restock Events",
-                      value: "7",
+                      value: loading ? '…' : String(healthData?.predictedRestocks ?? '—'),
                       sub: "Next 7 days",
                       color: "var(--color-mint)",
                     },
                     {
                       label: "Demand Surge Items",
-                      value: "3",
+                      value: loading ? '…' : String(healthData?.demandSurgeItems ?? '—'),
                       sub: "Predicted spike",
                       color: "var(--color-warning)",
                     },
                     {
                       label: "AI Accuracy Score",
-                      value: "94.2%",
+                      value: loading ? '…' : (healthData?.accuracyScore ?? '—'),
                       sub: "Model confidence",
                       color: "var(--color-info)",
                     },
@@ -577,77 +570,35 @@ export const AIDashboard: React.FC = () => {
                     className="divide-y"
                     style={{ borderColor: "var(--color-border)" }}
                   >
-                    {[
-                      {
-                        product: "Amoxicillin 250mg",
-                        change: "+40%",
-                        status: "Surge",
-                        color: "var(--color-warning)",
-                      },
-                      {
-                        product: "Paracetamol 500mg",
-                        change: "+12%",
-                        status: "Growing",
-                        color: "var(--color-mint)",
-                      },
-                      {
-                        product: "Cetirizine 10mg",
-                        change: "+28%",
-                        status: "Surge",
-                        color: "var(--color-warning)",
-                      },
-                      {
-                        product: "Vitamin D3 60K",
-                        change: "+8%",
-                        status: "Stable",
-                        color: "var(--color-mint)",
-                      },
-                      {
-                        product: "Atorvastatin 20mg",
-                        change: "-5%",
-                        status: "Decline",
-                        color: "var(--color-danger)",
-                      },
-                    ].map((row, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between px-5 py-3 hover:bg-[var(--color-surface-secondary)] transition-colors"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <div
-                            className="w-7 h-7 rounded-md flex items-center justify-center"
-                            style={{
-                              background: "var(--color-surface-secondary)",
-                            }}
-                          >
-                            <BarChart3
-                              className="w-3.5 h-3.5"
-                              style={{ color: "var(--color-mint)" }}
-                            />
-                          </div>
-                          <span className="text-[13px] text-[var(--color-text-primary)]">
-                            {row.product}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span
-                            className="text-[13px] font-semibold tabular-nums"
-                            style={{ color: row.color }}
-                          >
-                            {row.change}
-                          </span>
-                          <span
-                            className="text-[11px] px-2 py-0.5 rounded-full"
-                            style={{
-                              background: `${row.color}18`,
-                              color: row.color,
-                            }}
-                          >
-                            {row.status}
-                          </span>
-                        </div>
+                    {demandForecast.length === 0 ? (
+                      <div className="px-5 py-8 text-center text-sm text-[var(--color-text-muted)]">
+                        {loading ? 'Loading forecast…' : 'No demand forecast data available'}
                       </div>
-                    ))}
+                    ) : demandForecast.map((row, i) => {
+                      const rowColor = row.status === 'Surge' ? 'var(--color-warning)'
+                        : row.status === 'Decline' ? 'var(--color-danger)'
+                        : 'var(--color-mint)';
+                      return (
+                        <div
+                          key={i}
+                          className="flex items-center justify-between px-5 py-3 hover:bg-[var(--color-surface-secondary)] transition-colors"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <div
+                              className="w-7 h-7 rounded-md flex items-center justify-center"
+                              style={{ background: "var(--color-surface-secondary)" }}
+                            >
+                              <BarChart3 className="w-3.5 h-3.5" style={{ color: "var(--color-mint)" }} />
+                            </div>
+                            <span className="text-[13px] text-[var(--color-text-primary)]">{row.product}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-[13px] font-semibold tabular-nums" style={{ color: rowColor }}>{row.change}</span>
+                            <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ background: `${rowColor}18`, color: rowColor }}>{row.status}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -659,17 +610,17 @@ export const AIDashboard: React.FC = () => {
                   {[
                     {
                       label: "Anomalies Detected",
-                      value: "3",
+                      value: loading ? '…' : String(healthData?.anomaliesDetected ?? '—'),
                       color: "var(--color-danger)",
                     },
                     {
                       label: "Auto-Resolved",
-                      value: "1",
+                      value: loading ? '…' : String(healthData?.autoResolved ?? '—'),
                       color: "var(--color-mint)",
                     },
                     {
                       label: "Pending Review",
-                      value: "2",
+                      value: loading ? '…' : String(healthData?.pendingReview ?? '—'),
                       color: "var(--color-warning)",
                     },
                   ].map((s, i) => (
@@ -711,61 +662,31 @@ export const AIDashboard: React.FC = () => {
                     className="divide-y"
                     style={{ borderColor: "var(--color-border)" }}
                   >
-                    {[
-                      {
-                        title: "Duplicate Stock Entry",
-                        desc: "Paracetamol 500mg — duplicate batch BTH-2024-001 detected",
-                        time: "10 mins ago",
-                        status: "Pending",
-                        color: "var(--color-warning)",
-                      },
-                      {
-                        title: "Negative Stock Count",
-                        desc: "Ibuprofen 400mg — reported stock value is negative (-3)",
-                        time: "1h ago",
-                        status: "Pending",
-                        color: "var(--color-danger)",
-                      },
-                      {
-                        title: "Price Mismatch",
-                        desc: "Cetirizine 10mg — purchase price higher than selling price",
-                        time: "4h ago",
-                        status: "Resolved",
-                        color: "var(--color-mint)",
-                      },
-                    ].map((err, i) => (
-                      <div
-                        key={i}
-                        className="flex items-start gap-3 px-5 py-4 hover:bg-[var(--color-surface-secondary)] transition-colors"
-                      >
-                        <AlertTriangle
-                          className="w-4 h-4 flex-shrink-0 mt-0.5"
-                          style={{ color: err.color }}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[13px] font-semibold text-[var(--color-text-primary)]">
-                            {err.title}
-                          </div>
-                          <div className="text-[12px] text-[var(--color-text-muted)] mt-0.5">
-                            {err.desc}
-                          </div>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          <div
-                            className="text-[11px] px-2 py-0.5 rounded-full"
-                            style={{
-                              background: `${err.color}18`,
-                              color: err.color,
-                            }}
-                          >
-                            {err.status}
-                          </div>
-                          <div className="text-[11px] text-[var(--color-text-muted)] mt-1">
-                            {err.time}
-                          </div>
-                        </div>
+                    {anomalies.length === 0 ? (
+                      <div className="px-5 py-8 text-center text-sm text-[var(--color-text-muted)]">
+                        {loading ? 'Loading anomalies…' : 'No anomalies detected'}
                       </div>
-                    ))}
+                    ) : anomalies.map((err, i) => {
+                      const errColor = err.severity === 'danger' ? 'var(--color-danger)'
+                        : err.severity === 'warning' ? 'var(--color-warning)'
+                        : 'var(--color-mint)';
+                      return (
+                        <div
+                          key={i}
+                          className="flex items-start gap-3 px-5 py-4 hover:bg-[var(--color-surface-secondary)] transition-colors"
+                        >
+                          <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: errColor }} />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-[13px] font-semibold text-[var(--color-text-primary)]">{err.title}</div>
+                            <div className="text-[12px] text-[var(--color-text-muted)] mt-0.5">{err.desc}</div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <div className="text-[11px] px-2 py-0.5 rounded-full" style={{ background: `${errColor}18`, color: errColor }}>{err.status}</div>
+                            <div className="text-[11px] text-[var(--color-text-muted)] mt-1">{err.time}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -792,18 +713,20 @@ export const AIDashboard: React.FC = () => {
             className="text-[12px] font-medium flex-shrink-0"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            {ticker.text}
+            {ticker?.text ?? 'No recent activity'}
           </span>
-          <span
-            className="text-[12px] font-bold flex-shrink-0 tabular-nums"
-            style={{ color: "var(--color-mint)" }}
-          >
-            {ticker.detail}
-          </span>
+          {ticker?.detail && (
+            <span
+              className="text-[12px] font-bold flex-shrink-0 tabular-nums"
+              style={{ color: "var(--color-mint)" }}
+            >
+              {ticker.detail}
+            </span>
+          )}
         </div>
         {/* Indicator dots */}
         <div className="ml-auto flex gap-1 flex-shrink-0">
-          {TICKER_EVENTS.map((_, i) => (
+          {tickerEvents.map((_, i) => (
             <div
               key={i}
               className="w-1.5 h-1.5 rounded-full transition-colors duration-300"
