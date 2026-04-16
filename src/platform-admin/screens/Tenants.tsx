@@ -19,14 +19,7 @@ interface Tenant {
   created: string;
 }
 
-const initialTenants: Tenant[] = [
-  { id: 1, name: 'ABC Pharmacy', owner: 'Dr. Ravi Kumar', type: 'Pharmacy', domain: 'inventory.abcpharma.com', plan: 'Enterprise', status: 'Active', users: 6, created: 'Mar 1, 2026' },
-  { id: 2, name: 'FreshMart Super', owner: 'Suresh Mehta', type: 'Supermarket', domain: 'freshmart.app.com', plan: 'Pro', status: 'Active', users: 12, created: 'Feb 15, 2026' },
-  { id: 3, name: 'Central Warehouse', owner: 'Anjali Patel', type: 'Warehouse', domain: 'central.app.com', plan: 'Pro', status: 'Active', users: 8, created: 'Feb 8, 2026' },
-  { id: 4, name: 'QuickRetail Store', owner: 'Dev Sharma', type: 'Retail', domain: 'quickretail.app.com', plan: 'Free', status: 'Trial', users: 2, created: 'Mar 20, 2026' },
-  { id: 5, name: 'MedPlus Pharma', owner: 'Priya Nair', type: 'Pharmacy', domain: 'medplus.app.com', plan: 'Pro', status: 'Active', users: 5, created: 'Jan 22, 2026' },
-  { id: 6, name: 'BioLife Diagnostics', owner: 'Kiran Shah', type: 'Pharmacy', domain: 'biolife.app.com', plan: 'Enterprise', status: 'Suspended', users: 0, created: 'Dec 10, 2025' },
-];
+const initialTenants: Tenant[] = [];
 
 export const Tenants: React.FC = () => {
   const [showModal, setShowModal] = useState(false);

@@ -16,12 +16,7 @@ interface Plan {
   color: string;
 }
 
-const initialPlans: Plan[] = [
-  { id: 1, name: 'Starter', description: 'Free tier for individuals', price: '₹0', cycle: '/month', features: ['500 products', '1 warehouse', '2 users'], status: 'Active', color: 'bg-[var(--pa-text-light-gray)]' },
-  { id: 2, name: 'Business', description: 'Small to medium business', price: '₹2,499', cycle: '/month billed annually', features: ['Unlimited products', '5 warehouses', '10 users'], status: 'Active', color: 'bg-[var(--pa-teal)]' },
-  { id: 3, name: 'Premium', description: 'Advanced operations', price: '₹4,999', cycle: '/month', features: ['Everything + AI', 'Custom domain', 'Priority support'], status: 'Active', color: 'bg-[var(--pa-amber)]' },
-  { id: 4, name: 'Enterprise', description: 'Large scale management', price: 'Custom', cycle: 'Contact sales', features: ['Unlimited everything', 'SSO', 'SLA'], status: 'Active', color: 'bg-purple-500' },
-];
+const initialPlans: Plan[] = [];
 
 export const Subscriptions: React.FC = () => {
   const [showModal, setShowModal] = useState(false);

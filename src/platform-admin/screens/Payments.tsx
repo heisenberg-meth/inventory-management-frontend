@@ -15,15 +15,7 @@ interface Payment {
   status: "Paid" | "Free" | "Pending" | "Failed";
 }
 
-const initialPayments: Payment[] = [
-  { id: 'TXN-10042', tenant: 'ABC Pharmacy', plan: 'Enterprise', amount: '₹7,499', date: 'Mar 23', method: 'UPI', status: 'Paid' },
-  { id: 'TXN-10041', tenant: 'FreshMart', plan: 'Pro', amount: '₹2,499', date: 'Mar 22', method: 'Bank Transfer', status: 'Paid' },
-  { id: 'TXN-10040', tenant: 'Central WH', plan: 'Pro', amount: '₹2,499', date: 'Mar 20', method: 'Credit Card', status: 'Paid' },
-  { id: 'TXN-10039', tenant: 'QuickRetail', plan: 'Free', amount: '₹0', date: 'Mar 18', method: '—', status: 'Free' },
-  { id: 'TXN-10038', tenant: 'MedPlus', plan: 'Pro', amount: '₹2,499', date: 'Mar 15', method: 'UPI', status: 'Pending' },
-  { id: 'TXN-10037', tenant: 'BioLife', plan: 'Enterprise', amount: '₹7,499', date: 'Mar 10', method: 'Bank Transfer', status: 'Failed' },
-  { id: 'TXN-10036', tenant: 'New Tenant', plan: 'Business', amount: '₹2,499', date: 'Mar 8', method: 'Card', status: 'Paid' },
-];
+const initialPayments: Payment[] = [];
 
 export const Payments: React.FC = () => {
   const [showDrawer, setShowDrawer] = useState(false);

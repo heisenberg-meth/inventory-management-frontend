@@ -31,73 +31,12 @@ interface TicketData {
   messages: Message[];
 }
 
-const initialTickets: TicketData[] = [
-  {
-    id: 'TKT-001', subject: 'Cannot access billing module', tenant: 'ABC Pharmacy',
-    priority: 'High', assignedTo: 'Support Admin 1', status: 'Open', created: '2h ago',
-    contact: 'Ravi Kumar', email: 'ravi.kumar@abcpharmacy.com', phone: '+91 98765 43210',
-    description: 'Users at ABC Pharmacy are reporting a 403 Forbidden error when attempting to navigate to the billing module. This issue affects all user roles within the tenant.',
-    messages: [
-      { sender: 'Ravi Kumar', isAdmin: false, text: 'I am getting a 403 error when clicking on the billing section. This has been happening since this morning.', time: '2h ago' },
-      { sender: 'Support Admin 1', isAdmin: true, text: 'Hi Ravi, can you try clearing your browser cache and cookies, then logging in again?', time: '1h ago' },
-      { sender: 'Ravi Kumar', isAdmin: false, text: 'Still not working after clearing cache. The issue persists on both Chrome and Firefox.', time: '45m ago' },
-    ],
-  },
-  {
-    id: 'TKT-002', subject: 'Stock transfer not working', tenant: 'FreshMart',
-    priority: 'Medium', assignedTo: null, status: 'Urgent', created: '4h ago',
-    contact: 'Suresh Mehta', email: 'suresh@freshmart.in', phone: '+91 87654 32109',
-    description: 'Stock transfer between warehouses is failing with a timeout error. Multiple attempts have resulted in the same failure.',
-    messages: [
-      { sender: 'Suresh Mehta', isAdmin: false, text: 'Whenever I try to transfer stock between Warehouse A and B, I get a timeout error.', time: '4h ago' },
-    ],
-  },
-  {
-    id: 'TKT-003', subject: 'Invoice PDF not generating', tenant: 'Central WH',
-    priority: 'Medium', assignedTo: 'Support Admin 2', status: 'Open', created: '1d ago',
-    contact: 'Anjali Patel', email: 'anjali.patel@centralwh.com', phone: '+91 76543 21098',
-    description: 'PDF generation for invoices returns a blank page. This started after the most recent platform update.',
-    messages: [
-      { sender: 'Anjali Patel', isAdmin: false, text: 'Invoice PDFs are generating as blank pages. This started after the last update.', time: '1d ago' },
-    ],
-  },
-  {
-    id: 'TKT-004', subject: 'How to add custom domain?', tenant: 'QuickRetail',
-    priority: 'Low', assignedTo: 'Support Admin 1', status: 'Resolved', created: '2d ago',
-    contact: 'Dev Sharma', email: 'dev.sharma@quickretail.com', phone: '+91 65432 10987',
-    description: 'Tenant wants to configure a custom domain for their store portal.',
-    messages: [
-      { sender: 'Dev Sharma', isAdmin: false, text: 'How can I set up a custom domain for my store portal?', time: '2d ago' },
-      { sender: 'Support Admin 1', isAdmin: true, text: 'You can configure this under Settings → Domain. Add a CNAME record pointing to our servers and it will propagate within 24 hours.', time: '2d ago' },
-      { sender: 'Dev Sharma', isAdmin: false, text: 'Got it working, thank you!', time: '1d ago' },
-    ],
-  },
-  {
-    id: 'TKT-005', subject: 'API rate limit exceeded', tenant: 'MedPlus',
-    priority: 'High', assignedTo: 'Platform Admin', status: 'In Progress', created: '2d ago',
-    contact: 'Priya Nair', email: 'priya.nair@medplus.in', phone: '+91 54321 09876',
-    description: 'Tenant is hitting API rate limits during peak business hours causing integration failures.',
-    messages: [
-      { sender: 'Priya Nair', isAdmin: false, text: 'We are getting 429 errors during 10am–2pm every day. Our integrations are failing.', time: '2d ago' },
-      { sender: 'Platform Admin', isAdmin: true, text: 'We are investigating and will temporarily increase your rate limit while we optimize the underlying service.', time: '1d ago' },
-    ],
-  },
-  {
-    id: 'TKT-006', subject: 'Data export not working', tenant: 'ABC Pharmacy',
-    priority: 'Medium', assignedTo: 'Support Admin 2', status: 'Resolved', created: '3d ago',
-    contact: 'Ravi Kumar', email: 'ravi.kumar@abcpharmacy.com', phone: '+91 98765 43210',
-    description: 'CSV export for inventory data was timing out for large datasets.',
-    messages: [
-      { sender: 'Ravi Kumar', isAdmin: false, text: 'Export button just spins and never downloads the file for datasets over 10k rows.', time: '3d ago' },
-      { sender: 'Support Admin 2', isAdmin: true, text: 'We have fixed the timeout issue for large exports. Please try again and let us know.', time: '3d ago' },
-    ],
-  },
-];
+const initialTickets: TicketData[] = [];
 
 const PRIORITIES: Priority[] = ['High', 'Medium', 'Low', 'Urgent'];
 const STATUSES: Status[] = ['Open', 'In Progress', 'Resolved', 'Urgent'];
-const ASSIGNEES = ['Support Admin 1', 'Support Admin 2', 'Platform Admin'];
-const TENANTS = ['ABC Pharmacy', 'FreshMart', 'Central WH', 'QuickRetail', 'MedPlus', 'BioLife Diag'];
+const ASSIGNEES: string[] = [];
+const TENANTS: string[] = [];
 
 const getPriorityBadge = (priority: Priority) => {
   switch (priority) {
@@ -200,7 +139,7 @@ export const SupportTickets: React.FC = () => {
   const [filterTenant, setFilterTenant] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newSubject, setNewSubject] = useState('');
-  const [newTenant, setNewTenant] = useState(TENANTS[0]);
+  const [newTenant, setNewTenant] = useState('');
 
   // Edit state for the View Ticket modal
   const [editForm, setEditForm] = useState<Partial<TicketData>>({});
