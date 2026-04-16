@@ -5,25 +5,8 @@ import {
   UserPlus, TrendingUp, TrendingDown, Circle, X 
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { getDashboardStats, getSalesOrders, getTenantAuditLogs, type DashboardKPIs, type SalesOrder } from '../data/apiService';
+import { getDashboardStats, type DashboardKPIs } from '../data/apiService';
 import { useAuth } from '../context/AuthContext';
-
-interface ActivityLog {
-  id: string | number;
-  action: string;
-  time: string;
-  color: string;
-  detail: string;
-}
-
-interface TenantLog {
-  id: number;
-  movementType: string;
-  createdAt: string;
-  productId: number;
-  quantity: number;
-  notes?: string;
-}
 
 export const HomeDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -31,13 +14,8 @@ export const HomeDashboard: React.FC = () => {
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardKPIs | null>(null);
-  const [recentSales, setRecentSales] = useState<SalesOrder[]>([]);
-  const [recentActivity, setRecentActivity] = useState<ActivityLog[]>([]);
-
   useEffect(() => {
     fetchStats();
-    fetchRecentSales();
-    fetchActivity();
   }, []);
 
   const fetchStats = async () => {
@@ -52,29 +30,8 @@ export const HomeDashboard: React.FC = () => {
     }
   };
 
-  const fetchRecentSales = async () => {
-    try {
-      const orders = await getSalesOrders();
-      setRecentSales(orders.slice(0, 5));
-    } catch (err) {
-      console.error('Failed to fetch recent sales:', err);
-    }
-  };
-
-  const fetchActivity = async () => {
-    try {
-      const logs = await getTenantAuditLogs(0, 5) as TenantLog[];
-      setRecentActivity(logs.map(log => ({
-        id: log.id,
-        action: log.movementType,
-        time: new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        color: log.movementType === 'SALE' ? 'var(--color-mint)' : (log.movementType === 'PURCHASE' ? 'var(--color-info)' : 'var(--color-warning)'),
-        detail: `Product #${log.productId}: ${log.quantity > 0 ? '+' : ''}${log.quantity} ${log.notes || ''}`
-      })));
-    } catch (err) {
-      console.error('Failed to fetch activity logs:', err);
-    }
-  };
+  const recentSales = stats?.recentSales || [];
+  const recentActivity = stats?.recentActivity || [];
 
   const quickActions = [
     { icon: Package, label: 'New Product', path: '/app/products', action: 'add' },
@@ -87,8 +44,8 @@ export const HomeDashboard: React.FC = () => {
     { 
       icon: Package, 
       label: 'Products', 
-      value: stats ? stats.total_products?.toLocaleString() : '...', 
-      change: '+0%', // Dynamic change could be calculated if we have history
+      value: stats ? stats.totalProducts?.toLocaleString() : '...', 
+      change: stats ? null : null, 
       trend: 'up',
       iconBg: 'bg-[var(--color-mint)]',
       iconColor: 'text-white',
@@ -97,8 +54,8 @@ export const HomeDashboard: React.FC = () => {
     { 
       icon: AlertTriangle, 
       label: 'Low Stock', 
-      value: stats ? stats.low_stock_count?.toLocaleString() : '...', 
-      change: 'Active', 
+      value: stats ? stats.lowStockCount?.toLocaleString() : '...', 
+      change: stats ? null : null, 
       trend: 'down',
       iconBg: 'bg-[var(--color-warning)]',
       iconColor: 'text-white',
@@ -107,8 +64,8 @@ export const HomeDashboard: React.FC = () => {
     { 
       icon: DollarSign, 
       label: "Today's Revenue", 
-      value: stats ? `₹${(stats.today_sales_amount || 0).toLocaleString()}` : '...', 
-      change: '+0%', 
+      value: stats ? `₹${(stats.totalRevenue || 0).toLocaleString()}` : '...', 
+      change: stats ? null : null, 
       trend: 'up',
       iconBg: 'bg-[var(--color-mint)]',
       iconColor: 'text-white',
@@ -117,8 +74,8 @@ export const HomeDashboard: React.FC = () => {
     { 
       icon: ShoppingCart, 
       label: 'Today\'s Orders', 
-      value: stats ? stats.today_sales_count?.toLocaleString() : '...', 
-      change: '+0', 
+      value: stats ? stats.totalOrders?.toLocaleString() : '...', 
+      change: stats ? null : null, 
       trend: 'up',
       iconBg: 'bg-[var(--color-danger)]',
       iconColor: 'text-white',
@@ -126,27 +83,14 @@ export const HomeDashboard: React.FC = () => {
     },
   ];
 
-  const derivedStockLevels = stats?.category_distribution?.map((cat, idx) => ({
-    id: cat.category_id.toString(),
-    category: cat.category_name,
-    level: stats.total_products > 0 ? Math.min(100, Math.round((cat.product_count / stats.total_products) * 100)) : 0,
+  const derivedStockLevels = (stats?.stockLevels || []).map((cat, idx) => ({
+    id: idx.toString(),
+    category: cat.category,
+    level: cat.level,
     color: ['var(--color-mint)', 'var(--color-info)', 'var(--color-warning)', 'var(--color-danger)'][idx % 4]
-  })) || [];
+  }));
 
-  // Weekly sales chart placeholder - can be improved when backend supports it
-  const weeklySalesData = [
-    { day: "Mon", sales: 0 },
-    { day: "Tue", sales: 0 },
-    { day: "Wed", sales: 0 },
-    { day: "Thu", sales: 0 },
-    { day: "Fri", sales: 0 },
-    { day: "Sat", sales: 0 },
-    { day: "Sun", sales: LocalDateToDay(new Date()) === "Sun" ? stats?.today_sales_amount || 0 : 0 },
-  ];
-
-  function LocalDateToDay(date: Date) {
-    return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getDay()];
-  }
+  const weeklySalesData = stats?.weeklySales || [];
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -156,7 +100,7 @@ export const HomeDashboard: React.FC = () => {
         style={{ background: 'linear-gradient(135deg, #0f6644 0%, #1db97a 100%)' }}
       >
         <div className="relative z-10">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Welcome back, {user?.name || 'User'}!</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Welcome back, {user?.name}!</h1>
           <p className="text-white/80 mb-4 sm:mb-6 text-sm sm:text-base">Here's what's happening with your inventory today</p>
           
           {/* Quick Actions */}
@@ -183,11 +127,11 @@ export const HomeDashboard: React.FC = () => {
       </div>
 
       {/* Alert Bar */}
-      {!alertDismissed && stats?.expiring_soon_count !== undefined && stats.expiring_soon_count > 0 && (
+      {!alertDismissed && stats?.lowStockCount !== undefined && stats.lowStockCount > 0 && (
         <div className="bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 rounded-lg px-4 py-3 flex items-start sm:items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5 sm:mt-0" />
           <span className="text-[var(--color-warning)] font-medium text-sm flex-1">
-            {stats.expiring_soon_count} products expiring soon
+            {stats.lowStockCount} products are running low on stock
           </span>
           <div className="flex items-center gap-2">
             <button 
@@ -221,10 +165,12 @@ export const HomeDashboard: React.FC = () => {
                 <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg ${metric.iconBg} flex items-center justify-center`}>
                   <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${metric.iconColor}`} />
                 </div>
-                <div className={`flex items-center gap-1 text-xs font-medium ${metric.trend === 'up' ? 'text-[var(--color-mint)]' : 'text-[var(--color-danger)]'}`}>
-                  <TrendIcon className="w-3 h-3" />
-                  {metric.change}
-                </div>
+                {metric.change && (
+                  <div className={`flex items-center gap-1 text-xs font-medium ${metric.trend === 'up' ? 'text-[var(--color-mint)]' : 'text-[var(--color-danger)]'}`}>
+                    <TrendIcon className="w-3 h-3" />
+                    {metric.change}
+                  </div>
+                )}
               </div>
               <div className="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)] mb-1">
                 {metric.value}

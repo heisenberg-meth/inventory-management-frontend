@@ -1,4 +1,4 @@
-const BASE_URL = '/api';
+const BASE_URL = 'http://localhost:8080/api';
 
 interface RequestOptions extends RequestInit {
   data?: unknown;
@@ -148,18 +148,23 @@ export interface SalesOrder {
 }
 
 export interface DashboardKPIs {
-  total_products: number;
-  low_stock_count: number;
-  out_of_stock_count: number;
-  today_sales_amount: number;
-  today_sales_count: number;
-  today_purchases_amount: number;
-  expiring_soon_count?: number;
-  inventory_valuation: number;
-  category_distribution: {
-    category_id: number;
-    category_name: string;
-    product_count: number;
+  totalProducts: number;
+  lowStockCount: number;
+  totalRevenue: number;
+  totalOrders: number;
+  weeklySales: { day: string; sales: number }[];
+  stockLevels: { category: string; level: number }[];
+  recentSales: {
+    id: string;
+    total: number;
+    status: string;
+    paymentStatus: string;
+  }[];
+  recentActivity: {
+    action: string;
+    detail: string;
+    time: string;
+    color: string;
   }[];
 }
 
@@ -173,6 +178,15 @@ export interface PlatformStats {
   activeTenants: number;
   totalSubscriptions: number;
   systemHealth: string;
+  signupTrend: { month: string; signups: number }[];
+  planDistribution: { name: string; value: number; color: string }[];
+  supportTickets: {
+    id: string;
+    priority: 'High' | 'Medium' | 'Low';
+    subject: string;
+    tenant: string;
+    time: string;
+  }[];
 }
 
 export interface AuditLog {
@@ -198,6 +212,9 @@ async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Pr
   const token = localStorage.getItem('ims-token');
 
   const headers = new Headers(rest.headers);
+  // Bypass ngrok interstitial warning page
+  headers.set('ngrok-skip-browser-warning', 'true');
+  
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
   }
@@ -215,11 +232,31 @@ async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Pr
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `API error: ${response.status}`);
+    let err = "API failed";
+    try {
+      err = await response.text();
+    } catch (e) {
+      // ignore
+    }
+    console.error("API ERROR:", err);
+    throw new Error(err);
   }
 
-  return response.json();
+  const text = await response.text();
+  
+  if (!text) {
+    return {} as T;
+  }
+
+  let parsedData;
+  try {
+    parsedData = JSON.parse(text);
+  } catch (error) {
+    console.error("Failed to parse JSON. Response text:", text.substring(0, 200));
+    throw new Error(`Invalid JSON from backend: ${text.substring(0, 50)}...`);
+  }
+  
+  return parsedData as T;
 }
 
 export const api = {
@@ -247,10 +284,10 @@ export const getProducts = async (page = 0, size = 10): Promise<Product[]> => {
     name: p.name,
     batch: p.batchNumber || p.batch_number,
     expiry: p.expiryDate || p.expiry_date,
-    price: `₹${p.salePrice || p.sale_price || 0}`,
-    threshold: p.reorderLevel || p.reorder_level || 10,
+    price: p.salePrice || p.sale_price ? `₹${(p.salePrice || p.sale_price).toLocaleString()}` : undefined,
+    threshold: p.reorderLevel || p.reorder_level,
     max: 1000,
-    status: (p.stock || 0) === 0 ? 'Out of Stock' : ((p.stock || 0) <= (p.reorderLevel || p.reorder_level || 10) ? 'Low Stock' : 'Active')
+    status: p.status
   }));
 };
 
@@ -290,14 +327,9 @@ export const getTenantAuditLogs = (page = 0, size = 10) => api.get<PagedResponse
 
 // Platform
 export const getPlatformStats = async (): Promise<PlatformStats> => {
-  const data = await api.get<Record<string, number>>('/platform/stats');
-  return {
-    totalTenants: data.total_tenants || 0,
-    activeTenants: data.total_tenants || 0,
-    totalSubscriptions: 0,
-    systemHealth: "Excellent",
-  };
+  return await api.get<PlatformStats>('/platform/stats');
 };
 
 export const getTenants = () => api.get<Tenant[]>('/platform/tenants');
+export const createTenant = (data: unknown) => api.post<Tenant>('/platform/tenants', data);
 export const getAuditLogs = () => api.get<AuditLog[]>('/platform/audit/logs');

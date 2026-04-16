@@ -211,14 +211,15 @@ export const ProductManagement: React.FC = () => {
     { label: 'Expiring Soon', value: filtered.filter(p => p.status === 'Expiring').length.toLocaleString() },
   ];
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status?: string) => {
+    if (!status) return { bg: 'var(--color-surface-secondary)', text: 'var(--color-text-muted)' };
     switch (status) {
       case 'Active': return { bg: 'var(--color-mint)', text: 'var(--color-mint)' };
       case 'Low Stock': return { bg: 'var(--color-warning)', text: 'var(--color-warning)' };
       case 'Out of Stock': return { bg: 'var(--color-danger)', text: 'var(--color-danger)' };
       case 'Expiring': return { bg: 'var(--color-danger)', text: 'var(--color-danger)' };
       case 'Expired': return { bg: 'var(--color-danger)', text: 'var(--color-danger)' };
-      default: return { bg: 'var(--color-mint)', text: 'var(--color-mint)' };
+      default: return { bg: 'var(--color-surface-secondary)', text: 'var(--color-text-muted)' };
     }
   };
 
@@ -362,7 +363,7 @@ export const ProductManagement: React.FC = () => {
                   </td>
                 </tr>
               ) : paginated.map((product) => {
-                const statusColor = getStatusColor(product.status || 'Active');
+                const statusColor = getStatusColor(product.status);
                 const threshold = product.reorder_level || product.threshold || 10;
                 const stockPercent = (product.stock / (threshold * 4)) * 100; // Relative to 4x threshold for visualization
                 return (
@@ -639,7 +640,7 @@ export const ProductManagement: React.FC = () => {
                   <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{viewingProduct.name}</h3>
                   <span 
                     className="px-3 py-1 rounded-full text-xs font-medium"
-                    style={{ backgroundColor: `${getStatusColor(viewingProduct.status || 'Active').bg}20`, color: getStatusColor(viewingProduct.status || 'Active').text }}
+                    style={{ backgroundColor: `${getStatusColor(viewingProduct.status).bg}20`, color: getStatusColor(viewingProduct.status).text }}
                   >{viewingProduct.status}</span>
                 </div>
               </div>

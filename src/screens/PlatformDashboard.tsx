@@ -3,35 +3,12 @@ import { Building2, Users, DollarSign, Headphones, TrendingUp, Eye, X, AlertTria
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { getPlatformStats, getTenants, type PlatformStats, type Tenant as ApiTenant } from '../data/apiService';
 
-interface Tenant extends Omit<ApiTenant, 'companyCode' | 'workspaceSlug'> {
-  companyCode?: string;
-  workspaceSlug?: string;
-  status: string;
-  users: number;
-  lastActive: string;
-  revenue: string;
+interface Tenant extends ApiTenant {
+  status?: string;
+  users?: number;
+  lastActive?: string;
+  revenue?: string;
 }
-
-const signupData = [
-  { month: 'Oct', signups: 12, id: '2023-10' },
-  { month: 'Nov', signups: 18, id: '2023-11' },
-  { month: 'Dec', signups: 24, id: '2023-12' },
-  { month: 'Jan', signups: 31, id: '2024-01' },
-  { month: 'Feb', signups: 38, id: '2024-02' },
-  { month: 'Mar', signups: 45, id: '2024-03' },
-];
-
-const planDistribution = [
-  { name: 'Free', value: 145, color: 'var(--color-text-muted)', id: 'plan-free' },
-  { name: 'Pro', value: 89, color: 'var(--color-info)', id: 'plan-pro' },
-  { name: 'Enterprise', value: 34, color: 'var(--color-mint)', id: 'plan-enterprise' },
-];
-
-const supportTickets = [
-  { id: 'TKT-4521', tenant: 'Metro Pharmacy', subject: 'Invoice generation issue', priority: 'High', time: '10 mins ago' },
-  { id: 'TKT-4520', tenant: 'City Supermarket', subject: 'User permission question', priority: 'Medium', time: '1 hour ago' },
-  { id: 'TKT-4519', tenant: 'Warehouse Plus', subject: 'Stock sync problem', priority: 'High', time: '2 hours ago' },
-];
 
 const INPUT_CLS = "w-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-mint)]";
 
@@ -58,13 +35,7 @@ export const PlatformDashboard: React.FC = () => {
         getTenants()
       ]);
       setStats(sData);
-      setTenants((tData as ApiTenant[]).map(t => ({
-        ...t,
-        status: (t as any).status || 'Active',
-        users: (t as any).users || 1,
-        lastActive: (t as any).lastActive || 'Today',
-        revenue: (t as any).revenue || '₹0'
-      })));
+      setTenants(tData as Tenant[]);
     } catch (err) {
       console.error('Failed to fetch platform data:', err);
     } finally {
@@ -84,6 +55,7 @@ export const PlatformDashboard: React.FC = () => {
 
   const handleSuspend = () => {
     if (!suspendTarget) return;
+    // Note: In a real app, this should be an API call
     setTenants(prev => prev.map(t => t.id === suspendTarget.id ? { ...t, status: t.status === 'Active' ? 'Suspended' : 'Active' } : t));
     if (viewTenant?.id === suspendTarget.id) {
       setViewTenant(prev => prev ? { ...prev, status: prev.status === 'Active' ? 'Suspended' : 'Active' } : null);
@@ -92,22 +64,23 @@ export const PlatformDashboard: React.FC = () => {
     setSuspendTarget(null);
   };
 
-  const handleAddTenant = () => {
+  const handleAddTenant = async () => {
     if (!newTenantName) return;
-    const newTenant: Tenant = {
-      id: Math.max(...tenants.map(t => t.id)) + 1,
-      name: newTenantName,
-      type: newTenantType,
-      plan: newTenantPlan,
-      status: 'Active',
-      users: 1,
-      lastActive: 'Just now',
-      revenue: '₹0',
-    };
-    setTenants(prev => [newTenant, ...prev]);
-    setShowAddTenant(false);
-    setNewTenantName('');
-    showSuccess(`Tenant "${newTenantName}" created!`);
+    try {
+      const payload = {
+        name: newTenantName,
+        type: newTenantType,
+        plan: newTenantPlan,
+      };
+      await createTenant(payload);
+      setShowAddTenant(false);
+      setNewTenantName('');
+      showSuccess(`Tenant "${newTenantName}" created!`);
+      fetchData(); // Refresh list
+    } catch (err) {
+      console.error('Failed to create tenant:', err);
+      alert('Failed to create tenant');
+    }
   };
 
   const handleResolveTicket = (id: string) => {
@@ -139,11 +112,15 @@ export const PlatformDashboard: React.FC = () => {
   };
 
   const metrics = [
-    { icon: Building2, label: 'Total Tenants', value: stats ? stats.totalTenants.toString() : '...', iconBg: 'var(--color-mint)', change: '+12%' },
-    { icon: Users, label: 'Active Tenants', value: stats ? stats.activeTenants.toString() : '...', iconBg: 'var(--color-info)', change: '+8%' },
-    { icon: DollarSign, label: 'Subscriptions', value: stats ? stats.totalSubscriptions.toString() : '...', iconBg: 'var(--color-mint)', change: '+24%' },
-    { icon: Headphones, label: 'Health', value: stats ? stats.systemHealth : '...', iconBg: 'var(--color-warning)', change: 'OK' },
+    { icon: Building2, label: 'Total Tenants', value: stats ? stats.totalTenants.toString() : '...', iconBg: 'var(--color-mint)', change: null },
+    { icon: Users, label: 'Active Tenants', value: stats ? stats.activeTenants.toString() : '...', iconBg: 'var(--color-info)', change: null },
+    { icon: DollarSign, label: 'Subscriptions', value: stats ? stats.totalSubscriptions.toString() : '...', iconBg: 'var(--color-mint)', change: null },
+    { icon: Headphones, label: 'Health', value: stats ? stats.systemHealth : '...', iconBg: 'var(--color-warning)', change: null },
   ];
+
+  const signupData = stats?.signupTrend || [];
+  const planDistribution = stats?.planDistribution || [];
+  const supportTickets = stats?.supportTickets || [];
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -183,10 +160,12 @@ export const PlatformDashboard: React.FC = () => {
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${metric.iconBg}20` }}>
                   <Icon className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: metric.iconBg }} />
                 </div>
-                <div className="flex items-center gap-1 text-xs font-medium text-[var(--color-mint)]">
-                  <TrendingUp className="w-3 h-3" />
-                  {metric.change}
-                </div>
+                {metric.change && (
+                  <div className="flex items-center gap-1 text-xs font-medium text-[var(--color-mint)]">
+                    <TrendingUp className="w-3 h-3" />
+                    {metric.change}
+                  </div>
+                )}
               </div>
               <div className="text-xl sm:text-3xl font-bold text-[var(--color-text-primary)] mb-1">{metric.value}</div>
               <div className="text-xs sm:text-sm text-[var(--color-text-secondary)]">{metric.label}</div>
@@ -260,8 +239,8 @@ export const PlatformDashboard: React.FC = () => {
                         {tenant.status}
                       </span>
                     </td>
-                    <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-[var(--color-text-secondary)] hidden sm:table-cell">{tenant.users}</td>
-                    <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-[var(--color-text-secondary)] whitespace-nowrap hidden md:table-cell">{tenant.lastActive}</td>
+                    <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-[var(--color-text-secondary)] hidden sm:table-cell">{tenant.users ?? 'N/A'}</td>
+                    <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-[var(--color-text-secondary)] whitespace-nowrap hidden md:table-cell">{tenant.lastActive ?? 'N/A'}</td>
                     <td className="px-3 sm:px-4 py-3">
                       <div className="flex gap-1 sm:gap-2">
                         <button 
@@ -389,10 +368,10 @@ export const PlatformDashboard: React.FC = () => {
                 {[
                   { label: 'Business Type', value: viewTenant.type },
                   { label: 'Subscription Plan', value: viewTenant.plan },
-                  { label: 'Active Users', value: viewTenant.users.toString() },
-                  { label: 'Last Active', value: viewTenant.lastActive },
-                  { label: 'Revenue', value: viewTenant.revenue },
-                  { label: 'Status', value: viewTenant.status },
+                  { label: 'Active Users', value: viewTenant.users?.toString() ?? 'N/A' },
+                  { label: 'Last Active', value: viewTenant.lastActive ?? 'N/A' },
+                  { label: 'Revenue', value: viewTenant.revenue ?? 'N/A' },
+                  { label: 'Status', value: viewTenant.status ?? 'N/A' },
                 ].map(item => (
                   <div key={item.label} className="bg-[var(--color-surface-secondary)] rounded-lg p-3">
                     <div className="text-xs text-[var(--color-text-muted)] mb-1">{item.label}</div>
