@@ -41,6 +41,7 @@ export interface User {
   phone?: string;
   role: string;
   scope?: string;
+  isPlatformUser: boolean;
 }
 
 export interface Tenant {
@@ -268,6 +269,8 @@ export const api = {
 
 // Auth
 export const login = (credentials: Record<string, string>) => api.post<ApiResponse<null>>('/auth/login', credentials);
+export const platformLogin = (credentials: Record<string, string>) => api.post<ApiResponse<null>>('/platform/auth/login', credentials);
+export const logout = () => api.post('/auth/logout', {});
 export const signup = (userData: Record<string, unknown>) => api.post<ApiResponse<null>>('/auth/signup', userData);
 export const getProfile = () => api.get<ApiResponse<null>>('/auth/me');
 

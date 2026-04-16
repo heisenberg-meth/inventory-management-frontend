@@ -4,7 +4,7 @@ import {
   Building2, Mail, Lock, Eye, EyeOff, LayoutGrid,
   Shield, ShieldCheck, Fingerprint, Info, Star, Zap
 } from 'lucide-react';
-import { login as loginApi } from '../data/apiService';
+import { login as loginApi, platformLogin as platformLoginApi } from '../data/apiService';
 import { useAuth } from '../context/AuthContext';
 
 // Import images for Vite
@@ -52,13 +52,16 @@ export const LoginScreen: React.FC = () => {
     setError(false);
 
     try {
-      const response = await loginApi({ email, password, companyCode: orgId });
+      const response = isPlatformAdmin 
+        ? await platformLoginApi({ email, password })
+        : await loginApi({ email, password, companyCode: orgId });
+        
       const token = response.accessToken;
       
       if (token && response.user) {
         login(token, response.user, response.tenant);
         
-        if (isPlatformAdmin || response.user?.role === "PLATFORM_ADMIN") {
+        if (response.user.isPlatformUser || response.user.role === "PLATFORM_ADMIN") {
           navigate("/admin");
         } else {
           navigate("/app");

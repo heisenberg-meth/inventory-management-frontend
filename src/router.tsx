@@ -23,6 +23,22 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: "/platform/login",
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <Screens.LoginScreen />
+      </Suspense>
+    ),
+    loader: () => {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get('role') !== 'platform-admin') {
+        url.searchParams.set('role', 'platform-admin');
+        window.history.replaceState({}, '', url.pathname + url.search);
+      }
+      return null;
+    }
+  },
+  {
     path: "/portal",
     element: (
       <Suspense fallback={<PageLoader />}>
