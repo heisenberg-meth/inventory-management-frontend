@@ -161,7 +161,7 @@ export const Layout: React.FC = () => {
   const [prevPathname, setPrevPathname] = useState(location.pathname);
   if (location.pathname !== prevPathname) {
     setPrevPathname(location.pathname);
-    const currentSection = navSections.find(section => 
+    const currentSection = navSections.find(section =>
       section.items.some(item => isActive(item.path))
     );
     if (currentSection && currentSection.title !== expandedSection) {
