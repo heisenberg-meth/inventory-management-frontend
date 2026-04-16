@@ -24,22 +24,6 @@ const emptyForm: FormData = {
   stock: 0, reorderLevel: 10, batchNumber: '', expiryDate: ''
 };
 
-const computeStatus = (stock: number, threshold: number, expiry: string): string => {
-  if (stock === 0) return 'Out of Stock';
-  
-  // Expiry check
-  if (expiry) {
-    const today = new Date();
-    const expDate = new Date(expiry);
-    const days = Math.ceil((expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    if (days > 0 && days <= 30) return 'Expiring';
-    if (days <= 0) return 'Expired';
-  }
-
-  if (stock <= threshold) return 'Low Stock';
-  return 'Active';
-};
-
 export const ProductManagement: React.FC = () => {
   const { tenant } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
@@ -72,14 +56,20 @@ export const ProductManagement: React.FC = () => {
   const fetchInitialData = async () => {
     setLoading(true);
     try {
-      const [productsData, categoriesData] = await Promise.all([
-        getProducts(0, 1000), // Get a large batch for local sorting/filtering in this view
-        getCategories()
-      ]);
+      // Use smaller page size and individual catch to prevent total failure
+      const productsData = await getProducts(0, 50).catch(err => {
+        console.error('Failed to fetch products:', err);
+        return [];
+      });
+      const categoriesData = await getCategories().catch(err => {
+        console.error('Failed to fetch categories:', err);
+        return [];
+      });
+      
       setProducts(productsData);
       setCategories(categoriesData);
     } catch (err) {
-      console.error('Failed to fetch initial data:', err);
+      console.error('Unexpected error in fetchInitialData:', err);
     } finally {
       setLoading(false);
     }
@@ -182,10 +172,7 @@ export const ProductManagement: React.FC = () => {
   };
 
   const filtered = useMemo(() => {
-    let result = products.map(p => ({
-      ...p,
-      status: computeStatus(p.stock, p.reorder_level || p.threshold || 10, p.expiry || p.expiry_date || '')
-    })).filter(p => {
+    let result = products.filter(p => {
       const q = searchQuery.toLowerCase();
       const matchSearch = !q || p.name.toLowerCase().includes(q) || (p.batch || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q);
       const matchCat = categoryFilter === 'All Categories' || p.category === categoryFilter;
@@ -387,7 +374,7 @@ export const ProductManagement: React.FC = () => {
                     <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium text-[var(--color-text-primary)] whitespace-nowrap">{product.price}</td>
                     <td className="px-3 sm:px-4 py-3">
                       <div className="space-y-1">
-                        <div className="text-xs sm:text-sm font-medium text-[var(--color-text-primary)] whitespace-nowrap">{product.stock.toLocaleString()} {product.unit}s</div>
+                        <div className="text-xs sm:text-sm font-medium text-[var(--color-text-primary)] whitespace-nowrap">{product.stock?.toLocaleString()} {product.unit}s</div>
                         <div className="w-16 sm:w-20 h-1.5 bg-[var(--color-surface-secondary)] rounded-full overflow-hidden">
                           <div 
                             className="h-full rounded-full transition-all"

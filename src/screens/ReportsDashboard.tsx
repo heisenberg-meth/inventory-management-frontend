@@ -68,10 +68,10 @@ export const ReportsDashboard: React.FC = () => {
   };
 
   const metrics = [
-    { label: 'Total Revenue', value: stats ? `₹${(stats.totalRevenue / 100000).toFixed(2)}L` : '...', change: '+18.2%', up: true, icon: DollarSign, color: 'var(--color-mint)' },
-    { label: 'Total Orders', value: stats ? stats.totalOrders.toLocaleString() : '...', change: '+12.5%', up: true, icon: ShoppingCart, color: 'var(--color-info)' },
-    { label: 'Low Stock', value: stats ? stats.lowStockCount.toLocaleString() : '...', change: '+8.7%', up: true, icon: Package, color: '#a78bfa' },
-    { label: 'Stock Value', value: stats ? `₹${(stats.stockValuation / 100000).toFixed(2)}L` : '...', change: '-3.2%', up: false, icon: Users, color: 'var(--color-warning)' },
+    { label: 'Total Revenue', value: stats ? `₹${((stats.totalRevenue || 0) / 100000).toFixed(2)}L` : '...', change: '+18.2%', up: true, icon: DollarSign, color: 'var(--color-mint)' },
+    { label: 'Total Orders', value: stats ? stats.totalOrders?.toLocaleString() : '...', change: '+12.5%', up: true, icon: ShoppingCart, color: 'var(--color-info)' },
+    { label: 'Low Stock', value: stats ? stats.lowStockCount?.toLocaleString() : '...', change: '+8.7%', up: true, icon: Package, color: '#a78bfa' },
+    { label: 'Stock Value', value: stats ? `₹${((stats.stockValuation || 0) / 100000).toFixed(2)}L` : '...', change: '-3.2%', up: false, icon: Users, color: 'var(--color-warning)' },
   ];
 
   return (

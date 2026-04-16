@@ -51,8 +51,8 @@ export const PaymentsReceived: React.FC = () => {
       {/* METRIC CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { icon: '💰', title: 'Total Received', value: stats ? `₹${stats.totalRevenue.toLocaleString()}` : '...', trend: 'This month', color: 'text-[var(--color-mint)]' },
-          { icon: '✅', title: 'Settled', value: stats ? stats.totalOrders.toLocaleString() : '...', trend: 'Fully settled', color: 'text-[var(--color-mint)]' },
+          { icon: '💰', title: 'Total Received', value: stats ? `₹${stats.totalRevenue?.toLocaleString()}` : '...', trend: 'This month', color: 'text-[var(--color-mint)]' },
+          { icon: '✅', title: 'Settled', value: stats ? stats.totalOrders?.toLocaleString() : '...', trend: 'Fully settled', color: 'text-[var(--color-mint)]' },
           { icon: '⏳', title: 'Outstanding', value: '₹42,800', trend: 'Awaiting payment', color: 'text-[var(--color-warning)]' },
           { icon: '❌', title: 'Overdue', value: '₹18,400', trend: 'Past due date', color: 'text-[var(--color-danger)]' },
         ].map((metric, i) => (
