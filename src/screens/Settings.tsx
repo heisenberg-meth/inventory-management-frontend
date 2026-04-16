@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Settings as SettingsIcon, Building, Bell, CreditCard, Save, Check, Globe, Mail, Smartphone, User, Phone, MapPin, Lock, Edit3, Camera } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -62,7 +62,11 @@ export const Settings: React.FC = () => {
   const [draft, setDraft] = useState({ ...profile });
 
   // Update profile when user/tenant context changes
-  useEffect(() => {
+  const [prevUser, setPrevUser] = useState(user);
+  const [prevTenant, setPrevTenant] = useState(tenant);
+  if (user !== prevUser || tenant !== prevTenant) {
+    setPrevUser(user);
+    setPrevTenant(tenant);
     if (user || tenant) {
       const newProfile = {
         name: user?.name || '',
@@ -72,7 +76,7 @@ export const Settings: React.FC = () => {
       setProfile(newProfile);
       setDraft(newProfile);
     }
-  }, [user, tenant]);
+  }
 
   // Maintenance mode
   const [maintenance, setMaintenance] = useState(false);

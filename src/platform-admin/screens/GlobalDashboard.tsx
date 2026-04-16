@@ -4,12 +4,28 @@ import {
   CheckCircle2,
   IndianRupee,
   Ticket,
+  CheckCircle,
   Activity,
   Database,
   HardDrive,
   Cpu,
-  CheckCircle,
 } from "lucide-react";
+
+const revenueData = [
+  { month: 'Jan', revenue: 0 },
+  { month: 'Feb', revenue: 120000 },
+  { month: 'Mar', revenue: 250000 },
+  { month: 'Apr', revenue: 400000 },
+  { month: 'May', revenue: 480000 },
+  { month: 'Jun', revenue: 500000 },
+];
+
+const healthMetrics = [
+  { label: 'API Uptime', value: '99.9%', status: 'Operational', statusColor: 'mint', progress: 100, icon: Activity },
+  { label: 'Database Load', value: '42%', status: 'Normal', statusColor: 'mint', progress: 42, icon: Database },
+  { label: 'Storage Usage', value: '78%', status: 'Warning', statusColor: 'amber', progress: 78, icon: HardDrive },
+  { label: 'CPU Usage', value: '35%', status: 'Normal', statusColor: 'mint', progress: 35, icon: Cpu },
+];
 import { 
   Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   AreaChart, Area, PieChart, Pie, Cell 

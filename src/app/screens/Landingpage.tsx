@@ -393,7 +393,7 @@ function useMegaDropdown() {
 }
 
 // ─── Mega Nav Links (Desktop) ─────────────────────────────────────────────────
-function MegaNavLinks({ activeDropdown: _ad, open: _o, scheduleClose: _sc, textColor }: { activeDropdown: string | null; open: (key: string) => void; scheduleClose: () => void; textColor: string }) {
+function MegaNavLinks({ textColor }: { activeDropdown: string | null; open: (key: string) => void; scheduleClose: () => void; textColor: string }) {
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   const links = [
     { label: "Features", target: "features" },
@@ -418,7 +418,7 @@ function MegaNavLinks({ activeDropdown: _ad, open: _o, scheduleClose: _sc, textC
 }
 
 // ─── Mobile Mega Menu ─────────────────────────────────────────────────────────
-function MobileMegaMenu({ scrollTo, textColor, borderColor: _bc }: { scrollTo: (id: string) => void; textColor: string; borderColor: string }) {
+function MobileMegaMenu({ scrollTo, textColor }: { scrollTo: (id: string) => void; textColor: string; borderColor: string }) {
   const links = [
     { label: "Features", target: "features" },
     { label: "Solutions", target: "solutions" },
@@ -442,8 +442,12 @@ function MobileMegaMenu({ scrollTo, textColor, borderColor: _bc }: { scrollTo: (
 }
 
 // ─── Mega Dropdown Panel ──────────────────────────────────────────────────────
-function MegaDropdownPanel({ activeDropdown: _ad, cancelClose: _cc, scheduleClose: _sc, navHeight: _nh }: { activeDropdown: string | null; cancelClose: () => void; scheduleClose: () => void; navHeight: number }) {
-  // Placeholder — extend with actual dropdown content as needed
+function MegaDropdownPanel(_props: {
+  activeDropdown: string | null;
+  cancelClose: () => void;
+  scheduleClose: () => void;
+  navHeight: number;
+}) {
   return null;
 }
 
