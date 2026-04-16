@@ -102,7 +102,7 @@ export const UserManagement: React.FC = () => {
 
   const openEdit = (user: User) => {
     setEditUser(user);
-    setEditForm({ name: user.name || '', email: user.email || '', role: user.role || '', status: (user.scope as any) === 'INACTIVE' ? 'Inactive' : 'Active' });
+    setEditForm({ name: user.name || '', email: user.email || '', role: user.role || '', status: user.scope === 'INACTIVE' ? 'Inactive' : 'Active' });
   };
 
   const handleSaveEdit = async () => {
@@ -136,7 +136,7 @@ export const UserManagement: React.FC = () => {
 
   const toggleStatus = async (user: User) => {
     try {
-      const newStatus = (user.scope as any) === 'INACTIVE' ? 'ACTIVE' : 'INACTIVE';
+      const newStatus = user.scope === 'INACTIVE' ? 'ACTIVE' : 'INACTIVE';
       await updateUser(user.id, { scope: newStatus });
       showSuccess(`${user.name} ${newStatus === 'ACTIVE' ? 'activated' : 'deactivated'}`);
       fetchUsers();
@@ -147,8 +147,8 @@ export const UserManagement: React.FC = () => {
 
   const stats = [
     { label: 'Total Users', value: users.length },
-    { label: 'Active', value: users.filter(u => (u.scope as any) !== 'INACTIVE').length },
-    { label: 'Inactive', value: users.filter(u => (u.scope as any) === 'INACTIVE').length },
+    { label: 'Active', value: users.filter(u => u.scope !== 'INACTIVE').length },
+    { label: 'Inactive', value: users.filter(u => u.scope === 'INACTIVE').length },
     { label: 'Roles', value: roles.length },
   ];
 
@@ -223,7 +223,7 @@ export const UserManagement: React.FC = () => {
                   <tr><td colSpan={5} className="px-4 py-8 text-center text-[var(--color-text-secondary)] text-sm">No users found</td></tr>
                 ) : filteredUsers.map((user) => {
                   const roleColor = getRoleColor(user.role);
-                  const isActive = (user.scope as any) !== 'INACTIVE';
+                  const isActive = user.scope !== 'INACTIVE';
                   return (
                     <tr key={user.id} className="hover:bg-[var(--color-surface-secondary)] transition-colors">
                       <td className="px-3 sm:px-4 py-3">
