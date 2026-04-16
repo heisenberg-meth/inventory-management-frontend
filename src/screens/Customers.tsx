@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit, Trash2, Search, X, Check, Users, Phone, Mail, Eye } from 'lucide-react';
-import { getCustomers, type Customer as CustomerType } from '../data/apiService';
+import { getCustomers, createCustomer, updateCustomer, deleteCustomer, type Customer as CustomerType } from '../data/apiService';
 
 
 

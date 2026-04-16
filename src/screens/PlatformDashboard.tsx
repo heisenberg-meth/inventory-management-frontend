@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, Users, DollarSign, Headphones, TrendingUp, Eye, X, AlertTriangle, Check, Plus, Search } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { getPlatformStats, getTenants, type PlatformStats, type Tenant as ApiTenant } from '../data/apiService';
+import { getPlatformStats, getTenants, createTenant, type PlatformStats, type Tenant as ApiTenant } from '../data/apiService';
 
 interface Tenant extends ApiTenant {
   status?: string;

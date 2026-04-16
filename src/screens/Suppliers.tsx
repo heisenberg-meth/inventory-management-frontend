@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit, Trash2, Search, X, Check, Users2, Phone, Mail } from 'lucide-react';
-import { getSuppliers, type Supplier as SupplierType } from '../data/apiService';
+import { getSuppliers, createSupplier, updateSupplier, deleteSupplier, type Supplier as SupplierType } from '../data/apiService';
 
 const IC = "w-full bg-[var(--color-surface-secondary)] border border-[var(--color-border)] rounded-lg px-4 py-2.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-mint)]";
 

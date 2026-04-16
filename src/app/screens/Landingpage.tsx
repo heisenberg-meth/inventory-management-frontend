@@ -442,6 +442,7 @@ function MobileMegaMenu({ scrollTo, textColor }: { scrollTo: (id: string) => voi
 }
 
 // ─── Mega Dropdown Panel ──────────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function MegaDropdownPanel(_props: {
   activeDropdown: string | null;
   cancelClose: () => void;
