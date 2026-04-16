@@ -147,7 +147,6 @@ export const Layout: React.FC = () => {
     if (path === '/app') return location.pathname === '/app';
     return location.pathname.startsWith(path);
   };
-<<<<<<< HEAD
   const currentSectionTitle = (() => {
     const currentSection = navSections.find(section => 
       section.items.some(item => isActive(item.path))
@@ -157,7 +156,7 @@ export const Layout: React.FC = () => {
 
   if (currentSectionTitle && currentSectionTitle !== expandedSection) {
     setExpandedSection(currentSectionTitle);
-=======
+  }
 
   const [prevPathname, setPrevPathname] = useState(location.pathname);
   if (location.pathname !== prevPathname) {
@@ -168,7 +167,6 @@ export const Layout: React.FC = () => {
     if (currentSection && currentSection.title !== expandedSection) {
       setExpandedSection(currentSection.title);
     }
->>>>>>> 33b995d (refactor: optimize state synchronization and cleanup unused props across multiple components)
   }
 
   const toggleSection = (title: string) => {
@@ -321,10 +319,10 @@ export const Layout: React.FC = () => {
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-medium text-[var(--color-text-primary)] truncate">
-                {user?.name || 'Loading...'}
+                {user?.name || "Loading..."}
               </div>
               <div className="text-xs text-[var(--color-text-secondary)] truncate">
-                {user?.role || 'User'}
+                {user?.role || "User"}
               </div>
             </div>
             <button
@@ -369,10 +367,10 @@ export const Layout: React.FC = () => {
             {/* Tenant Switcher */}
             <div className="hidden sm:flex items-center gap-2 bg-[var(--color-surface-secondary)] px-3 py-1.5 rounded-full border border-[var(--color-border)]">
               <span className="text-xs sm:text-sm text-[var(--color-text-primary)]">
-                {tenant?.name || 'No Business'}
+                {tenant?.name || "No Business"}
               </span>
               <span className="px-2 py-0.5 bg-[var(--color-danger)] text-white text-xs rounded-full">
-                {tenant?.plan || 'production'}
+                {tenant?.plan || "production"}
               </span>
             </div>
 
@@ -502,7 +500,7 @@ export const Layout: React.FC = () => {
                   }}
                   className="sm:inline"
                 >
-                  {user?.name || 'Loading...'}
+                  {user?.name || "Loading..."}
                 </span>
                 <ChevronDown
                   size={13}
