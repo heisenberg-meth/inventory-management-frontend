@@ -101,7 +101,7 @@ export const ProductManagement: React.FC = () => {
       name: p.name,
       sku: p.sku || '',
       category: p.category || '',
-      categoryId: p.categoryId?.toString() || (categories.length > 0 ? categories[0].id.toString() : '1'),
+      categoryId: (p.categoryId || p.category_id)?.toString() || (categories.length > 0 ? categories[0].id.toString() : '1'),
       purchasePrice: (p.purchase_price || 0).toString(),
       salePrice: (p.sale_price || 0).toString(),
       unit: p.unit,
@@ -127,7 +127,7 @@ export const ProductManagement: React.FC = () => {
   const handleSave = async () => {
     if (!validateForm()) return;
     
-    const payload: any = {
+    const payload: Record<string, unknown> = {
       name: formData.name,
       sku: formData.sku,
       categoryId: Number(formData.categoryId),
@@ -157,9 +157,9 @@ export const ProductManagement: React.FC = () => {
       }
       setShowModal(false);
       fetchInitialData(); // Refresh list from server
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to save product:', err);
-      alert(err.message || 'Failed to save product');
+      alert(err instanceof Error ? err.message : 'Failed to save product');
     }
   };
 
@@ -170,9 +170,9 @@ export const ProductManagement: React.FC = () => {
       setDeleteTarget(null);
       showSuccess('Product deleted.');
       fetchInitialData();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to delete product:', err);
-      alert(err.message || 'Failed to delete product');
+      alert(err instanceof Error ? err.message : 'Failed to delete product');
     }
   };
 

@@ -147,8 +147,6 @@ export const Layout: React.FC = () => {
     if (path === '/app') return location.pathname === '/app';
     return location.pathname.startsWith(path);
   };
-
-  // Auto-expand current section on mount or path change
   useEffect(() => {
     const currentSection = navSections.find(section => 
       section.items.some(item => isActive(item.path))
@@ -156,7 +154,6 @@ export const Layout: React.FC = () => {
     if (currentSection && currentSection.title !== expandedSection) {
       setExpandedSection(currentSection.title);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   const toggleSection = (title: string) => {

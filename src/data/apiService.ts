@@ -7,6 +7,7 @@ interface RequestOptions extends RequestInit {
 export interface Product {
   id: number;
   name: string;
+  sku?: string;
   batch_number: string;
   category_id?: number;
   category?: string;
@@ -30,6 +31,7 @@ export interface Product {
   expiryDate?: string;
   salePrice?: number;
   reorderLevel?: number;
+  categoryId?: number;
 }
 
 export interface User {
@@ -146,12 +148,19 @@ export interface SalesOrder {
 }
 
 export interface DashboardKPIs {
-  totalRevenue: number;
-  totalOrders: number;
-  lowStockCount: number;
-  outOfStockCount: number;
-  recentSales: SalesOrder[];
-  stockValuation: number;
+  total_products: number;
+  low_stock_count: number;
+  out_of_stock_count: number;
+  today_sales_amount: number;
+  today_sales_count: number;
+  today_purchases_amount: number;
+  expiring_soon_count?: number;
+  inventory_valuation: number;
+  category_distribution: {
+    category_id: number;
+    category_name: string;
+    product_count: number;
+  }[];
 }
 
 export interface StockItem {
@@ -245,8 +254,8 @@ export const getProducts = async (page = 0, size = 10): Promise<Product[]> => {
   }));
 };
 
-export const createProduct = (data: any) => api.post<Product>('/tenant/products', data);
-export const updateProduct = (id: number | string, data: any) => api.put<Product>(`/tenant/products/${id}`, data);
+export const createProduct = (data: unknown) => api.post<Product>('/tenant/products', data);
+export const updateProduct = (id: number | string, data: unknown) => api.put<Product>(`/tenant/products/${id}`, data);
 export const deleteProduct = (id: number | string) => api.delete(`/tenant/products/${id}`);
 
 export const getLowStockProducts = async (): Promise<Product[]> => {
@@ -277,6 +286,7 @@ export const getStockReport = () => api.get<Record<string, unknown>>('/tenant/re
 // Tenant Stock
 export const getStockTransfers = () => api.get<StockTransfer[]>('/tenant/stock/transfers');
 export const getStockByLocation = (locId: string | number) => api.get<Record<string, unknown>>(`/tenant/stock/by-location?locationId=${locId}`);
+export const getTenantAuditLogs = (page = 0, size = 10) => api.get<PagedResponse<unknown>>(`/tenant/audit?page=${page}&size=${size}`).then(res => res.content || []);
 
 // Platform
 export const getPlatformStats = async (): Promise<PlatformStats> => {

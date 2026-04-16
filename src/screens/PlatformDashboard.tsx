@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, Users, DollarSign, Headphones, TrendingUp, Eye, X, AlertTriangle, Check, Plus, Search } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { getPlatformStats, getTenants, type PlatformStats, type Tenant } from '../data/apiService';
+import { getPlatformStats, getTenants, type PlatformStats, type Tenant as ApiTenant } from '../data/apiService';
 
-
-
-
+interface Tenant extends Omit<ApiTenant, 'companyCode' | 'workspaceSlug'> {
+  companyCode?: string;
+  workspaceSlug?: string;
+  status: string;
+  users: number;
+  lastActive: string;
+  revenue: string;
+}
 
 const signupData = [
   { month: 'Oct', signups: 12, id: '2023-10' },
@@ -53,7 +58,13 @@ export const PlatformDashboard: React.FC = () => {
         getTenants()
       ]);
       setStats(sData);
-      setTenants(tData);
+      setTenants((tData as ApiTenant[]).map(t => ({
+        ...t,
+        status: (t as any).status || 'Active',
+        users: (t as any).users || 1,
+        lastActive: (t as any).lastActive || 'Today',
+        revenue: (t as any).revenue || '₹0'
+      })));
     } catch (err) {
       console.error('Failed to fetch platform data:', err);
     } finally {

@@ -69,7 +69,6 @@ export const Settings: React.FC = () => {
         phone: user?.phone || '',
         location: tenant?.address || ''
       };
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setProfile(newProfile);
       setDraft(newProfile);
     }

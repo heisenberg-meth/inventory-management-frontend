@@ -51,8 +51,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     } catch (error) {
       console.error('Failed to refresh profile:', error);
-      // If profile fetch fails with 401, we might want to logout
-      // logout(); 
     }
   };
 
@@ -66,8 +64,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setToken(savedToken);
         if (savedUser) setUser(JSON.parse(savedUser));
         if (savedTenant) setTenant(JSON.parse(savedTenant));
-        
-        // Optionally refresh profile from server to ensure data is fresh
         await refreshProfile();
       }
       setLoading(false);
@@ -82,8 +78,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     </AuthContext.Provider>
   );
 };
-
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

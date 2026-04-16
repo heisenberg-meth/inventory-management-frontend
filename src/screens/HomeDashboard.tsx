@@ -5,36 +5,39 @@ import {
   UserPlus, TrendingUp, TrendingDown, Circle, X 
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { getDashboardStats, type DashboardKPIs } from '../data/apiService';
+import { getDashboardStats, getSalesOrders, getTenantAuditLogs, type DashboardKPIs, type SalesOrder } from '../data/apiService';
+import { useAuth } from '../context/AuthContext';
 
-// These will be replaced by API data or kept as placeholders if backend doesn't provide them yet
-const weeklyData = [
-  { day: "Mon", sales: 0 },
-  { day: "Tue", sales: 0 },
-  { day: "Wed", sales: 0 },
-  { day: "Thu", sales: 0 },
-  { day: "Fri", sales: 0 },
-  { day: "Sat", sales: 0 },
-  { day: "Sun", sales: 0 },
-];
+interface ActivityLog {
+  id: string | number;
+  action: string;
+  time: string;
+  color: string;
+  detail: string;
+}
 
-const stockLevels = [
-  { category: 'Medicines', level: 0, color: 'var(--color-mint)', id: 'medicines' },
-  { category: 'Medical Supplies', level: 0, color: 'var(--color-mint)', id: 'medical-supplies' },
-  { category: 'Personal Care', level: 0, color: 'var(--color-warning)', id: 'personal-care' },
-  { category: 'Equipment', level: 0, color: 'var(--color-danger)', id: 'equipment' },
-];
-
-const recentActivity: { id: number; action: string; time: string; user: string; color: string; detail: string }[] = [];
+interface TenantLog {
+  id: number;
+  movementType: string;
+  createdAt: string;
+  productId: number;
+  quantity: number;
+  notes?: string;
+}
 
 export const HomeDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardKPIs | null>(null);
+  const [recentSales, setRecentSales] = useState<SalesOrder[]>([]);
+  const [recentActivity, setRecentActivity] = useState<ActivityLog[]>([]);
 
   useEffect(() => {
     fetchStats();
+    fetchRecentSales();
+    fetchActivity();
   }, []);
 
   const fetchStats = async () => {
@@ -49,6 +52,30 @@ export const HomeDashboard: React.FC = () => {
     }
   };
 
+  const fetchRecentSales = async () => {
+    try {
+      const orders = await getSalesOrders();
+      setRecentSales(orders.slice(0, 5));
+    } catch (err) {
+      console.error('Failed to fetch recent sales:', err);
+    }
+  };
+
+  const fetchActivity = async () => {
+    try {
+      const logs = await getTenantAuditLogs(0, 5) as TenantLog[];
+      setRecentActivity(logs.map(log => ({
+        id: log.id,
+        action: log.movementType,
+        time: new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        color: log.movementType === 'SALE' ? 'var(--color-mint)' : (log.movementType === 'PURCHASE' ? 'var(--color-info)' : 'var(--color-warning)'),
+        detail: `Product #${log.productId}: ${log.quantity > 0 ? '+' : ''}${log.quantity} ${log.notes || ''}`
+      })));
+    } catch (err) {
+      console.error('Failed to fetch activity logs:', err);
+    }
+  };
+
   const quickActions = [
     { icon: Package, label: 'New Product', path: '/app/products', action: 'add' },
     { icon: ShoppingCart, label: 'New Order', path: '/app/orders', action: 'add' },
@@ -60,8 +87,8 @@ export const HomeDashboard: React.FC = () => {
     { 
       icon: Package, 
       label: 'Products', 
-      value: stats ? stats.totalOrders.toLocaleString() : '...', // Using totalOrders as proxy for now or I should check the schema again
-      change: '+12%', 
+      value: stats ? stats.total_products?.toLocaleString() : '...', 
+      change: '+0%', // Dynamic change could be calculated if we have history
       trend: 'up',
       iconBg: 'bg-[var(--color-mint)]',
       iconColor: 'text-white',
@@ -70,8 +97,8 @@ export const HomeDashboard: React.FC = () => {
     { 
       icon: AlertTriangle, 
       label: 'Low Stock', 
-      value: stats ? stats.lowStockCount.toLocaleString() : '...', 
-      change: '-8%', 
+      value: stats ? stats.low_stock_count?.toLocaleString() : '...', 
+      change: 'Active', 
       trend: 'down',
       iconBg: 'bg-[var(--color-warning)]',
       iconColor: 'text-white',
@@ -79,9 +106,9 @@ export const HomeDashboard: React.FC = () => {
     },
     { 
       icon: DollarSign, 
-      label: "Revenue", 
-      value: stats ? `₹${(stats.totalRevenue / 1000).toFixed(1)}K` : '...', 
-      change: '+24%', 
+      label: "Today's Revenue", 
+      value: stats ? `₹${(stats.today_sales_amount || 0).toLocaleString()}` : '...', 
+      change: '+0%', 
       trend: 'up',
       iconBg: 'bg-[var(--color-mint)]',
       iconColor: 'text-white',
@@ -89,15 +116,37 @@ export const HomeDashboard: React.FC = () => {
     },
     { 
       icon: ShoppingCart, 
-      label: 'Pending', 
-      value: stats ? stats.totalOrders.toLocaleString() : '...', 
-      change: '+2', 
+      label: 'Today\'s Orders', 
+      value: stats ? stats.today_sales_count?.toLocaleString() : '...', 
+      change: '+0', 
       trend: 'up',
       iconBg: 'bg-[var(--color-danger)]',
       iconColor: 'text-white',
       path: '/app/orders'
     },
   ];
+
+  const derivedStockLevels = stats?.category_distribution?.map((cat, idx) => ({
+    id: cat.category_id.toString(),
+    category: cat.category_name,
+    level: stats.total_products > 0 ? Math.min(100, Math.round((cat.product_count / stats.total_products) * 100)) : 0,
+    color: ['var(--color-mint)', 'var(--color-info)', 'var(--color-warning)', 'var(--color-danger)'][idx % 4]
+  })) || [];
+
+  // Weekly sales chart placeholder - can be improved when backend supports it
+  const weeklySalesData = [
+    { day: "Mon", sales: 0 },
+    { day: "Tue", sales: 0 },
+    { day: "Wed", sales: 0 },
+    { day: "Thu", sales: 0 },
+    { day: "Fri", sales: 0 },
+    { day: "Sat", sales: 0 },
+    { day: "Sun", sales: LocalDateToDay(new Date()) === "Sun" ? stats?.today_sales_amount || 0 : 0 },
+  ];
+
+  function LocalDateToDay(date: Date) {
+    return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getDay()];
+  }
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -107,7 +156,7 @@ export const HomeDashboard: React.FC = () => {
         style={{ background: 'linear-gradient(135deg, #0f6644 0%, #1db97a 100%)' }}
       >
         <div className="relative z-10">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Welcome back, John!</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Welcome back, {user?.name || 'User'}!</h1>
           <p className="text-white/80 mb-4 sm:mb-6 text-sm sm:text-base">Here's what's happening with your inventory today</p>
           
           {/* Quick Actions */}
@@ -134,11 +183,11 @@ export const HomeDashboard: React.FC = () => {
       </div>
 
       {/* Alert Bar */}
-      {!alertDismissed && (
+      {!alertDismissed && stats?.expiring_soon_count !== undefined && stats.expiring_soon_count > 0 && (
         <div className="bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 rounded-lg px-4 py-3 flex items-start sm:items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5 sm:mt-0" />
           <span className="text-[var(--color-warning)] font-medium text-sm flex-1">
-            7 products expiring within 30 days
+            {stats.expiring_soon_count} products expiring soon
           </span>
           <div className="flex items-center gap-2">
             <button 
@@ -202,7 +251,7 @@ export const HomeDashboard: React.FC = () => {
             </button>
           </div>
           <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={weeklyData}>
+            <BarChart data={weeklySalesData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
               <XAxis dataKey="day" stroke="var(--color-text-muted)" fontSize={12} />
               <YAxis stroke="var(--color-text-muted)" fontSize={12} />
@@ -222,7 +271,7 @@ export const HomeDashboard: React.FC = () => {
         {/* Stock Levels */}
         <div className="bg-[var(--color-card-bg)] border border-[var(--color-border)] rounded-xl p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base sm:text-lg font-semibold text-[var(--color-text-primary)]">Stock Levels</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-[var(--color-text-primary)]">Stock Distribution</h3>
             <button 
               onClick={() => navigate('/app/stock')}
               className="text-xs text-[var(--color-mint)] hover:underline"
@@ -231,7 +280,9 @@ export const HomeDashboard: React.FC = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {stockLevels.map((stock) => (
+            {derivedStockLevels.length === 0 ? (
+              <div className="text-center py-8 text-[var(--color-text-muted)] text-sm">No category data available</div>
+            ) : derivedStockLevels.map((stock) => (
               <div key={stock.id}>
                 <div className="flex justify-between mb-2">
                   <span className="text-xs sm:text-sm text-[var(--color-text-primary)]">{stock.category}</span>
@@ -265,9 +316,9 @@ export const HomeDashboard: React.FC = () => {
           <div className="space-y-3">
             {loading ? (
               <div className="flex justify-center py-8"><div className="w-6 h-6 border-2 border-[var(--color-mint)] border-t-transparent rounded-full animate-spin"></div></div>
-            ) : (!stats || stats.recentSales.length === 0) ? (
+            ) : (recentSales.length === 0) ? (
               <div className="text-center py-8 text-[var(--color-text-muted)]">No recent orders</div>
-            ) : stats.recentSales.map((order) => (
+            ) : recentSales.map((order) => (
               <button
                 key={order.id}
                 onClick={() => navigate('/app/orders')}
@@ -314,7 +365,9 @@ export const HomeDashboard: React.FC = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {recentActivity.map((activity, idx) => (
+            {recentActivity.length === 0 ? (
+              <div className="text-center py-8 text-[var(--color-text-muted)]">No recent activity</div>
+            ) : recentActivity.map((activity, idx) => (
               <div key={idx} className="flex gap-3">
                 <div className="flex-shrink-0 mt-1">
                   <Circle className="w-2 h-2" fill={activity.color} stroke={activity.color} />
