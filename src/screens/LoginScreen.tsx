@@ -303,8 +303,7 @@ export const LoginScreen: React.FC = () => {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{
-        __html: `
+      <style>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
           25% { transform: translateX(-4px); }
@@ -325,7 +324,7 @@ export const LoginScreen: React.FC = () => {
         .animate-image-reveal {
           animation: image-reveal 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
-      `}} />
+      `}</style>
     </div>
   );
 };

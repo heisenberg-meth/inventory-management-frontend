@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router";
 import { Layout } from "./components/Layout";
 import { PlatformAdminLayout } from "./platform-admin/PlatformAdminLayout";
 import { PageLoader } from "./components/PageLoader";
+import { RequireAuth } from "./components/RequireAuth";
 import * as Screens from "./routes";
 
 export const router = createBrowserRouter([
@@ -48,7 +49,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    Component: PlatformAdminLayout,
+    element: (
+      <RequireAuth requirePlatform>
+        <PlatformAdminLayout />
+      </RequireAuth>
+    ),
     children: [
       {
         index: true,
@@ -142,7 +147,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/app",
-    Component: Layout,
+    element: (
+      <RequireAuth>
+        <Layout />
+      </RequireAuth>
+    ),
     children: [
       {
         index: true,
