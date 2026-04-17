@@ -210,12 +210,45 @@ export interface Brand {
   productCount: number;
 }
 
+const isDev = import.meta.env.DEV;
+
+/**
+ * ApiError surfaces a safe, user-facing message on `.message` while
+ * keeping the raw backend body on `.detail` (dev-only). We explicitly
+ * do NOT throw the raw body as the error message so that components
+ * rendering `err.message` can't accidentally paint attacker-controlled
+ * or sensitive server output (stack traces, internal IDs, SQL, etc.)
+ * into the DOM.
+ */
+export class ApiError extends Error {
+  readonly status: number;
+  readonly detail?: string;
+
+  constructor(status: number, message: string, detail?: string) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.detail = detail;
+  }
+}
+
+function defaultMessageForStatus(status: number): string {
+  if (status === 401) return 'Your session has expired. Please sign in again.';
+  if (status === 403) return 'You do not have permission to perform this action.';
+  if (status === 404) return 'The requested resource was not found.';
+  if (status === 409) return 'This request conflicts with the current state.';
+  if (status === 429) return 'Too many requests. Please slow down and try again.';
+  if (status >= 500) return 'The server is having trouble. Please try again shortly.';
+  if (status >= 400) return 'The request could not be completed.';
+  return 'Request failed.';
+}
+
 async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const { data, ...rest } = options;
   const token = localStorage.getItem('ims-token');
 
   const headers = new Headers(rest.headers);
-  
+
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
   }
@@ -233,31 +266,38 @@ async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Pr
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
   if (!response.ok) {
-    let err = "API failed";
+    let detail: string | undefined;
     try {
-      err = await response.text();
+      detail = await response.text();
     } catch {
       // ignore
     }
-    console.error("API ERROR:", err);
-    throw new Error(err);
+    // Drop the session on auth failures so stale tokens don't linger.
+    if (response.status === 401) {
+      localStorage.removeItem('ims-token');
+      localStorage.removeItem('ims-user');
+      localStorage.removeItem('ims-tenant');
+    }
+    if (isDev) {
+      console.error(`API ${response.status} on ${endpoint}:`, detail);
+    }
+    throw new ApiError(response.status, defaultMessageForStatus(response.status), detail);
   }
 
   const text = await response.text();
-  
+
   if (!text) {
     return {} as T;
   }
 
-  let parsedData;
   try {
-    parsedData = JSON.parse(text);
+    return JSON.parse(text) as T;
   } catch {
-    console.error("Failed to parse JSON. Response text:", text.substring(0, 200));
-    throw new Error(`Invalid JSON from backend: ${text.substring(0, 50)}...`);
+    if (isDev) {
+      console.error(`Failed to parse JSON from ${endpoint}`);
+    }
+    throw new ApiError(response.status, 'Received an unexpected response from the server.');
   }
-  
-  return parsedData as T;
 }
 
 export const api = {
