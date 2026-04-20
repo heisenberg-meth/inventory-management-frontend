@@ -128,70 +128,73 @@ export const Layout: React.FC = () => {
 
   const navSections: NavSection[] = [
     {
-      title: 'Home',
+      title: "Home",
       icon: Home,
       items: [
-        { label: 'Dashboard', path: '/app' },
-        { label: 'AI Dashboard', path: '/app/ai' },
-        { label: 'Analytics', path: '/app/analytics' },
-      ]
+        { label: "Dashboard", path: "/app" },
+        { label: "AI Dashboard", path: "/app/ai" },
+        { label: "Analytics", path: "/app/analytics" },
+      ],
     },
     {
-      title: 'Inventory',
+      title: "Inventory",
       icon: Package,
       items: [
-        { label: 'Products', path: '/app/products' },
-        { label: 'Stock Adjustments', path: '/app/stock' },
-        { label: 'Warehouses', path: '/app/warehouses' },
-        { label: 'Shipments', path: '/app/shipments' },
-        { label: 'Stock Transfers', path: '/app/transfers' },
-        { label: 'Low Stock Alerts', path: '/app/alerts', badge: '23', badgeColor: 'bg-[var(--color-danger)]' },
-      ]
+        { label: "Products", path: "/app/products" },
+        { label: "Stock Adjustments", path: "/app/stock" },
+        { label: "Warehouses", path: "/app/warehouses" },
+        { label: "Shipments", path: "/app/shipments" },
+        { label: "Stock Transfers", path: "/app/transfers" },
+        {
+          label: "Low Stock Alerts",
+          path: "/app/alerts",
+          badge: "23",
+          badgeColor: "bg-[var(--color-danger)]",
+        },
+      ],
     },
     {
-      title: 'Items',
+      title: "Items",
       icon: Grid3x3,
       items: [
-        { label: 'Item Groups', path: '/app/item-groups' },
-        { label: 'Composite Items', path: '/app/composite' },
-        { label: 'Price Lists', path: '/app/price-lists' },
-        { label: 'Product List', path: '/app/products' },
-        { label: 'Categories', path: '/app/categories' },
-      ]
+        { label: "Item Groups", path: "/app/item-groups" },
+        { label: "Composite Items", path: "/app/composite" },
+        { label: "Price Lists", path: "/app/price-lists" },
+        { label: "Product List", path: "/app/products" },
+        { label: "Categories", path: "/app/categories" },
+      ],
     },
     {
-      title: 'Sales',
+      title: "Sales",
       icon: ShoppingBag,
       items: [
-        { label: 'Customers', path: '/app/customers' },
-        { label: 'Sales Orders', path: '/app/orders' },
-        { label: 'Invoices', path: '/app/invoices' },
-        { label: 'Payments Received', path: '/app/payments' },
-      ]
+        { label: "Customers", path: "/app/customers" },
+        { label: "Sales Orders", path: "/app/orders" },
+        { label: "Invoices", path: "/app/invoices" },
+        { label: "Payments Received", path: "/app/payments" },
+      ],
     },
     {
-      title: 'Purchases',
+      title: "Purchases",
       icon: ShoppingCart,
       items: [
-        { label: 'Suppliers', path: '/app/suppliers' },
-        { label: 'Purchase Orders', path: '/app/purchase-orders' },
-        { label: 'Bills', path: '/app/bills' },
-      ]
+        { label: "Suppliers", path: "/app/suppliers" },
+        { label: "Purchase Orders", path: "/app/purchase-orders" },
+        { label: "Bills", path: "/app/bills" },
+      ],
     },
     {
-      title: 'Reports',
+      title: "Reports",
       icon: BarChart3,
-      items: [
-        { label: 'Activity Log', path: '/app/activity' },
-      ]
+      items: [{ label: "Activity Log", path: "/app/activity" }],
     },
     {
-      title: 'Settings',
+      title: "Settings",
       icon: Settings,
       items: [
-        { label: 'User Roles', path: '/app/users' },
-        { label: 'Settings', path: '/app/settings' },
-      ]
+        { label: "User Roles", path: "/app/users" },
+        { label: "Settings", path: "/app/settings" },
+      ],
     },
   ];
 

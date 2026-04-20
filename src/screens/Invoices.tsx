@@ -39,9 +39,12 @@ export const Invoices: React.FC = () => {
     }
   };
 
-  const filtered = invoices.filter(inv => {
-    const matchSearch = !search || inv.invoiceNumber.toLowerCase().includes(search.toLowerCase()) || inv.customerName.toLowerCase().includes(search.toLowerCase());
-    const matchFilter = filter === 'All' || inv.status === filter;
+  const filtered = invoices.filter((inv) => {
+    const matchSearch =
+      !search ||
+      inv.invoiceNumber.toLowerCase().includes(search.toLowerCase()) ||
+      inv.customerName.toLowerCase().includes(search.toLowerCase());
+    const matchFilter = filter === "All" || inv.status === filter;
     return matchSearch && matchFilter;
   });
 
