@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  const apiTarget = env.VITE_API_PROXY_TARGET || 'https://synaptical-handlike-betsy.ngrok-free.dev'
+  const apiTarget = env.VITE_API_PROXY_TARGET || 'https://inventry-backend-3zc8.onrender.com'
   const allowedHosts = (env.VITE_DEV_ALLOWED_HOSTS || '')
     .split(',')
     .map(h => h.trim())
