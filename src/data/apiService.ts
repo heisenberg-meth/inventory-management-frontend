@@ -1,4 +1,4 @@
-const BASE_URL = '/api';
+const BASE_URL = 'https://synaptical-handlike-betsy.ngrok-free.dev/api';
 
 interface RequestOptions extends RequestInit {
   data?: unknown;
