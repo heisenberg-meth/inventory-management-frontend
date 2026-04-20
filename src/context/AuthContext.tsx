@@ -38,6 +38,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const refreshProfile = async () => {
+    if (!token) return;
     try {
       const response = await getProfile();
       // getProfile returns { user, tenant } in its data field now based on backend change

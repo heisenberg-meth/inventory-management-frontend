@@ -485,20 +485,34 @@ export interface AIHealthData {
   pendingReview: number;
 }
 
-export const getAIHealth          = () => api.get<AIHealthData>('/tenant/ai/health');
-export const getAIRecommendations = () => api.get<AIRecommendation[]>('/tenant/ai/recommendations');
-export const getAIDemandForecast  = () => api.get<AIDemandForecast[]>('/tenant/ai/demand-forecast');
-export const getAIAnomalies       = () => api.get<AIAnomaly[]>('/tenant/ai/anomalies');
+// AI Dashboard (Currently unimplemented - returning stub data)
+export const getAIHealth          = () => Promise.resolve({
+  score: 0,
+  metrics: [],
+  realtimeCount: 0,
+  predictiveCount: 0,
+  errorCount: 0,
+  pricingCount: 0,
+  predictedRestocks: 0,
+  demandSurgeItems: 0,
+  accuracyScore: 'N/A',
+  anomaliesDetected: 0,
+  autoResolved: 0,
+  pendingReview: 0
+} as AIHealthData);
+export const getAIRecommendations = () => Promise.resolve([] as AIRecommendation[]);
+export const getAIDemandForecast  = () => Promise.resolve([] as AIDemandForecast[]);
+export const getAIAnomalies       = () => Promise.resolve([] as AIAnomaly[]);
 
-// ── Analytics ───────────────────────────────────────────────────────────────
+// ── Analytics (Currently unimplemented - returning stub data) ─────────────────────
 export interface RevenueTrendPoint { month: string; revenue: number }
 export interface TopProduct        { name: string; value: number }
 export interface CategoryStat      { name: string; pct: number }
 export interface OrderStatusStat   { label: string; count: number; pct: number }
 export interface QuickStat         { label: string; value: string; highlight: boolean }
 
-export const getRevenueTrend    = () => api.get<RevenueTrendPoint[]>('/tenant/analytics/revenue-trend');
-export const getTopProducts     = () => api.get<TopProduct[]>('/tenant/analytics/top-products');
-export const getCategoryStats   = () => api.get<CategoryStat[]>('/tenant/analytics/categories');
-export const getOrderStatusStats= () => api.get<OrderStatusStat[]>('/tenant/analytics/order-statuses');
-export const getQuickStats      = () => api.get<QuickStat[]>('/tenant/analytics/quick-stats');
+export const getRevenueTrend     = () => Promise.resolve([] as RevenueTrendPoint[]);
+export const getTopProducts      = () => Promise.resolve([] as TopProduct[]);
+export const getCategoryStats    = () => Promise.resolve([] as CategoryStat[]);
+export const getOrderStatusStats = () => Promise.resolve([] as OrderStatusStat[]);
+export const getQuickStats       = () => Promise.resolve([] as QuickStat[]);
